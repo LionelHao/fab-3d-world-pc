@@ -84,8 +84,8 @@ defineExpose({ canvasRef })
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(to right, rgba(20, 21, 15, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20, 21, 15, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: 16px 16px;
   -webkit-mask-image: radial-gradient(85% 75% at 50% 50%, #000 0%, transparent 100%);
@@ -99,7 +99,7 @@ defineExpose({ canvasRef })
   position: absolute;
   inset: 35% 20% 10% 20%;
   pointer-events: none;
-  background: radial-gradient(closest-side, rgba(212, 242, 58, 0.20), transparent 70%);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--hilite) 20%, transparent), transparent 70%);
   z-index: 1;
 }
 

@@ -345,10 +345,10 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
   min-width: 1440px;
   background: var(--paper);
   background-image:
-    linear-gradient(to right, rgba(20,21,15,0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20,21,15,0.04) 1px, transparent 1px),
-    linear-gradient(to right, rgba(20,21,15,0.018) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20,21,15,0.018) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 1.8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 1.8%, transparent) 1px, transparent 1px);
   background-size: 64px 64px, 64px 64px, 16px 16px, 16px 16px;
   font-family: var(--f-sans);
   color: var(--ink);

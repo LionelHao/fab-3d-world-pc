@@ -27,13 +27,13 @@ defineProps({
       <span class="pc-farm-card__corner pc-farm-card__corner--br"></span>
       <slot name="img">
         <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <ellipse cx="160" cy="158" rx="120" ry="6" fill="rgba(20,21,15,0.1)"/>
-          <rect x="40" y="120" width="240" height="14" fill="rgba(20,21,15,0.12)" stroke="#14150F" stroke-width="1"/>
-          <rect x="40" y="118" width="240" height="2" fill="#14150F"/>
-          <text x="160" y="80" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#5A6E1A" text-anchor="middle" letter-spacing="0.1em">
+          <ellipse cx="160" cy="158" rx="120" ry="6" fill="var(--ink)" fill-opacity="0.1"/>
+          <rect x="40" y="120" width="240" height="14" fill="var(--ink)" fill-opacity="0.12" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="40" y="118" width="240" height="2" fill="var(--ink)"/>
+          <text x="160" y="80" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="var(--accent-link)" text-anchor="middle" letter-spacing="0.1em">
             LIVE STREAM
           </text>
-          <text x="160" y="98" font-family="IBM Plex Mono" font-size="9" fill="#8A8C7F" text-anchor="middle">
+          <text x="160" y="98" font-family="IBM Plex Mono" font-size="9" fill="var(--ink-3)" text-anchor="middle">
             {{ job.cam }}
           </text>
         </svg>

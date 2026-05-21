@@ -54,11 +54,11 @@ defineExpose({ canvasRef })
       <div ref="canvasRef" class="pc-plate__render">
         <slot v-if="!hasViewer" name="render">
           <svg viewBox="0 0 700 540" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <ellipse cx="350" cy="420" rx="280" ry="18" fill="rgba(20,21,15,0.1)"/>
-            <text x="350" y="270" font-family="IBM Plex Mono" font-size="14" font-weight="600" fill="#5A6E1A" text-anchor="middle" letter-spacing="0.1em">
+            <ellipse cx="350" cy="420" rx="280" ry="18" fill="var(--ink)" fill-opacity="0.1"/>
+            <text x="350" y="270" font-family="IBM Plex Mono" font-size="14" font-weight="600" fill="var(--accent-link)" text-anchor="middle" letter-spacing="0.1em">
               3D RENDER · SLOT
             </text>
-            <text x="350" y="290" font-family="IBM Plex Mono" font-size="10" font-weight="500" fill="#8A8C7F" text-anchor="middle" letter-spacing="0.1em">
+            <text x="350" y="290" font-family="IBM Plex Mono" font-size="10" font-weight="500" fill="var(--ink-3)" text-anchor="middle" letter-spacing="0.1em">
               {{ sampleCode }}
             </text>
           </svg>
@@ -125,8 +125,8 @@ defineExpose({ canvasRef })
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(20,21,15,0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20,21,15,0.06) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px);
   background-size: 24px 24px;
   mask-image: radial-gradient(80% 80% at 50% 55%, #000 0%, transparent 100%);
   -webkit-mask-image: radial-gradient(80% 80% at 50% 55%, #000 0%, transparent 100%);
@@ -136,7 +136,7 @@ defineExpose({ canvasRef })
   content: "";
   position: absolute;
   inset: 28% 14% 10% 14%;
-  background: radial-gradient(closest-side, rgba(212,242,58,0.28), transparent 70%);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--hilite) 28%, transparent), transparent 70%);
   pointer-events: none;
 }
 
