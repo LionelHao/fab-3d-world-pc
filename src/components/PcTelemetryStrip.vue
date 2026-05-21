@@ -48,7 +48,7 @@ defineProps({
   background: var(--ink);
   color: var(--paper);
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 500;
   letter-spacing: 0.1em;
   padding: 6px 80px;

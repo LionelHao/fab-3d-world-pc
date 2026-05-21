@@ -84,7 +84,7 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
 .admin-nav__wm {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--text-22);
   color: var(--ink);
   text-decoration: none;
   display: flex;
@@ -95,7 +95,7 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
 .admin-nav__div { color: var(--ink-3); font-weight: 500; }
 .admin-nav__tag {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   color: var(--ink);
   background: var(--hilite);
@@ -106,7 +106,7 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
 }
 .admin-nav__mode {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 700;
   color: var(--paper);
   background: var(--semantic-danger);
@@ -137,7 +137,7 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
   gap: 14px;
   justify-content: center;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -202,7 +202,7 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
 }
 .admin-nav__av-txt {
   font-family: var(--f-mono);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 700;
   color: var(--hilite);
 }
@@ -214,7 +214,7 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
   background: var(--hilite);
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 7px;
+  font-size: var(--text-7);
   font-weight: 700;
   padding: 0 3px;
   border: 1.5px solid var(--ink);

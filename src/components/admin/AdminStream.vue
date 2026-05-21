@@ -71,7 +71,7 @@ function splitTs(ts) {
 
 .admin-stream__type {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink);
   padding: 2px 5px;
   border: 1.5px solid var(--ink);
@@ -113,7 +113,7 @@ function splitTs(ts) {
 
 .admin-stream__desc {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink);
   font-weight: 500;
   line-height: 1.35;

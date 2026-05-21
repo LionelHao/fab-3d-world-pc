@@ -43,7 +43,7 @@ defineProps({
   align-items: center;
   padding: 0 20px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   gap: 16px;
@@ -58,7 +58,7 @@ defineProps({
 }
 .admin-foot__kbd {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   background: var(--paper);
   color: var(--ink);

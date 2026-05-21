@@ -93,7 +93,7 @@ function onTab(section, tab) {
   justify-content: space-between;
   gap: 8px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 700;
   color: var(--ink);
   letter-spacing: 0.08em;
@@ -106,7 +106,7 @@ function onTab(section, tab) {
 .admin-sidebar__ix--crit { color: var(--semantic-danger); }
 .admin-sidebar__count {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   background: var(--ink);
   color: var(--hilite);
   padding: 1px 5px;
@@ -131,7 +131,7 @@ function onTab(section, tab) {
   text-align: left;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.005em;
@@ -139,7 +139,7 @@ function onTab(section, tab) {
 .admin-sidebar__stab:first-of-type { border-top: 0; }
 .admin-sidebar__stab-ix {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--accent-link);
   font-weight: 700;
   width: 22px;
@@ -149,7 +149,7 @@ function onTab(section, tab) {
 .admin-sidebar__stab-lbl { flex: 1; }
 .admin-sidebar__pill {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   background: var(--paper-3);
   color: var(--ink);
   padding: 1px 4px;
@@ -173,7 +173,7 @@ function onTab(section, tab) {
 .admin-sidebar__foot {
   padding: 12px;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-3);
   letter-spacing: 0.08em;
   text-transform: uppercase;

@@ -76,7 +76,7 @@ defineProps({
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -125,14 +125,14 @@ defineProps({
 .pc-farm-card__title {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--ink);
   text-transform: uppercase;
   line-height: 1.1;
 }
 .pc-farm-card__by {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
 }
 .pc-farm-card__by b { color: var(--ink); font-weight: 600; }
@@ -148,13 +148,13 @@ defineProps({
 .pc-farm-card__pct {
   background: var(--accent-link);
   color: var(--hilite);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 700;
   padding: 2px 8px;
   letter-spacing: 0.02em;
 }
 .pc-farm-card__eta {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -177,7 +177,7 @@ defineProps({
   display: flex;
   flex-direction: column;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   letter-spacing: 0.04em;
   gap: 2px;

@@ -53,7 +53,7 @@ defineProps({
   justify-content: space-between;
   gap: 12px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -73,7 +73,7 @@ defineProps({
 
 .pc-sub-section__stamp {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 2px 6px;

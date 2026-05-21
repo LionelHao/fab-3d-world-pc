@@ -245,7 +245,7 @@ function onModelClick(url) {
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -273,7 +273,7 @@ function onModelClick(url) {
   padding: 48px;
   text-align: center;
   font-family: var(--f-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink-2);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -300,7 +300,7 @@ function onModelClick(url) {
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -361,20 +361,20 @@ function onModelClick(url) {
   background: var(--ink);
   color: var(--hilite);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.06em;
 }
 .pc-post-detail__model-label {
   font-family: var(--f-cond);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 700;
   color: var(--ink);
   text-transform: uppercase;
 }
 .pc-post-detail__model-arrow {
   font-family: var(--f-mono);
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--accent-link);
   text-align: center;
 }

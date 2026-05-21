@@ -121,7 +121,7 @@ const showLabel = computed(() => !props.hideLabel && props.label)
   outline: 0;
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 500;
   padding: 0 var(--space-10);
 }
@@ -132,7 +132,7 @@ const showLabel = computed(() => !props.hideLabel && props.label)
 
 .ui-searchbar__kbd {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 600;
   color: var(--ink-2);
   border: 1px solid var(--ink-2);

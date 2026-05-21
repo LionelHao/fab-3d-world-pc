@@ -82,7 +82,7 @@ function parseRich(html) {
 }
 
 .pc-log__ts {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
@@ -113,7 +113,7 @@ function parseRich(html) {
 
 .pc-log__desc {
   font-family: var(--f-sans);
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--ink);
   font-weight: 500;
   line-height: 1.3;
@@ -123,7 +123,7 @@ function parseRich(html) {
 
 .pc-log__amt {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -139,7 +139,7 @@ function parseRich(html) {
 }
 .pc-log__meta {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-3);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -149,7 +149,7 @@ function parseRich(html) {
   color: var(--ink);
   text-decoration: none;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;

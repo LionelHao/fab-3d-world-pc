@@ -209,7 +209,7 @@ function onUpload() { router.push('/publish').catch(() => ElMessage.info('Upload
   padding: 48px 0;
   text-align: center;
   font-family: var(--f-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink-2);
   letter-spacing: 0.1em;
   text-transform: uppercase;

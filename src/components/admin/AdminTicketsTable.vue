@@ -70,7 +70,7 @@ function statusLabel(s) {
   background: var(--paper-3);
   color: var(--ink-2);
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -82,7 +82,7 @@ function statusLabel(s) {
 .admin-tt td {
   padding: 8px 10px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink);
   border-bottom: 1px solid var(--ink-2);
   vertical-align: middle;
@@ -97,7 +97,7 @@ function statusLabel(s) {
 .admin-tt__sev {
   display: inline-block;
   padding: 2px 5px;
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -110,7 +110,7 @@ function statusLabel(s) {
 .admin-tt__stt {
   display: inline-block;
   padding: 2px 6px;
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -140,7 +140,7 @@ function statusLabel(s) {
   color: var(--ink);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 9px;
+  font-size: var(--text-9);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;

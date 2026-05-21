@@ -49,7 +49,7 @@ defineProps({
   justify-content: space-between;
   margin-bottom: var(--space-12);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -69,7 +69,7 @@ defineProps({
 
 .ui-form-section__stamp {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 500;
   letter-spacing: 0.1em;
   padding: 2px 5px;

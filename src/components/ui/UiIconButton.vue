@@ -134,7 +134,7 @@ const isNumberBadge = computed(() => typeof props.badge === 'number')
   align-items: center;
   justify-content: center;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;

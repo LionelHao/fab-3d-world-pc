@@ -56,7 +56,7 @@ defineEmits(['cta-click'])
 }
 .pc-sechd__num {
   font-family: var(--f-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--accent-link);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -65,7 +65,7 @@ defineEmits(['cta-click'])
   margin: 0;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 36px;
+  font-size: var(--text-36);
   letter-spacing: -0.015em;
   color: var(--ink);
   text-transform: uppercase;
@@ -73,7 +73,7 @@ defineEmits(['cta-click'])
 }
 .pc-sechd__sub {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -82,7 +82,7 @@ defineEmits(['cta-click'])
 .pc-sechd__cta {
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink);
   text-decoration: none;
   display: inline-flex;

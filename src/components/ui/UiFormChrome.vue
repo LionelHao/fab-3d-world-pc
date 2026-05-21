@@ -80,7 +80,7 @@ const segments = computed(() =>
   gap: var(--space-8);
   padding: 0 var(--space-12);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -132,7 +132,7 @@ const segments = computed(() =>
   gap: var(--space-10);
   padding: 0 var(--space-12);
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;

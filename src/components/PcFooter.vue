@@ -105,7 +105,7 @@ const onLogo = (e) => {
 .pc-footer__wm {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--text-22);
   letter-spacing: -0.01em;
   color: var(--ink);
   text-decoration: none;
@@ -116,7 +116,7 @@ const onLogo = (e) => {
 .pc-footer__wm-div { color: var(--ink-3); font-weight: 500; }
 .pc-footer__wm-tag {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   color: var(--ink);
   background: var(--hilite);
@@ -128,13 +128,13 @@ const onLogo = (e) => {
 .pc-footer__tagline {
   margin: 0;
   font-family: var(--f-sans);
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--ink-2);
   line-height: 1.5;
 }
 .pc-footer__meta {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -163,7 +163,7 @@ const onLogo = (e) => {
   margin: 0 0 12px;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--text-12);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink);
@@ -182,7 +182,7 @@ const onLogo = (e) => {
 }
 .pc-footer__col ul li a {
   font-family: var(--f-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink-2);
   text-decoration: none;
   transition: color 120ms ease-out;
@@ -204,7 +204,7 @@ const onLogo = (e) => {
   justify-content: space-between;
   align-items: center;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

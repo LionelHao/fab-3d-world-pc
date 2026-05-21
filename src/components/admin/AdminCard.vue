@@ -62,7 +62,7 @@ defineProps({
   justify-content: space-between;
   gap: 8px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -88,7 +88,7 @@ defineProps({
 .admin-card__title { color: var(--paper); }
 .admin-card__stamp {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   background: transparent;
   color: var(--paper);
   border: 1px solid var(--ink-3);

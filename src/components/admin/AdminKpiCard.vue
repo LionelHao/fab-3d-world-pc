@@ -113,7 +113,7 @@ const sparkEnd = computed(() => {
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -148,7 +148,7 @@ const sparkEnd = computed(() => {
 .admin-kpi__val {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 48px;
+  font-size: var(--text-48);
   color: var(--ink);
   line-height: 1;
   letter-spacing: -0.02em;
@@ -157,7 +157,7 @@ const sparkEnd = computed(() => {
 .admin-kpi__val--crit { color: var(--semantic-danger); }
 .admin-kpi__unit {
   font-family: var(--f-mono);
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--ink-3);
   font-weight: 500;
   margin-left: 4px;
@@ -174,7 +174,7 @@ const sparkEnd = computed(() => {
 }
 .admin-kpi__d {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;

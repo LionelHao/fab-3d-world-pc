@@ -72,7 +72,7 @@ defineEmits(['download'])
   background: var(--paper);
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -92,7 +92,7 @@ defineEmits(['download'])
 }
 .pc-file-row__name {
   font-family: var(--f-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 600;
   color: var(--ink);
   letter-spacing: -0.005em;
@@ -102,7 +102,7 @@ defineEmits(['download'])
 }
 .pc-file-row__desc {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 500;
   color: var(--ink-2);
   letter-spacing: 0.04em;
@@ -114,7 +114,7 @@ defineEmits(['download'])
 /* ===== size ===== */
 .pc-file-row__size {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: 0.04em;

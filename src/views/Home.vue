@@ -380,7 +380,7 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
   align-items: center;
   gap: 4px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   letter-spacing: 0.12em;
   text-transform: uppercase;

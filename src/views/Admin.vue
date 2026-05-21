@@ -267,7 +267,7 @@ function onViewAllTickets() {
   height: 36px;
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 700;
@@ -303,7 +303,7 @@ function onViewAllTickets() {
   color: var(--ink);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;

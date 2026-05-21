@@ -97,7 +97,7 @@ defineExpose({ canvasRef })
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   flex-shrink: 0;
@@ -157,7 +157,7 @@ defineExpose({ canvasRef })
   top: 18px;
   left: 44px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   line-height: 1.7;
   color: var(--accent-link);
   letter-spacing: 0.1em;
@@ -172,7 +172,7 @@ defineExpose({ canvasRef })
   top: 18px;
   right: 44px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   line-height: 1.7;
   color: var(--ink-2);
   letter-spacing: 0.1em;
@@ -217,7 +217,7 @@ defineExpose({ canvasRef })
   align-items: flex-end;
   z-index: 3;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-2);
   letter-spacing: 0.1em;
 }

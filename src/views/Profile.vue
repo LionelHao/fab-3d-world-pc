@@ -305,7 +305,7 @@ onMounted(load)
   margin: 0;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 32px;
+  font-size: var(--text-32);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.015em;
@@ -324,7 +324,7 @@ onMounted(load)
   color: var(--ink);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -404,7 +404,7 @@ onMounted(load)
   outline: 0;
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   padding: 0 12px;
   font-variant-numeric: tabular-nums;
@@ -412,7 +412,7 @@ onMounted(load)
 .pc-profile__input-wrap--ro input { color: var(--ink-2); }
 .pc-profile__badge {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   background: var(--ink);
   color: var(--paper);
   padding: 0 8px;
@@ -428,7 +428,7 @@ onMounted(load)
   border: 1.5px solid var(--ink);
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   padding: 10px 12px;
   resize: vertical;
@@ -439,7 +439,7 @@ onMounted(load)
 .pc-profile__tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .pc-profile__tag {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 600;
   border: 1.5px solid var(--ink);
   color: var(--ink);
@@ -472,7 +472,7 @@ onMounted(load)
   color: var(--paper);
   padding: 5px 8px;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   display: flex;
@@ -501,7 +501,7 @@ onMounted(load)
   align-items: center;
   justify-content: center;
   font-family: var(--f-cond);
-  font-size: 86px;
+  font-size: var(--text-86);
   font-weight: 700;
   color: var(--ink);
   letter-spacing: -0.03em;
@@ -523,7 +523,7 @@ onMounted(load)
   color: var(--ink);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -579,14 +579,14 @@ onMounted(load)
 }
 .pc-profile__stat-v {
   font-family: var(--f-mono);
-  font-size: 22px;
+  font-size: var(--text-22);
   font-weight: 600;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.005em;
   line-height: 1.05;
 }
-.pc-profile__stat-v small { color: var(--ink-3); font-size: 13px; font-weight: 500; }
+.pc-profile__stat-v small { color: var(--ink-3); font-size: var(--text-13); font-weight: 500; }
 .pc-profile__stat-em { color: var(--ink); background: var(--hilite); padding: 0 4px; }
 .pc-profile__stat-delta {
   font-family: var(--f-mono);
@@ -614,7 +614,7 @@ onMounted(load)
 }
 .pc-profile__ach-foot a {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink);
   font-weight: 700;
   text-decoration: none;

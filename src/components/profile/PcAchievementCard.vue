@@ -94,7 +94,7 @@ defineProps({
   color: var(--paper);
   padding: 4px 8px;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   display: flex;
@@ -166,7 +166,7 @@ defineProps({
 .pc-ach__t {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.005em;

@@ -144,7 +144,7 @@ const onAvatar = () => emit('avatar-click')
 .pc-navbar__wm {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--text-22);
   letter-spacing: -0.01em;
   color: var(--ink);
   text-decoration: none;
@@ -156,7 +156,7 @@ const onAvatar = () => emit('avatar-click')
 .pc-navbar__wm-div { color: var(--ink-3); font-weight: 500; }
 .pc-navbar__wm-tag {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   color: var(--ink);
   background: var(--hilite);
@@ -171,7 +171,7 @@ const onAvatar = () => emit('avatar-click')
   text-decoration: none;
   font-family: var(--f-mono);
   font-weight: 600;
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 8px 12px;
@@ -181,7 +181,7 @@ const onAvatar = () => emit('avatar-click')
   transition: color 120ms ease-out, background-color 120ms ease-out;
 }
 .pc-navbar__link-ix {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-3);
   font-weight: 500;
 }
@@ -208,7 +208,7 @@ const onAvatar = () => emit('avatar-click')
   gap: 6px;
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 600;
   padding: 6px 8px;
   border: 1px solid var(--ink);
@@ -239,7 +239,7 @@ const onAvatar = () => emit('avatar-click')
   border-radius: var(--radius-none);
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--text-13);
   letter-spacing: 0;
   text-transform: uppercase;
   display: inline-flex;

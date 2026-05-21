@@ -76,7 +76,7 @@ const effectiveCols = computed(() => {
   justify-content: space-between;
   gap: 12px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -101,7 +101,7 @@ const effectiveCols = computed(() => {
 .ui-spec-card-pc__stamp {
   color: var(--ink-3);
   font-weight: 600;
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   flex-shrink: 0;
 }
@@ -125,7 +125,7 @@ const effectiveCols = computed(() => {
 
 .ui-spec-card-pc__cell-k {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: 0.12em;
@@ -134,7 +134,7 @@ const effectiveCols = computed(() => {
 
 .ui-spec-card-pc__cell-v {
   font-family: var(--f-mono);
-  font-size: 15px;
+  font-size: var(--text-15);
   font-weight: 600;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
@@ -145,7 +145,7 @@ const effectiveCols = computed(() => {
   color: var(--ink-3);
   font-weight: 500;
   margin-left: 2px;
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 
 .ui-spec-card-pc__cell-v-em {

@@ -38,7 +38,7 @@ defineProps({
   margin: 0;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 26px;
+  font-size: var(--text-26);
   line-height: 1.05;
   letter-spacing: -0.015em;
   color: var(--ink);
@@ -48,7 +48,7 @@ defineProps({
 .ui-page-title__sub {
   margin-top: var(--space-4);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;

@@ -618,7 +618,7 @@ function onRelatedViewAll() {
 .goods-detail__wm {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--text-22);
   letter-spacing: -0.01em;
   color: var(--ink);
   text-decoration: none;
@@ -632,7 +632,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__wm-tag {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--ink);
@@ -643,7 +643,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__app-mode {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: 0.1em;
@@ -657,7 +657,7 @@ function onRelatedViewAll() {
   justify-content: center;
   gap: 12px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -804,7 +804,7 @@ function onRelatedViewAll() {
   background: var(--paper);
   border: 1.5px solid var(--ink);
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: 0.06em;
@@ -853,7 +853,7 @@ function onRelatedViewAll() {
   align-items: flex-end;
   gap: 0;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-2);
   letter-spacing: 0.08em;
 }
@@ -885,7 +885,7 @@ function onRelatedViewAll() {
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -905,7 +905,7 @@ function onRelatedViewAll() {
   align-items: baseline;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-2);
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -950,7 +950,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__ctrl-kbd {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   color: var(--hilite);
   border: 1px solid var(--ink-2);
@@ -963,7 +963,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__ctrl-lbl {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -980,7 +980,7 @@ function onRelatedViewAll() {
   border: 1.5px solid var(--ink);
   border-radius: var(--radius-none);
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 600;
   color: var(--ink);
   letter-spacing: 0.08em;
@@ -1044,7 +1044,7 @@ function onRelatedViewAll() {
   align-items: baseline;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -1085,12 +1085,12 @@ function onRelatedViewAll() {
 }
 .goods-detail__vthumb-art {
   font-family: var(--f-mono);
-  font-size: 18px;
+  font-size: var(--text-18);
   color: var(--ink);
 }
 .goods-detail__vthumb-label {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   color: var(--ink);
   letter-spacing: 0.06em;
@@ -1106,7 +1106,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__axis-label {
   font-family: var(--f-mono);
-  font-size: 8px;
+  font-size: var(--text-8);
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: 0.12em;
@@ -1121,13 +1121,13 @@ function onRelatedViewAll() {
   justify-content: center;
   gap: 6px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .goods-detail__render-placeholder .sub {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-3);
 }
 
@@ -1146,7 +1146,7 @@ function onRelatedViewAll() {
   justify-content: space-between;
   gap: 12px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1165,7 +1165,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__brow-stamp {
   color: var(--ink-3);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 600;
 }
 
@@ -1194,7 +1194,7 @@ function onRelatedViewAll() {
   align-items: center;
   justify-content: center;
   font-family: var(--f-cond);
-  font-size: 18px;
+  font-size: var(--text-18);
   font-weight: 700;
   border: 1.5px solid var(--ink);
 }
@@ -1205,14 +1205,14 @@ function onRelatedViewAll() {
 }
 .goods-detail__tip-title {
   font-family: var(--f-cond);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 700;
   color: var(--ink);
   text-transform: uppercase;
 }
 .goods-detail__tip-subtitle {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   letter-spacing: 0.04em;
 }
@@ -1227,7 +1227,7 @@ function onRelatedViewAll() {
   border: 1.5px solid var(--ink);
   border-radius: var(--radius-none);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   color: var(--ink);
   letter-spacing: 0.04em;
@@ -1261,7 +1261,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__related-title {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   color: var(--ink);
   letter-spacing: 0.08em;
@@ -1269,7 +1269,7 @@ function onRelatedViewAll() {
 }
 .goods-detail__related-view-all {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--accent-link);
   text-decoration: none;
   letter-spacing: 0.06em;

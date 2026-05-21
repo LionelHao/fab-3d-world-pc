@@ -70,7 +70,7 @@ defineEmits(['click'])
   color: var(--paper);
   padding: 6px 10px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -128,7 +128,7 @@ defineEmits(['click'])
   margin: 0;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.005em;
@@ -142,7 +142,7 @@ defineEmits(['click'])
 }
 .pc-related-card__likes {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 500;
   color: var(--ink-2);
   letter-spacing: 0.04em;
@@ -150,7 +150,7 @@ defineEmits(['click'])
 }
 .pc-related-card__price {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   color: var(--accent-link);
   letter-spacing: 0.04em;

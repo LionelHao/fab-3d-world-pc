@@ -117,7 +117,7 @@ defineEmits(['update:modelValue', 'ibtn-click', 'submit'])
   background: var(--paper-3);
   color: var(--ink-2);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 600;
   letter-spacing: 0.06em;
   border-left: 1.5px solid var(--ink);
@@ -173,7 +173,7 @@ defineEmits(['update:modelValue', 'ibtn-click', 'submit'])
   background: var(--ink);
   color: var(--hilite);
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   letter-spacing: 0.06em;
   border-left: 1.5px solid var(--ink);

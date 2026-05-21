@@ -179,7 +179,7 @@ const onBookmark = (e) => {
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -240,7 +240,7 @@ const onBookmark = (e) => {
   left: 8px;
   bottom: 8px;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink);
   background: var(--paper);
   border: 1.5px solid var(--ink);
@@ -301,7 +301,7 @@ const onBookmark = (e) => {
   margin: 0;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--text-16);
   line-height: 1.15;
   letter-spacing: -0.005em;
   color: var(--ink);
@@ -315,7 +315,7 @@ const onBookmark = (e) => {
 
 .ui-card__by {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   letter-spacing: 0.02em;
 }
@@ -327,7 +327,7 @@ const onBookmark = (e) => {
 
 .ui-card__specs {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   line-height: 1.5;
   background: var(--paper-2);
@@ -346,7 +346,7 @@ const onBookmark = (e) => {
 
 .ui-card__price {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -363,7 +363,7 @@ const onBookmark = (e) => {
   display: flex;
   gap: 10px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }

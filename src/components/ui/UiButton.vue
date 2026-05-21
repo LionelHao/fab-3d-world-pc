@@ -132,7 +132,7 @@ defineEmits(['click'])
 .ui-button--secondary {
   background: var(--paper);
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--text-13);
   justify-content: center;
   gap: var(--space-8);
 }

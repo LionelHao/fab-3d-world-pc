@@ -122,7 +122,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
 }
 .pc-detail-stick__sample-id {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 500;
   color: var(--ink-2);
   letter-spacing: 0.08em;
@@ -136,7 +136,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
   background: var(--hilite);
   color: var(--ink);
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   font-weight: 700;
   letter-spacing: 0.08em;
   padding: 3px 8px;
@@ -148,7 +148,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
   margin: 0 0 14px;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 28px;
+  font-size: var(--text-28);
   line-height: 1.05;
   letter-spacing: -0.015em;
   color: var(--ink);
@@ -161,7 +161,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
 }
 .pc-detail-stick__ver-num {
   font-family: var(--f-mono);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 700;
   vertical-align: super;
   color: var(--accent-link);
@@ -186,7 +186,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
 .pc-detail-stick__name {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--ink);
   text-transform: uppercase;
   display: inline-flex;
@@ -195,7 +195,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
 }
 .pc-detail-stick__maker {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -219,7 +219,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
   color: var(--ink);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -256,7 +256,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
   color: var(--ink-2);
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--text-12);
   letter-spacing: 0;
   text-transform: uppercase;
   cursor: pointer;
@@ -269,7 +269,7 @@ defineEmits(['follow-toggle', 'tab-change', 'author-click'])
 .pc-detail-stick__tab:last-child { border-right: 0; }
 .pc-detail-stick__tab-ix {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--accent-link);
   font-weight: 600;
   letter-spacing: 0.08em;

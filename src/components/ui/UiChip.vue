@@ -63,12 +63,12 @@ defineEmits(['click'])
 .ui-chip--lg {
   height: 32px;
   padding: 0 var(--space-12);
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 
 .ui-chip--md {
   padding: 7px var(--space-10);
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 
 .ui-chip--sm {
@@ -78,7 +78,7 @@ defineEmits(['click'])
 
 .ui-chip__ix {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-3);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -86,7 +86,7 @@ defineEmits(['click'])
 
 .ui-chip__count {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-3);
   font-weight: 500;
   font-variant-numeric: tabular-nums;

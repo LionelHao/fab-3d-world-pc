@@ -77,7 +77,7 @@ const emit = defineEmits(['action'])
 }
 .admin-alert__sev {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -98,7 +98,7 @@ const emit = defineEmits(['action'])
   margin: 0;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-14);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.005em;
@@ -106,7 +106,7 @@ const emit = defineEmits(['action'])
 }
 .admin-alert__since {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-2);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -126,7 +126,7 @@ const emit = defineEmits(['action'])
   color: var(--ink);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;

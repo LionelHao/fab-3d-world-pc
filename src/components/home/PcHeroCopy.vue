@@ -96,7 +96,7 @@ function formatStat(n) {
 
 .pc-hero-copy__eyebrow {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   color: var(--ink);
   background: var(--hilite);
@@ -121,7 +121,7 @@ function formatStat(n) {
   margin: 0 0 24px;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 88px;
+  font-size: var(--text-88);
   line-height: 0.92;
   letter-spacing: -0.025em;
   color: var(--ink);
@@ -130,7 +130,7 @@ function formatStat(n) {
 .pc-hero-copy__ver { color: var(--accent-link); }
 .pc-hero-copy__ver-num {
   font-family: var(--f-mono);
-  font-size: 36px;
+  font-size: var(--text-36);
   font-weight: 700;
   letter-spacing: 0;
   vertical-align: super;
@@ -152,13 +152,13 @@ function formatStat(n) {
 }
 .pc-hero-copy__handle {
   font-family: var(--f-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 600;
   color: var(--ink);
 }
 .pc-hero-copy__maker {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -172,7 +172,7 @@ function formatStat(n) {
   align-items: center;
   gap: 6px;
   font-family: var(--f-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
@@ -181,7 +181,7 @@ function formatStat(n) {
 
 .pc-hero-copy__body {
   font-family: var(--f-sans);
-  font-size: 16px;
+  font-size: var(--text-16);
   color: var(--ink-2);
   line-height: 1.55;
   max-width: 460px;
@@ -200,7 +200,7 @@ function formatStat(n) {
   border-radius: var(--radius-none);
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--text-16);
   letter-spacing: 0;
   text-transform: uppercase;
   display: inline-flex;
@@ -214,7 +214,7 @@ function formatStat(n) {
 .pc-hero-copy__btn-primary .pc-hero-copy__size,
 .pc-hero-copy__size {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 500;
   letter-spacing: 0.06em;
   opacity: 0.7;
@@ -240,7 +240,7 @@ function formatStat(n) {
   border-radius: var(--radius-none);
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--text-16);
   letter-spacing: 0;
   text-transform: uppercase;
   display: inline-flex;

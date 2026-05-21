@@ -211,7 +211,7 @@ const onFootLink = (label) => ElMessage.info(`${label} — 暂未开放`)
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;

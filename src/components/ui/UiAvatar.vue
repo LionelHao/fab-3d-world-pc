@@ -91,21 +91,21 @@ const ariaLabelFinal = computed(() => props.ariaLabel || props.name || 'Avatar')
 .ui-avatar__initials { user-select: none; }
 
 .ui-avatar--size-20 { width: 20px; height: 20px; }
-.ui-avatar--size-20 .ui-avatar__initials { font-size: 9px; }
+.ui-avatar--size-20 .ui-avatar__initials { font-size: var(--text-9); }
 .ui-avatar--size-22 { width: 22px; height: 22px; }
-.ui-avatar--size-22 .ui-avatar__initials { font-size: 11px; }
+.ui-avatar--size-22 .ui-avatar__initials { font-size: var(--text-11); }
 .ui-avatar--size-24 { width: 24px; height: 24px; }
-.ui-avatar--size-24 .ui-avatar__initials { font-size: 12px; }
+.ui-avatar--size-24 .ui-avatar__initials { font-size: var(--text-12); }
 .ui-avatar--size-26 { width: 26px; height: 26px; }
-.ui-avatar--size-26 .ui-avatar__initials { font-size: 12px; }
+.ui-avatar--size-26 .ui-avatar__initials { font-size: var(--text-12); }
 .ui-avatar--size-32 { width: 32px; height: 32px; }
-.ui-avatar--size-32 .ui-avatar__initials { font-size: 14px; }
+.ui-avatar--size-32 .ui-avatar__initials { font-size: var(--text-14); }
 .ui-avatar--size-40 { width: 40px; height: 40px; }
-.ui-avatar--size-40 .ui-avatar__initials { font-size: 16px; }
+.ui-avatar--size-40 .ui-avatar__initials { font-size: var(--text-16); }
 .ui-avatar--size-56 { width: 56px; height: 56px; }
-.ui-avatar--size-56 .ui-avatar__initials { font-size: 22px; }
+.ui-avatar--size-56 .ui-avatar__initials { font-size: var(--text-22); }
 .ui-avatar--size-80 { width: 80px; height: 80px; }
-.ui-avatar--size-80 .ui-avatar__initials { font-size: 32px; }
+.ui-avatar--size-80 .ui-avatar__initials { font-size: var(--text-32); }
 
 .ui-avatar--shape-square { border-radius: var(--radius-none); }
 .ui-avatar--shape-rounded { border-radius: var(--radius-sm); }

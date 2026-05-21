@@ -81,7 +81,7 @@ const fieldId = `ui-field-${++fieldUid}`
   align-items: center;
   gap: var(--space-6);
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: 0.12em;
@@ -91,7 +91,7 @@ const fieldId = `ui-field-${++fieldUid}`
 .ui-form-field__req {
   color: var(--accent-link);
   font-weight: 700;
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 
 .ui-form-field__hint {

@@ -78,7 +78,7 @@ const onFollow = (e) => {
   align-items: center;
   justify-content: space-between;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   flex-shrink: 0;
@@ -106,7 +106,7 @@ const onFollow = (e) => {
 
 .pc-maker__handle {
   font-family: var(--f-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 600;
   color: var(--ink);
   display: flex;
@@ -115,7 +115,7 @@ const onFollow = (e) => {
 }
 .pc-maker__badge {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -136,7 +136,7 @@ const onFollow = (e) => {
 .pc-maker__cell { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .pc-maker__k {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   color: var(--ink-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -144,7 +144,7 @@ const onFollow = (e) => {
 }
 .pc-maker__v {
   font-family: var(--f-mono);
-  font-size: 18px;
+  font-size: var(--text-18);
   font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
@@ -159,7 +159,7 @@ const onFollow = (e) => {
   border-radius: var(--radius-none);
   font-family: var(--f-mono);
   font-weight: 700;
-  font-size: 11px;
+  font-size: var(--text-11);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;

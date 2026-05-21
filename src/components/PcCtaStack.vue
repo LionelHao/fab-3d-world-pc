@@ -79,7 +79,7 @@ defineEmits(['primary-click', 'secondary-click'])
   border-radius: var(--radius-none);
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--text-15);
   letter-spacing: 0;
   text-transform: uppercase;
   display: flex;
@@ -137,7 +137,7 @@ defineEmits(['primary-click', 'secondary-click'])
 }
 .pc-cta-stack__primary-meta {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 700;
   color: var(--ink);
   background: var(--paper);
@@ -156,7 +156,7 @@ defineEmits(['primary-click', 'secondary-click'])
   color: var(--ink);
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-14);
   letter-spacing: 0;
   text-transform: uppercase;
   display: flex;

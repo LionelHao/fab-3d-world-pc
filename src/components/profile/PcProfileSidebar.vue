@@ -107,7 +107,7 @@ function onTab(idx, tab) {
   justify-content: center;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 56px;
+  font-size: var(--text-56);
   color: var(--ink);
   letter-spacing: -0.02em;
   margin: 0 auto 12px;
@@ -129,7 +129,7 @@ function onTab(idx, tab) {
 .pc-sidebar__handle {
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--text-22);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.005em;
@@ -141,7 +141,7 @@ function onTab(idx, tab) {
   flex-direction: column;
   gap: 4px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   text-align: left;
@@ -155,7 +155,7 @@ function onTab(idx, tab) {
 .pc-sidebar__k {
   color: var(--ink-2);
   font-weight: 600;
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .pc-sidebar__v {
   color: var(--ink);
@@ -167,7 +167,7 @@ function onTab(idx, tab) {
   color: var(--ink);
   padding: 1px 5px;
   font-weight: 700;
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 
 /* ===== side tabs ===== */
@@ -189,7 +189,7 @@ function onTab(idx, tab) {
   text-align: left;
   font-family: var(--f-cond);
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--ink);
   text-transform: uppercase;
   letter-spacing: -0.005em;
@@ -223,7 +223,7 @@ function onTab(idx, tab) {
 .pc-sidebar__foot {
   padding: 12px 16px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--ink-3);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -241,7 +241,7 @@ function onTab(idx, tab) {
 }
 .pc-sidebar__kbd {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: var(--text-9);
   font-weight: 700;
   color: var(--ink);
   background: var(--paper-3);
