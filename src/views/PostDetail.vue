@@ -13,6 +13,7 @@ import PcFooter from '@/components/PcFooter.vue'
 import PcDetailStick from '@/components/PcDetailStick.vue'
 import PcCtaStack from '@/components/PcCtaStack.vue'
 import UiSpecCard from '@/components/ui/UiSpecCard.vue'
+import UiReveal from '@/components/ui/UiReveal.vue'
 
 import {
   brandConstants,
@@ -109,7 +110,7 @@ function onModelClick(url) {
 
     <div class="pc-post-detail__shell">
       <!-- LEFT: gallery -->
-      <section class="pc-post-detail__gallery">
+      <UiReveal as="section" class="pc-post-detail__gallery" :delay="0">
         <div class="pc-post-detail__gallery-head">
           <span>§ 01 · Gallery</span>
           <span class="pc-post-detail__gallery-stamp">{{ galleryImages.length }} ENTRIES</span>
@@ -124,7 +125,7 @@ function onModelClick(url) {
           />
         </div>
         <div v-else class="pc-post-detail__gallery-empty">EOF · NO PHOTOS</div>
-      </section>
+      </UiReveal>
 
       <!-- RIGHT: detail -->
       <aside class="pc-post-detail__right">
@@ -147,24 +148,28 @@ function onModelClick(url) {
         />
 
         <div class="pc-post-detail__right-pad">
-          <PcCtaStack
-            primary-label="Buy / Save"
-            primary-meta=""
-            secondary-label="Share Link"
-            secondary-aria-label="Share post link"
-            @primary-click="onPrimary"
-            @secondary-click="onSecondary"
-          />
+          <UiReveal :delay="0">
+            <PcCtaStack
+              primary-label="Buy / Save"
+              primary-meta=""
+              secondary-label="Share Link"
+              secondary-aria-label="Share post link"
+              @primary-click="onPrimary"
+              @secondary-click="onSecondary"
+            />
+          </UiReveal>
 
-          <UiSpecCard
-            num="§ 02"
-            title="Stats"
-            stamp="LIVE"
-            :cells="statsCells"
-            :cols="3"
-          />
+          <UiReveal :delay="80">
+            <UiSpecCard
+              num="§ 02"
+              title="Stats"
+              stamp="LIVE"
+              :cells="statsCells"
+              :cols="3"
+            />
+          </UiReveal>
 
-          <section class="pc-post-detail__notes">
+          <UiReveal as="section" class="pc-post-detail__notes" :delay="160">
             <div class="pc-post-detail__eyebrow">
               <span>§ 03 · Notes</span>
               <span class="pc-post-detail__eyebrow-stamp">CONTENT</span>
@@ -172,9 +177,9 @@ function onModelClick(url) {
             <p class="pc-post-detail__content">
               {{ post.content || 'NO CONTENT · STAND BY' }}
             </p>
-          </section>
+          </UiReveal>
 
-          <section v-if="modelEntries.length" class="pc-post-detail__models">
+          <UiReveal v-if="modelEntries.length" as="section" class="pc-post-detail__models" :delay="240">
             <div class="pc-post-detail__eyebrow">
               <span>§ 04 · Model Files</span>
               <span class="pc-post-detail__eyebrow-stamp">{{ modelEntries.length }} ENTRIES</span>
@@ -192,7 +197,7 @@ function onModelClick(url) {
                 <span class="pc-post-detail__model-arrow">→</span>
               </button>
             </div>
-          </section>
+          </UiReveal>
         </div>
       </aside>
     </div>

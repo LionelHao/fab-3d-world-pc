@@ -27,6 +27,7 @@ import PcFarmCard from '@/components/home/PcFarmCard.vue'
 
 import UiChip from '@/components/ui/UiChip.vue'
 import UiCard from '@/components/ui/UiCard.vue'
+import UiReveal from '@/components/ui/UiReveal.vue'
 
 import {
   brandConstants,
@@ -249,7 +250,7 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
       </div>
     </section>
 
-    <section class="pc-home__block">
+    <UiReveal as="section" class="pc-home__block" :delay="0">
       <PcSectionHeader
         :num="sectionHeaders.trending.num"
         :title="sectionHeaders.trending.title"
@@ -288,9 +289,9 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
           @bookmark-toggle="onBookmarkToggle(card.postId, $event)"
         />
       </div>
-    </section>
+    </UiReveal>
 
-    <section class="pc-home__block">
+    <UiReveal as="section" class="pc-home__block" :delay="80">
       <PcSectionHeader
         :num="sectionHeaders.operators.num"
         :title="sectionHeaders.operators.title"
@@ -306,9 +307,9 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
           @follow-toggle="onFollowToggle(m.opId, $event)"
         />
       </div>
-    </section>
+    </UiReveal>
 
-    <section class="pc-home__block">
+    <UiReveal as="section" class="pc-home__block" :delay="160">
       <PcSectionHeader
         :num="sectionHeaders.print_farm.num"
         :title="sectionHeaders.print_farm.title"
@@ -325,7 +326,7 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
           />
         </div>
       </div>
-    </section>
+    </UiReveal>
 
     <PcFooter
       :brand="brandConstants"

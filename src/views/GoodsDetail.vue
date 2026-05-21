@@ -30,6 +30,7 @@ import PcFooter from '@/components/PcFooter.vue'
 import UiSpecCard from '@/components/ui/UiSpecCard.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiIconButton from '@/components/ui/UiIconButton.vue'
+import UiReveal from '@/components/ui/UiReveal.vue'
 
 import {
   studioBrandConstants,
@@ -466,33 +467,39 @@ function onRelatedViewAll() {
         />
 
         <div class="goods-detail__right-pad">
-          <PcCtaStack
-            primary-label="Download Bundle"
-            :primary-meta="enriched.fileSizeStr"
-            secondary-label="Send to Print Queue"
-            secondary-aria-label="Send to Print Queue"
-            @primary-click="onDownloadBundle"
-            @secondary-click="onSendToPrint"
-          />
+          <UiReveal :delay="0">
+            <PcCtaStack
+              primary-label="Download Bundle"
+              :primary-meta="enriched.fileSizeStr"
+              secondary-label="Send to Print Queue"
+              secondary-aria-label="Send to Print Queue"
+              @primary-click="onDownloadBundle"
+              @secondary-click="onSendToPrint"
+            />
+          </UiReveal>
 
-          <UiSpecCard
-            num="§ 01"
-            title="Geometry"
-            :stamp="geometryStamp"
-            :cells="geometryCells"
-            :cols="3"
-          />
+          <UiReveal :delay="60">
+            <UiSpecCard
+              num="§ 01"
+              title="Geometry"
+              :stamp="geometryStamp"
+              :cells="geometryCells"
+              :cols="3"
+            />
+          </UiReveal>
 
-          <UiSpecCard
-            num="§ 02"
-            title="Print Config"
-            stamp="RECOMMENDED · FDM"
-            :cells="printConfigCells"
-            :cols="3"
-          />
+          <UiReveal :delay="120">
+            <UiSpecCard
+              num="§ 02"
+              title="Print Config"
+              stamp="RECOMMENDED · FDM"
+              :cells="printConfigCells"
+              :cols="3"
+            />
+          </UiReveal>
 
           <!-- § 03 Files -->
-          <section class="goods-detail__section">
+          <UiReveal as="section" class="goods-detail__section" :delay="180">
             <div class="goods-detail__eyebrow">
               <span class="goods-detail__brow-text">
                 <span class="goods-detail__brow-num">§ 03</span>
@@ -512,10 +519,10 @@ function onRelatedViewAll() {
                 @download="onFileDownload(file)"
               />
             </div>
-          </section>
+          </UiReveal>
 
           <!-- Tip widget -->
-          <div class="goods-detail__tip">
+          <UiReveal class="goods-detail__tip" :delay="240">
             <div class="goods-detail__tip-icon">{{ tipDefaults.prefix }}</div>
             <div class="goods-detail__tip-text">
               <span class="goods-detail__tip-title">{{ tipDefaults.title.replace('{handle}', enriched.user?.handle || 'maker') }}</span>
@@ -535,10 +542,10 @@ function onRelatedViewAll() {
                 ${{ opt.amount }}
               </button>
             </div>
-          </div>
+          </UiReveal>
 
           <!-- § 04 Related -->
-          <section class="goods-detail__related">
+          <UiReveal as="section" class="goods-detail__related" :delay="300">
             <div class="goods-detail__related-head">
               <span class="goods-detail__related-title">§ 04 · Related Specimens</span>
               <a class="goods-detail__related-view-all" href="#" @click.prevent="onRelatedViewAll">View all →</a>
@@ -562,7 +569,7 @@ function onRelatedViewAll() {
                 </svg>
               </PcRelatedCard>
             </div>
-          </section>
+          </UiReveal>
         </div>
       </div>
     </div>
