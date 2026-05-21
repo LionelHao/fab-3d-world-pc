@@ -15,9 +15,11 @@
  *
  * 业务零修改: getGoodsDetail(route.params.id) 保留 + enrichWithGoodsFixture 兜底.
  */
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import * as OV from 'online-3d-viewer/build/engine/o3dv.module.js'
+import { attachViewerSoul } from '@/utils/viewerSoul.js'
 
 import PcViewerStage from '@/components/PcViewerStage.vue'
 import PcDetailStick from '@/components/PcDetailStick.vue'
@@ -39,6 +41,13 @@ import {
   formatFileSize,
   formatThousands,
 } from '@/mocks/cd-4-fixture.js'
+// PC footer 是跨页公用 chrome，数据来自 cd-3-fixture
+import {
+  brandConstants as pcBrand,
+  footerColumns,
+  socialLinks,
+  footerBottom,
+} from '@/mocks/cd-3-fixture.js'
 
 import { getGoodsDetail } from '@/service/goods'
 
@@ -48,6 +57,31 @@ const router = useRouter()
 const goods = ref(null)
 const loading = ref(false)
 
+/* ─── 3D viewer (Phase 4 T4.1: online-3d-viewer + viewerSoul) ─── */
+const viewerStageRef = ref(null)
+const viewerReady = ref(false)
+let viewer = null
+let soul = null // viewerSoul 控制器（轨道入场 + 自转）
+
+function initViewer() {
+  const container = viewerStageRef.value?.canvasRef
+  if (!container || viewer) return
+  try {
+    viewer = new OV.EmbeddedViewer(container, {
+      onModelLoaded: () => {
+        viewerReady.value = true
+        // 模型加载完成后注入相机轨道入场动画 + 空闲自转
+        if (soul) soul.restart()
+        else soul = attachViewerSoul(viewer, { autoSpin: autoRotate.value })
+      },
+    })
+    const url = enriched.value.modelUrl // fixture 兜底必非空
+    if (url) viewer.LoadModelFromUrlList([url])
+  } catch (err) {
+    console.error('[GoodsDetail] viewer 初始化失败:', err)
+  }
+}
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -56,6 +90,22 @@ onMounted(async () => {
     // axios interceptor 已处理; fixture 接管兜底
   } finally {
     loading.value = false
+  }
+  // 数据就绪后初始化 3D viewer（modelUrl 经 fixture 兜底必非空）
+  await nextTick()
+  initViewer()
+})
+
+onUnmounted(() => {
+  soul?.dispose()
+  soul = null
+  if (viewer) {
+    try {
+      viewer.Destroy?.()
+    } catch {
+      // noop
+    }
+    viewer = null
   }
 })
 
@@ -156,6 +206,9 @@ function isCtrlActive(groupTitle, item) {
 }
 function onToggleAutoRotate() {
   autoRotate.value = !autoRotate.value
+  // Phase 4 T4.1: 接 viewerSoul — 真实暂停 / 恢复模型自转
+  if (autoRotate.value) soul?.resume()
+  else soul?.pause()
   ElMessage.success(`Auto-rotate ${autoRotate.value ? 'ON' : 'OFF'}`)
 }
 function onVariantClick(v) {
@@ -262,7 +315,7 @@ function onRelatedViewAll() {
     <!-- ===== Studio shell ===== -->
     <div class="goods-detail__studio">
       <!-- LEFT viewer -->
-      <PcViewerStage class="goods-detail__viewer">
+      <PcViewerStage ref="viewerStageRef" class="goods-detail__viewer">
         <template #breadcrumb>
           <div class="goods-detail__breadcrumb">
             <template v-for="(c, idx) in breadcrumb" :key="c.label">
@@ -383,8 +436,8 @@ function onRelatedViewAll() {
           </div>
         </template>
 
-        <!-- 默认 render slot: 用 placeholder, 后续接 online-3d-viewer -->
-        <div class="goods-detail__render-placeholder" aria-hidden="true">
+        <!-- 默认 render slot: viewer 未就位时显示占位 (Phase 4 T4.1) -->
+        <div v-if="!viewerReady" class="goods-detail__render-placeholder" aria-hidden="true">
           <span>3D RENDER</span>
           <span class="sub">SLOT · awaiting viewer attach</span>
         </div>
@@ -514,7 +567,12 @@ function onRelatedViewAll() {
       </div>
     </div>
 
-    <PcFooter />
+    <PcFooter
+      :brand="pcBrand"
+      :columns="footerColumns"
+      :social="socialLinks"
+      :bottom="footerBottom"
+    />
   </div>
 </template>
 
@@ -702,6 +760,7 @@ function onRelatedViewAll() {
 
 /* ===== Studio shell ===== */
 .goods-detail__studio {
+  width: 100%; /* flex column 父级中 margin:0 auto 会禁用 stretch，须显式撑满 (Phase 4 T4.1 修既有塌缩) */
   max-width: 1440px;
   margin: 0 auto;
   padding: 16px 32px 32px;

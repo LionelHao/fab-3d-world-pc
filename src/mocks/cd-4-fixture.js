@@ -153,7 +153,7 @@ export const dragonDetailFixture = {
     'Prints in a single piece, supportless, on any FDM machine with at least a 180×180 bed.',
   ],
   status: 'ON_SALE',
-  modelUrl: '',
+  modelUrl: '/models/sample-gear.stl', // TODO: backend integration — fixture 兜底模型 (Phase 4 T4.1)
   // 派生 user 块 (cd-4 d-author)
   user: {
     username: 'ironforge',

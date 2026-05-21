@@ -265,6 +265,11 @@ const onBookmark = (e) => {
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Phase 4 T4.5: 卡片封面 3D 感反馈 */
+  transition: transform 240ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+.ui-card:hover .ui-card__cover {
+  transform: scale(1.05);
 }
 
 .ui-card__scale {

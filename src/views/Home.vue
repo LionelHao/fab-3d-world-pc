@@ -8,8 +8,10 @@
  * 业务接口 (零修改): getPosts(number, page) → res.postCoverInfoList
  * Fixture fallback: src/mocks/cd-3-fixture.js
  */
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import * as OV from 'online-3d-viewer/build/engine/o3dv.module.js'
+import { attachViewerSoul } from '@/utils/viewerSoul.js'
 import { ElMessage } from 'element-plus'
 
 import { getPosts } from '@/service/content'
@@ -73,6 +75,62 @@ const makers = computed(() =>
 
 const farmJobs = computed(() => farmFixtures)
 
+/* ─── Hero 3D viewer (Phase 4 T4.3: PcHeroPlate render slot 挂真 viewer) ─── */
+const heroPlateRef = ref(null)
+let heroViewer = null
+let heroSoul = null
+let heroIO = null
+let isHeroHovered = false
+
+function initHeroViewer() {
+  const container = heroPlateRef.value?.canvasRef
+  if (!container || heroViewer) return
+  try {
+    heroViewer = new OV.EmbeddedViewer(container, {
+      onModelLoaded: () => {
+        if (heroSoul) heroSoul.restart()
+        else heroSoul = attachViewerSoul(heroViewer)
+      },
+    })
+    heroViewer.LoadModelFromUrlList([heroFixture.modelUrl])
+  } catch (err) {
+    console.error('[Home] hero viewer 初始化失败:', err)
+  }
+}
+
+/* Phase 4 T4.4: hover 视差 — 进入停自转，相机 eye 随光标轻微偏移 */
+function onHeroPointerEnter() {
+  isHeroHovered = true
+  heroSoul?.pause()
+}
+function onHeroPointerLeave() {
+  isHeroHovered = false
+  heroSoul?.setParallax(0, 0)
+  heroSoul?.resume()
+}
+function onHeroPointerMove(e) {
+  if (!heroSoul || !isHeroHovered) return
+  const r = e.currentTarget.getBoundingClientRect()
+  const x = ((e.clientX - r.left) / r.width) * 2 - 1
+  const y = ((e.clientY - r.top) / r.height) * 2 - 1
+  heroSoul.setParallax(x, -y) // -y: 光标上移 → 视角上抬
+}
+
+/* Phase 4 T4.4: 滚动联动 — 非 hover 时 hero 滚出视口驱动相机俯仰角 */
+function setupHeroScrollLink() {
+  const el = heroPlateRef.value?.canvasRef
+  if (!el || heroIO) return
+  heroIO = new IntersectionObserver(
+    (entries) => {
+      const e = entries[0]
+      if (!e || !heroSoul || isHeroHovered) return
+      heroSoul.setParallax(0, (1 - e.intersectionRatio) * 0.7)
+    },
+    { threshold: Array.from({ length: 21 }, (_, i) => i / 20) },
+  )
+  heroIO.observe(el)
+}
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -83,6 +141,18 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  // hero 3D viewer 初始化（DOM 已 mount，与 backend 拉取解耦）
+  await nextTick()
+  initHeroViewer()
+  setupHeroScrollLink()
+})
+
+onUnmounted(() => {
+  heroIO?.disconnect()
+  heroIO = null
+  heroSoul?.dispose()
+  heroSoul = null
+  heroViewer = null
 })
 
 const onLogoClick = () => window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -154,11 +224,16 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
     <section class="pc-home__hero">
       <div class="pc-home__hero-inner">
         <PcHeroPlate
+          ref="heroPlateRef"
           :data="heroFixture.plate"
           :sample-code="heroFixture.sampleCode"
           :rev="heroFixture.rev"
           :sample-class="heroFixture.sampleClass"
           :certified="heroFixture.certified"
+          :has-viewer="true"
+          @pointerenter="onHeroPointerEnter"
+          @pointerleave="onHeroPointerLeave"
+          @pointermove="onHeroPointerMove"
         />
         <PcHeroCopy
           :hero="heroFixture"

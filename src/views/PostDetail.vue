@@ -18,6 +18,9 @@ import {
   brandConstants,
   navLinks,
   telemetryDefaults,
+  footerColumns,
+  socialLinks,
+  footerBottom,
 } from '@/mocks/cd-3-fixture.js'
 import { formatThousands, formatSampleCode } from '@/mocks/cd-4-fixture.js'
 
@@ -194,7 +197,12 @@ function onModelClick(url) {
       </aside>
     </div>
 
-    <PcFooter />
+    <PcFooter
+      :brand="brandConstants"
+      :columns="footerColumns"
+      :social="socialLinks"
+      :bottom="footerBottom"
+    />
   </div>
 </template>
 

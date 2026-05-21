@@ -7,13 +7,20 @@
  *
  * 槽位: 装饰 chrome (head/crosshairs/readouts/scale-ruler) + render slot 供 SVG/3D viewer
  */
+import { ref } from 'vue'
+
 defineProps({
   data: { type: Object, required: true }, // heroFixture.plate + sample/rev/class/certified
   sampleCode: { type: String, required: true },
   rev: { type: String, default: '' },
   sampleClass: { type: String, default: '' },
   certified: { type: Boolean, default: false },
+  hasViewer: { type: Boolean, default: false }, // Phase 4 T4.3: true 时 render slot 让位给 3D viewer
 })
+
+// Phase 4 T4.3: 暴露 render 容器，供调用方挂载 online-3d-viewer
+const canvasRef = ref(null)
+defineExpose({ canvasRef })
 </script>
 
 <template>
@@ -44,8 +51,8 @@ defineProps({
         <div>PARTS · <b>{{ data.parts }}</b></div>
       </div>
 
-      <div class="pc-plate__render">
-        <slot name="render">
+      <div ref="canvasRef" class="pc-plate__render">
+        <slot v-if="!hasViewer" name="render">
           <svg viewBox="0 0 700 540" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <ellipse cx="350" cy="420" rx="280" ry="18" fill="rgba(20,21,15,0.1)"/>
             <text x="350" y="270" font-family="IBM Plex Mono" font-size="14" font-weight="600" fill="#5A6E1A" text-anchor="middle" letter-spacing="0.1em">
@@ -189,6 +196,12 @@ defineProps({
   height: 100%;
   display: block;
   animation: pc-plate-float 5s ease-in-out infinite;
+}
+/* Phase 4 T4.3: 3D viewer canvas — 不加 float 动画（viewer 自身有相机轨道动效）*/
+.pc-plate__render :deep(canvas) {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 @keyframes pc-plate-float {
   0%, 100% { transform: translateY(0); }

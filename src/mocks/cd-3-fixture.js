@@ -129,6 +129,7 @@ export function derivePrice(type) {
 export const heroFixture = {
   postId: 'fbw-2447-drg',
   coverUrl: '',
+  modelUrl: '/models/sample-gear.stl', // TODO: backend integration — Phase 4 T4.3 hero 3D fixture 兜底
   title: 'Mecha Dragon V3.4',
   type: 'free-model',
 

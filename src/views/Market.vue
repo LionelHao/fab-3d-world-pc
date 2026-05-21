@@ -18,6 +18,9 @@ import {
   brandConstants,
   navLinks,
   telemetryDefaults,
+  footerColumns,
+  socialLinks,
+  footerBottom,
 } from '@/mocks/cd-3-fixture.js'
 import { formatThousands } from '@/mocks/cd-4-fixture.js'
 
@@ -145,7 +148,12 @@ function onUpload() { router.push('/publish').catch(() => ElMessage.info('Upload
       </div>
     </main>
 
-    <PcFooter />
+    <PcFooter
+      :brand="brandConstants"
+      :columns="footerColumns"
+      :social="socialLinks"
+      :bottom="footerBottom"
+    />
   </div>
 </template>
 
