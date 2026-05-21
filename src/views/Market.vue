@@ -21,6 +21,7 @@ import {
   footerColumns,
   socialLinks,
   footerBottom,
+  gridFixtures,
 } from '@/mocks/cd-3-fixture.js'
 import { formatThousands } from '@/mocks/cd-4-fixture.js'
 
@@ -32,6 +33,16 @@ const categories = ref([])
 const categoryId = ref(null)
 const loading = ref(false)
 const searchValue = ref('')
+
+// fixture 兜底：backend 不可达时填充 §01 网格，保 propagation 页密度 ≥80%
+// （CLAUDE.md「Mock Fixture as First-class Citizen」）。
+// TODO: backend integration — getGoodsList 可用后由真实数据自动让位。
+const marketFallbackGoods = gridFixtures.map((g) => ({
+  // 取 sampleCode 数字段作 id，让卡片 sample-code 派生为干净的 FBW-NNNN-GDS
+  id: String(g.sampleCode || '').replace(/\D/g, '').slice(-4) || '0000',
+  title: g.title,
+  coverUrl: g.coverUrl,
+}))
 
 const telemetry = computed(() => ({
   ...telemetryDefaults,
@@ -54,6 +65,11 @@ async function loadGoods() {
   loading.value = true
   try {
     goods.value = (await getGoodsList(categoryId.value)) || []
+  } catch {
+    // backend 不可达 → fixture 兜底（避免空网格 + 阻止未捕获的 AxiosError 逸出）。
+    // loadGoods 在 onMounted / onChipClick / onSearch 处均未 await，缺 catch 会成
+    // unhandledrejection（Phase 3.7 AUTO-PASS 漏检，Phase 5.5 复查修复）。
+    goods.value = marketFallbackGoods
   } finally {
     loading.value = false
   }
