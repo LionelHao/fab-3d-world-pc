@@ -2,30 +2,44 @@
 /**
  * PcTelemetryStrip — 黑底遥测状态条
  *
- * Spec: docs/design/specs/p3.2-pc-home.md §1.3
- * Anchor: cd-3-desktop.html line 239-264, 1353-1367
+ * Spec: docs/design/specs/p3.2-pc-home.md §1.3 · p3.10-profile.md §3.A
+ * Anchor: cd-3-desktop.html line 239-264 · cd-8-desktop-profile.html line 234-261
  *
- * 6 段固定显示: LIVE / NETWORK / FARM / SAMPLES / REV / SYNC
+ * 两种模式:
+ *  - 默认: 6 段固定 LIVE / NETWORK / FARM / SAMPLES / REV / SYNC（传 data）
+ *  - 自定义: 传 items=[[label,value], …]，完全替换段位（T3.10.5 扩展，cd-8 profile）
  */
 defineProps({
-  data: { type: Object, required: true },
+  data: { type: Object, default: () => null },
+  /** 自定义段位 [[label, value], …]；非空则替换固定 6 段 */
+  items: { type: Array, default: () => [] },
 })
 </script>
 
 <template>
   <div class="pc-telemetry">
     <span class="pc-telemetry__led" aria-hidden="true"></span>
-    <span>LIVE</span>
-    <span class="pc-telemetry__sep">/</span>
-    <span>NETWORK <b>{{ data.network.value }} {{ data.network.unit }}</b></span>
-    <span class="pc-telemetry__sep">/</span>
-    <span>FARM <b>{{ data.farm.value }} {{ data.farm.unit }}</b></span>
-    <span class="pc-telemetry__sep">/</span>
-    <span>SAMPLES <b>{{ data.samples.value }}</b></span>
-    <span class="pc-telemetry__sep">/</span>
-    <span>REV <b>{{ data.rev }}</b></span>
-    <span class="pc-telemetry__sep">/</span>
-    <span>SYNC <b>{{ (data.syncMs / 1000).toFixed(2) }}s</b></span>
+    <!-- 自定义段位模式 (cd-8 profile) -->
+    <template v-if="items.length">
+      <template v-for="(it, idx) in items" :key="idx">
+        <span v-if="idx > 0" class="pc-telemetry__sep">/</span>
+        <span>{{ it[0] }}<template v-if="it[1]">&nbsp;<b>{{ it[1] }}</b></template></span>
+      </template>
+    </template>
+    <!-- 固定 6 段模式 (cd-3 home) -->
+    <template v-else-if="data">
+      <span>LIVE</span>
+      <span class="pc-telemetry__sep">/</span>
+      <span>NETWORK <b>{{ data.network.value }} {{ data.network.unit }}</b></span>
+      <span class="pc-telemetry__sep">/</span>
+      <span>FARM <b>{{ data.farm.value }} {{ data.farm.unit }}</b></span>
+      <span class="pc-telemetry__sep">/</span>
+      <span>SAMPLES <b>{{ data.samples.value }}</b></span>
+      <span class="pc-telemetry__sep">/</span>
+      <span>REV <b>{{ data.rev }}</b></span>
+      <span class="pc-telemetry__sep">/</span>
+      <span>SYNC <b>{{ (data.syncMs / 1000).toFixed(2) }}s</b></span>
+    </template>
   </div>
 </template>
 

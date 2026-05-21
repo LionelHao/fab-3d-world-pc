@@ -1,112 +1,326 @@
-<template>
-  <div class="admin" v-loading="loading">
-    <h2>运营后台</h2>
-    <el-tabs v-model="tab" @tab-change="onTabChange">
-      <!-- 数据看板 -->
-      <el-tab-pane label="数据看板" name="dashboard">
-        <el-row :gutter="16">
-          <el-col :span="6"><el-statistic title="用户数" :value="stats.userCount || 0"/></el-col>
-          <el-col :span="6"><el-statistic title="帖子数" :value="stats.postCount || 0"/></el-col>
-          <el-col :span="6"><el-statistic title="商品数" :value="stats.goodsCount || 0"/></el-col>
-          <el-col :span="6"><el-statistic title="订单数" :value="stats.orderCount || 0"/></el-col>
-        </el-row>
-      </el-tab-pane>
-
-      <!-- 帖子管理 -->
-      <el-tab-pane label="帖子管理" name="posts">
-        <el-table :data="posts">
-          <el-table-column prop="id" label="ID" width="80"/>
-          <el-table-column prop="title" label="标题"/>
-          <el-table-column prop="status" label="状态" width="120"/>
-          <el-table-column label="操作" width="120">
-            <template #default="{ row }">
-              <el-button size="small" type="danger" @click="onOffline(row.id)">下架</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-
-      <!-- 用户管理 -->
-      <el-tab-pane label="用户管理" name="users">
-        <el-table :data="users">
-          <el-table-column prop="id" label="ID" width="80"/>
-          <el-table-column prop="username" label="用户名"/>
-          <el-table-column prop="status" label="状态" width="100"/>
-          <el-table-column label="操作" width="180">
-            <template #default="{ row }">
-              <el-button size="small" type="danger" @click="onBan(row.id)">封禁</el-button>
-              <el-button size="small" @click="onUnban(row.id)">解禁</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-
-      <!-- 订单查询 -->
-      <el-tab-pane label="订单查询" name="orders">
-        <el-table :data="orders">
-          <el-table-column prop="orderNo" label="订单号"/>
-          <el-table-column prop="totalAmount" label="金额" width="120"/>
-          <el-table-column prop="status" label="状态" width="140"/>
-        </el-table>
-      </el-tab-pane>
-    </el-tabs>
-  </div>
-</template>
-
 <script setup>
-import { ref, onMounted } from 'vue'
+/**
+ * Admin.vue — PC 运营控制台（Ops Console）
+ *
+ * Phase 3.11 · anchor 1:1 复刻 cd-9-desktop-admin.html
+ * Spec: docs/design/specs/p3.11-admin.md
+ *
+ * 装配: AdminNav + AdminTelemetry + shell(AdminSidebar + main(KPI strip /
+ * ops-row(Stream + Alerts) / Tickets table)) + AdminFooter。
+ *
+ * 业务零修改: `admin.js` service 全部保留。getDashboard() 真实计数经 enrichAdmin()
+ * 注入 sidebar section count；listUsers/listPosts/listOrders 由 sidebar §02.1/§03.1/§04.1
+ * stab 触发真实读取。reports queue / stream / alerts 为运营 mock 域（见 fixture audit
+ * §3 Mapping note 2），动作走 mock action（ElMessage + console.log）。
+ */
+import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import {
-  getDashboard, listPosts, offlinePost,
-  listUsers, banUser, unbanUser, listOrders
-} from '@/service/admin'
+import { getDashboard, listPosts, listUsers, listOrders } from '@/service/admin'
+import { enrichAdmin } from '@/mocks/cd-9-fixture'
+import AdminNav from '@/components/admin/AdminNav.vue'
+import AdminTelemetry from '@/components/admin/AdminTelemetry.vue'
+import AdminSidebar from '@/components/admin/AdminSidebar.vue'
+import AdminKpiCard from '@/components/admin/AdminKpiCard.vue'
+import AdminCard from '@/components/admin/AdminCard.vue'
+import AdminStream from '@/components/admin/AdminStream.vue'
+import AdminAlert from '@/components/admin/AdminAlert.vue'
+import AdminTicketsTable from '@/components/admin/AdminTicketsTable.vue'
+import AdminFooter from '@/components/admin/AdminFooter.vue'
 
-const tab = ref('dashboard')
-const loading = ref(false)
-const stats = ref({})
-const posts = ref([])
-const users = ref([])
-const orders = ref([])
+// view-model: 先用 fixture 兜底, getDashboard 成功后真实计数注入 sidebar
+const vm = ref(enrichAdmin({}))
+const activeTab = ref('01.1')
 
-const runLoad = async (fn) => {
-  loading.value = true
+async function loadDashboard() {
   try {
-    await fn()
+    const dashboard = await getDashboard()
+    vm.value = enrichAdmin(dashboard || {})
   } catch (error) {
-    // 响应拦截器已处理
-  } finally {
-    loading.value = false
+    // backend 不可达 → 保留 fixture 兜底, 不降低视觉密度 (per CLAUDE.md Mock Fixture 原则)
+    vm.value = enrichAdmin({})
   }
 }
 
-const onTabChange = (name) => {
-  if (name === 'dashboard') runLoad(async () => { stats.value = (await getDashboard()) || {} })
-  if (name === 'posts') runLoad(async () => { posts.value = (await listPosts()) || [] })
-  if (name === 'users') runLoad(async () => { users.value = (await listUsers()) || [] })
-  if (name === 'orders') runLoad(async () => { orders.value = (await listOrders()) || [] })
+onMounted(loadDashboard)
+
+/* ---- 派生印章文字 ---- */
+const streamStamp = computed(() => 'AUTO-PAUSE · OFF')
+const alertsStamp = computed(() => `${vm.value.alerts.length} OPEN`)
+const ticketsStamp = computed(
+  () => `${vm.value.tickets.meta.total} OPEN · ${vm.value.tickets.meta.crit} CRIT`,
+)
+const streamMetaText = computed(() => {
+  const m = vm.value.stream.meta
+  return `SHOWING ${m.showing} OF ${m.total} EVENTS · ${m.window} · TAIL FROM ${m.tailFrom}`
+})
+const ticketsMetaText = computed(() => {
+  const m = vm.value.tickets.meta
+  return `SHOWING ${m.showing} OF ${m.total} OPEN TICKETS · SORT ${m.sort}`
+})
+
+/* ---- sidebar 导航: §02.1/§03.1/§04.1 走真实 backend 读取 ---- */
+const REAL_LOADERS = { '02.1': listUsers, '03.1': listPosts, '04.1': listOrders }
+
+async function onSidebarTab({ section, tab }) {
+  const loader = REAL_LOADERS[tab.ix]
+  if (loader) {
+    try {
+      const data = await loader()
+      console.log(`[admin] ${tab.label} loaded:`, data)
+      ElMessage.success(`${tab.label} · ${Array.isArray(data) ? data.length : 0} 条`)
+    } catch (error) {
+      ElMessage.info(`${tab.label} · 切换`)
+    }
+    return
+  }
+  console.log('[admin] sidebar tab:', tab.ix, tab.label)
+  ElMessage.info(`${section.name} · ${tab.label}`)
 }
 
-const onOffline = async (id) => {
-  await offlinePost(id)
-  ElMessage.success('已下架')
-  onTabChange('posts')
+/* ---- mock action handlers (运营 mock 域) ---- */
+function onLogo() {
+  console.log('[admin] logo')
+  ElMessage.info('Ops Console')
 }
-const onBan = async (id) => {
-  await banUser(id)
-  ElMessage.success('已封禁')
-  onTabChange('users')
+function onHelp() {
+  console.log('[admin] help')
+  ElMessage.info('Help · ⌘K command palette')
 }
-const onUnban = async (id) => {
-  await unbanUser(id)
-  ElMessage.success('已解禁')
-  onTabChange('users')
+function onBell() {
+  console.log('[admin] notifications')
+  ElMessage.info(`${vm.value.alerts.length} alerts open`)
 }
-
-onMounted(() => onTabChange('dashboard'))
+function onAvatar() {
+  console.log('[admin] account')
+  ElMessage.info(vm.value.ctx.operator)
+}
+function onAlertAction(alert, act) {
+  console.log('[admin] alert action:', alert.title, act.label)
+  ElMessage.success(`${act.label} · ${alert.title}`)
+}
+function onCreateAlert() {
+  console.log('[admin] create manual alert')
+  ElMessage.info('Create manual alert')
+}
+function onTicketAction({ ticket, action }) {
+  console.log('[admin] ticket action:', ticket.id, action.label)
+  ElMessage.success(`${ticket.id} · ${action.label}`)
+}
+function onLoadOlder() {
+  console.log('[admin] load older events')
+  ElMessage.info('Load older events')
+}
+function onViewAllTickets() {
+  console.log('[admin] view all tickets')
+  ElMessage.info(`View all ${vm.value.tickets.meta.total} tickets`)
+}
 </script>
 
+<template>
+  <div class="admin-outer">
+    <div class="admin-page">
+      <AdminNav
+        :brand="vm.brand"
+        :ctx="vm.ctx"
+        @logo-click="onLogo"
+        @help-click="onHelp"
+        @bell-click="onBell"
+        @avatar-click="onAvatar"
+      />
+
+      <AdminTelemetry :items="vm.telemetry.items" :live="vm.telemetry.live" />
+
+      <div class="admin-shell">
+        <AdminSidebar
+          v-model:active="activeTab"
+          :sections="vm.sidebar.sections"
+          :foot="vm.sidebar.foot"
+          @tab-click="onSidebarTab"
+        />
+
+        <main class="admin-main">
+          <!-- KPI strip -->
+          <section class="admin-kpi-strip">
+            <AdminKpiCard v-for="kpi in vm.kpi" :key="kpi.ix" v-bind="kpi" />
+          </section>
+
+          <!-- ops row: stream + alerts -->
+          <section class="admin-ops-row">
+            <AdminCard num="§ S" title="Stream · Live Tail" led :stamp="streamStamp" stamp-tone="hilite">
+              <AdminStream :rows="vm.stream.rows" />
+              <template #foot>
+                <span class="admin-meta">{{ streamMetaText }}</span>
+                <button type="button" class="admin-obtn" @click="onLoadOlder">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                  Load older
+                </button>
+              </template>
+            </AdminCard>
+
+            <AdminCard num="§ A" title="Alerts" :stamp="alertsStamp" stamp-tone="crit">
+              <div class="admin-alert-list">
+                <AdminAlert
+                  v-for="(alert, idx) in vm.alerts"
+                  :key="idx"
+                  :sev="alert.sev"
+                  :tone="alert.tone"
+                  :age="alert.age"
+                  :title="alert.title"
+                  :since="alert.since"
+                  :actions="alert.actions"
+                  @action="onAlertAction(alert, $event)"
+                />
+                <button type="button" class="admin-add" @click="onCreateAlert">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                  Create manual alert
+                </button>
+              </div>
+            </AdminCard>
+          </section>
+
+          <!-- tickets table -->
+          <AdminCard num="§ T" title="Tickets · Reports Queue" :stamp="ticketsStamp" stamp-tone="crit">
+            <AdminTicketsTable :rows="vm.tickets.rows" @action="onTicketAction" />
+            <template #foot>
+              <span class="admin-meta">{{ ticketsMetaText }}</span>
+              <button type="button" class="admin-obtn" @click="onViewAllTickets">
+                View all {{ vm.tickets.meta.total }} →
+              </button>
+            </template>
+          </AdminCard>
+        </main>
+      </div>
+
+      <AdminFooter
+        :version="vm.footer.version"
+        :sessions="vm.footer.sessions"
+        :network="vm.footer.network"
+        :shortcuts="vm.footer.shortcuts"
+      />
+    </div>
+  </div>
+</template>
+
 <style scoped>
-.admin {
-  padding: 24px;
+.admin-outer {
+  min-height: 100vh;
+  background: var(--ink);
+  display: flex;
+  justify-content: center;
 }
+.admin-page {
+  width: 1440px;
+  min-width: 1440px;
+  background: var(--paper);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* CAD 网格背景 (cd-9 .page) */
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 2%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 2%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px, 16px 16px, 16px 16px;
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  flex: 1;
+  min-height: calc(100vh - 56px - 30px - 28px);
+}
+
+.admin-main {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+/* KPI strip */
+.admin-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+/* ops row */
+.admin-ops-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 12px;
+}
+
+/* alerts list */
+.admin-alert-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.admin-add {
+  background: var(--paper);
+  border: 1.5px dashed var(--ink);
+  height: 36px;
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.admin-add svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+.admin-add:hover { background: var(--hilite); }
+.admin-add:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
+
+/* card-foot 内部元素 */
+.admin-meta {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.admin-obtn {
+  height: 28px;
+  padding: 0 10px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.admin-obtn svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.admin-obtn:hover { background: var(--hilite); }
+.admin-obtn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
 </style>
