@@ -11,6 +11,7 @@
  */
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { login, getUserInfo } from '@/service/user'
@@ -21,6 +22,7 @@ import UiFormField from '@/components/ui/UiFormField.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
@@ -42,14 +44,23 @@ const startCountdown = () => {
 }
 onMounted(startCountdown)
 onUnmounted(() => clearInterval(timer))
-const countdown = computed(() => ({ label: 'RESEND', value: `${resend.value}s` }))
+const countdown = computed(() => ({ label: t('login.field.verifyResend'), value: `${resend.value}s` }))
+
+const chromeTitle = computed(() => [t('login.chrome.titleA'), t('login.chrome.titleB')])
+const telemetry = computed(() => [
+  t('login.chrome.telemetrySecure'),
+  [t('login.chrome.telemetryModeLabel'), t('login.chrome.telemetryModeLogin')],
+  [t('login.chrome.telemetrySessionLabel'), '0'],
+])
+const pageTitle = computed(() => t('login.page.title'))
+const pageSubtitle = computed(() => [t('login.page.subtitleA'), t('login.page.subtitleB')])
 
 const onLogin = async () => {
   if (loading.value) return
   errors.username = !form.username
   errors.password = !form.password
   if (errors.username || errors.password) {
-    ElMessage.warning('请输入用户名和密码')
+    ElMessage.warning(t('login.msg.credentialsRequired'))
     return
   }
   loading.value = true
@@ -62,28 +73,28 @@ const onLogin = async () => {
     } catch (e) {
       // 资料获取失败不阻断登录
     }
-    ElMessage.success('登录成功')
+    ElMessage.success(t('login.msg.loginSuccess'))
     router.push('/home')
   } catch (error) {
-    ElMessage.error('登录失败,请检查用户名或密码')
+    ElMessage.error(t('login.msg.loginFailed'))
   } finally {
     loading.value = false
   }
 }
 
-const onRegister = () => ElMessage.info('注册 — 请联系运营开通账号')
+const onRegister = () => ElMessage.info(t('login.msg.registerContactOps'))
 const onBack = () => router.push('/home')
-const onFootLink = (label) => ElMessage.info(`${label} — 暂未开放`)
+const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { label }))
 </script>
 
 <template>
   <div class="pc-login">
     <UiFormChrome
-      :title="['LOGIN · ', 'ACCESS']"
-      :telemetry="['SECURE', ['MODE', 'LOGIN'], ['SESSION', '0']]"
-      right-label="Help"
+      :title="chromeTitle"
+      :telemetry="telemetry"
+      :right-label="t('login.chrome.helpRightLabel')"
       @back="onBack"
-      @right-click="onFootLink('Help')"
+      @right-click="onFootLink(t('login.foot.help'))"
     >
       <template #right-icon>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -96,25 +107,25 @@ const onFootLink = (label) => ElMessage.info(`${label} — 暂未开放`)
 
     <div class="pc-login__stage">
       <div class="pc-login__card">
-        <UiPageTitle title="Operator Access" :sub="['FBW IDENTITY · ', 'V3.4']" />
+        <UiPageTitle :title="pageTitle" :sub="pageSubtitle" />
 
-        <UiFormSection num="§ 01" name="Credentials" stamp="REQ">
+        <UiFormSection num="§ 01" :name="t('login.section.credentialsName')" :stamp="t('login.section.stampRequired')">
           <UiFormField
-            label="Username"
+            :label="t('login.field.usernameLabel')"
             required
-            hint="account id"
-            :helper="errors.username ? 'USERNAME REQUIRED' : 'ENTER YOUR FBW OPERATOR ID'"
+            :hint="t('login.field.usernameHint')"
+            :helper="errors.username ? t('login.field.usernameHelperRequired') : t('login.field.usernameHelperDefault')"
             :helper-tone="errors.username ? 'warn' : 'default'"
             v-slot="{ fieldId }"
           >
-            <UiInput :id="fieldId" v-model="form.username" placeholder="operator id" :error="errors.username" />
+            <UiInput :id="fieldId" v-model="form.username" :placeholder="t('login.field.usernamePlaceholder')" :error="errors.username" />
           </UiFormField>
 
           <UiFormField
-            label="Password"
+            :label="t('login.field.passwordLabel')"
             required
-            hint="min 8 chars"
-            :helper="errors.password ? 'PASSWORD REQUIRED' : ''"
+            :hint="t('login.field.passwordHint')"
+            :helper="errors.password ? t('login.field.passwordHelperRequired') : ''"
             helper-tone="warn"
             v-slot="{ fieldId }"
           >
@@ -122,9 +133,9 @@ const onFootLink = (label) => ElMessage.info(`${label} — 暂未开放`)
               :id="fieldId"
               v-model="form.password"
               :type="showPwd ? 'text' : 'password'"
-              placeholder="enter password"
+              :placeholder="t('login.field.passwordPlaceholder')"
               :error="errors.password"
-              ibtn-label="Toggle password visibility"
+              :ibtn-label="t('login.field.passwordToggleAria')"
               @ibtn-click="showPwd = !showPwd"
               @submit="onLogin"
             >
@@ -136,33 +147,33 @@ const onFootLink = (label) => ElMessage.info(`${label} — 暂未开放`)
             </UiInput>
           </UiFormField>
 
-          <UiFormField label="Verify Code" required hint="6 digits" helper="CODE WILL BE SENT VIA SMS · TYPE 6 DIGITS" v-slot="{ fieldId }">
-            <UiInput :id="fieldId" v-model="form.verifyCode" inputmode="numeric" :maxlength="6" placeholder="------" :countdown="countdown" />
+          <UiFormField :label="t('login.field.verifyLabel')" required :hint="t('login.field.verifyHint')" :helper="t('login.field.verifyHelper')" v-slot="{ fieldId }">
+            <UiInput :id="fieldId" v-model="form.verifyCode" inputmode="numeric" :maxlength="6" :placeholder="t('login.field.verifyPlaceholder')" :countdown="countdown" />
           </UiFormField>
         </UiFormSection>
 
         <div class="pc-login__cta">
-          <UiButton variant="primary" badge="/AUTH" :disabled="loading" @click="onLogin">
+          <UiButton variant="primary" :badge="t('login.cta.badgeAuth')" :disabled="loading" @click="onLogin">
             <template #icon>
               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </template>
-            Sign In
+            {{ t('login.cta.signIn') }}
           </UiButton>
           <UiButton variant="secondary" @click="onRegister">
             <template #icon>
               <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" /></svg>
             </template>
-            Register · Phone
+            {{ t('login.cta.register') }}
           </UiButton>
         </div>
 
         <div class="pc-login__foot">
           <span>
-            <a href="#" @click.prevent="onFootLink('Forgot')">Forgot</a>
+            <a href="#" @click.prevent="onFootLink(t('login.foot.forgot'))">{{ t('login.foot.forgot') }}</a>
             <span class="pc-login__sep"> · </span>
-            <a href="#" @click.prevent="onFootLink('Help')">Help</a>
+            <a href="#" @click.prevent="onFootLink(t('login.foot.help'))">{{ t('login.foot.help') }}</a>
             <span class="pc-login__sep"> · </span>
-            <a href="#" @click.prevent="onFootLink('Legal')">Legal</a>
+            <a href="#" @click.prevent="onFootLink(t('login.foot.legal'))">{{ t('login.foot.legal') }}</a>
           </span>
           <span class="pc-login__ver">FBW v3.47</span>
         </div>

@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "helpAria": "帮助",
+    "notificationsAria": "通知",
+    "myProfileAria": "我的资料"
+  },
+  "telemetry": {
+    "studioLive": "工作台在线"
+  },
+  "viewer": {
+    "controlsHeading": "控制",
+    "autoRotateLabel": "自动旋转",
+    "stateOn": "开启",
+    "stateOff": "关闭",
+    "variantsHeading": "变体",
+    "renderPlaceholder": "3D 渲染",
+    "renderPlaceholderSub": "插槽 · 等待 viewer 接入"
+  },
+  "cta": {
+    "downloadBundle": "下载整包",
+    "sendToPrint": "送至打印队列"
+  },
+  "spec": {
+    "geometryTitle": "几何参数",
+    "printConfigTitle": "打印配置",
+    "printConfigStamp": "推荐 · FDM",
+    "cells": {
+      "dimensions": "尺寸",
+      "polygons": "多边形",
+      "vertices": "顶点",
+      "volume": "体积",
+      "surface": "表面积",
+      "massEst": "估算质量",
+      "layer": "层高",
+      "infill": "填充",
+      "material": "材料",
+      "supports": "支撑",
+      "nozzle": "喷嘴",
+      "printTime": "打印时长",
+      "supportsNone": "无需",
+      "supportsRequired": "必需"
+    }
+  },
+  "section": {
+    "filesTitle": "文件",
+    "filesStamp": "{count} 项 · 整包 {size}",
+    "relatedTitle": "§ 04 · 相关样本",
+    "viewAll": "查看全部 →"
+  },
+  "toast": {
+    "helpCenterMock": "帮助中心（暂未接入）",
+    "notificationsMock": "通知（暂未接入）",
+    "profileRouteMock": "个人资料路由（暂未接入）",
+    "ctrlMock": "控制 · {group} → {label} ({kbd})",
+    "autoRotateToast": "自动旋转 {state}",
+    "variantToast": "变体 · {label}",
+    "followed": "已关注",
+    "unfollowed": "已取消关注",
+    "authorMock": "{'@'}{handle} 主页（暂未接入）",
+    "bundleAwaitingBackend": "整包下载链接待后端就位",
+    "printQueueAwaiting": "打印队列待接入",
+    "fileDownloadMock": "下载 · {filename}（暂未接入）",
+    "tipSelected": "已选 Tip ${amount}（mock 支付待接入）",
+    "breadcrumbMock": "面包屑 · {label}",
+    "openMock": "打开 · {title}",
+    "allRelatedMock": "全部相关（暂未接入）"
+  }
+}

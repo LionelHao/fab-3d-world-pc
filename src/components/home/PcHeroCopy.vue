@@ -5,7 +5,10 @@
  * Spec: docs/design/specs/p3.2-pc-home.md §1.4.2
  * Anchor: cd-3-desktop.html line 1543-1595 + CSS line 459-547
  */
+import { useI18n } from 'vue-i18n'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
+
+const { t, tm } = useI18n()
 
 defineProps({
   hero: { type: Object, required: true }, // heroFixture
@@ -57,12 +60,12 @@ function formatStat(n) {
           <span class="pc-hero-copy__sep">·</span>
           <span>↓ <b>{{ formatStat(hero.stats.downloads) }}</b></span>
           <span class="pc-hero-copy__sep">·</span>
-          <span><b>{{ formatStat(hero.stats.prints) }}</b> prints</span>
+          <span><b>{{ formatStat(hero.stats.prints) }}</b> {{ t('home.hero.statsPrintsLabel') }}</span>
         </div>
       </div>
 
       <div class="pc-hero-copy__body">
-        <p v-for="(p, i) in hero.body" :key="i">{{ p }}</p>
+        <p v-for="(p, i) in tm('home.hero.body')" :key="i">{{ p }}</p>
       </div>
     </div>
 
@@ -71,7 +74,7 @@ function formatStat(n) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 4v12m0 0-4-4m4 4 4-4M5 20h14"/>
         </svg>
-        {{ hero.cta.primary.label }}
+        {{ t('home.hero.ctaDownload') }}
         <span class="pc-hero-copy__size">{{ hero.cta.primary.size }}</span>
       </button>
       <button class="pc-hero-copy__btn-secondary" type="button" @click="$emit('studio-click')">
@@ -79,7 +82,7 @@ function formatStat(n) {
           <path d="M3 12a9 9 0 1 0 9-9"/>
           <path d="M3 6V3h3"/>
         </svg>
-        {{ hero.cta.secondary.label }}
+        {{ t('home.hero.ctaStudio') }}
       </button>
     </div>
   </div>

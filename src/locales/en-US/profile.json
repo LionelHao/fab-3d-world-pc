@@ -1,0 +1,58 @@
+{
+  "header": {
+    "title": "Operator",
+    "actionExport": "Export Data",
+    "actionPublic": "Public Profile",
+    "actionSignOut": "Sign Out"
+  },
+  "section": {
+    "identityName": "Display · Public",
+    "identityStamp": "EDIT MODE",
+    "statsName": "Studio Stats",
+    "statsStamp": "8 METRICS · LAST 30 D",
+    "activityName": "Activity · Last 30 Days",
+    "activityStamp": "6 ENTRIES · TAIL",
+    "achievementsName": "Achievements",
+    "achievementsStamp": "{shown} OF {total} SHOWN"
+  },
+  "field": {
+    "handle": "Handle",
+    "handleReadonly": "READONLY",
+    "handleChange": "Change ›",
+    "displayName": "Display Name",
+    "bio": "Bio",
+    "bioCount": "{count} / {max} chars",
+    "tags": "Tags",
+    "tagAdd": "+ ADD"
+  },
+  "avatar": {
+    "heading": "AVATAR",
+    "replace": "Replace Image"
+  },
+  "achievement": {
+    "viewAll": "View all achievements ({total}) →",
+    "badgeHeading": "BADGE"
+  },
+  "sidebar": {
+    "openDashboard": "OPEN DASHBOARD"
+  },
+  "toast": {
+    "loadFailed": "Failed to load profile, using placeholder data",
+    "navMock": "Nav · {label} (mock)",
+    "searchMock": "Search · {query} (mock)",
+    "localeMock": "Locale (mock)",
+    "notificationsMock": "Notifications (mock)",
+    "logSampleMock": "Log Sample (mock)",
+    "accountMock": "Account (mock)",
+    "sideTabMock": "{label} (mock)",
+    "exportQueued": "Export queued (mock)",
+    "publicProfileMock": "Public profile (mock)",
+    "handleChangeMock": "Change handle (mock)",
+    "replaceImageMock": "Replace image (mock)",
+    "addTagMock": "Add tag (mock)",
+    "viewLogMock": "Full activity log (mock)",
+    "viewAchievementsMock": "All achievements (mock)",
+    "footerLinkMock": "{label} (mock)",
+    "signedOut": "Signed out"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "appTitle": "FBW · Fab 3D World",
+  "language": "Language",
+  "languageZh": "中文",
+  "languageEn": "English",
+  "actions": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "retry": "Retry",
+    "continue": "Continue",
+    "loading": "Loading…",
+    "more": "More"
+  },
+  "toast": {
+    "notAvailable": "{label} — coming soon",
+    "networkError": "Network error, please try again",
+    "loadFailed": "Load failed",
+    "saveSuccess": "Saved",
+    "saveFailed": "Save failed"
+  },
+  "empty": {
+    "noData": "No data",
+    "eof": "End of list"
+  },
+  "navbar": {
+    "notificationsAria": "Notifications",
+    "uploadAria": "Log a sample",
+    "uploadLabel": "Log Sample",
+    "avatarAria": "My profile"
+  },
+  "telemetry": {
+    "live": "LIVE"
+  },
+  "footer": {
+    "tagline": "A laboratory of printable geometries. Every model logged as a specimen. Every print measured, classified, archived. Since 2024.",
+    "statusLabel": "STATUS",
+    "uptimeLabel": "UPTIME"
+  }
+}

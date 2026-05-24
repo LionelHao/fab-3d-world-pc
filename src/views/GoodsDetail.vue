@@ -17,6 +17,7 @@
  */
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import * as OV from 'online-3d-viewer/build/engine/o3dv.module.js'
 import { attachViewerSoul } from '@/utils/viewerSoul.js'
@@ -54,6 +55,7 @@ import { getGoodsDetail } from '@/service/goods'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const goods = ref(null)
 const loading = ref(false)
@@ -147,23 +149,23 @@ const axisLabels = viewerOverlayDefaults.axisLabels
 const geometryCells = computed(() => {
   const m = enriched.value
   return [
-    { k: 'Dimensions', v: m.dimensions ? `${m.dimensions.w}×${m.dimensions.d}×${m.dimensions.h}` : '—', vSmall: 'mm' },
-    { k: 'Polygons', v: formatThousands(m.polygons) },
-    { k: 'Vertices', v: formatThousands(m.vertices_count) },
-    { k: 'Volume', v: m.volume_cm3 != null ? String(m.volume_cm3) : '—', vSmall: 'cm³' },
-    { k: 'Surface', v: m.surface_cm2 != null ? String(m.surface_cm2) : '—', vSmall: 'cm²' },
-    { k: 'Mass est.', v: m.mass_g != null ? `~${m.mass_g}` : '—', vSmall: 'g' },
+    { k: t('goodsDetail.spec.cells.dimensions'), v: m.dimensions ? `${m.dimensions.w}×${m.dimensions.d}×${m.dimensions.h}` : '—', vSmall: 'mm' },
+    { k: t('goodsDetail.spec.cells.polygons'), v: formatThousands(m.polygons) },
+    { k: t('goodsDetail.spec.cells.vertices'), v: formatThousands(m.vertices_count) },
+    { k: t('goodsDetail.spec.cells.volume'), v: m.volume_cm3 != null ? String(m.volume_cm3) : '—', vSmall: 'cm³' },
+    { k: t('goodsDetail.spec.cells.surface'), v: m.surface_cm2 != null ? String(m.surface_cm2) : '—', vSmall: 'cm²' },
+    { k: t('goodsDetail.spec.cells.massEst'), v: m.mass_g != null ? `~${m.mass_g}` : '—', vSmall: 'g' },
   ]
 })
 const printConfigCells = computed(() => {
   const m = enriched.value
   return [
-    { k: 'Layer', v: m.recommended_layer_mm != null ? String(m.recommended_layer_mm.toFixed(2)) : '—', vSmall: 'mm' },
-    { k: 'Infill', v: m.infill_pct != null ? String(m.infill_pct) : '—', vSmall: m.infill_pattern ? `% ${m.infill_pattern}` : '%' },
-    { k: 'Material', v: (m.compatible_materials || []).join(' / ') || '—' },
-    { k: 'Supports', v: m.needs_supports === false ? 'None' : m.needs_supports ? 'Required' : '—', vEm: m.needs_supports === false },
-    { k: 'Nozzle', v: m.nozzle_mm != null ? String(m.nozzle_mm.toFixed(2)) : '—', vSmall: 'mm' },
-    { k: 'Print Time', v: m.print_time_str || '—' },
+    { k: t('goodsDetail.spec.cells.layer'), v: m.recommended_layer_mm != null ? String(m.recommended_layer_mm.toFixed(2)) : '—', vSmall: 'mm' },
+    { k: t('goodsDetail.spec.cells.infill'), v: m.infill_pct != null ? String(m.infill_pct) : '—', vSmall: m.infill_pattern ? `% ${m.infill_pattern}` : '%' },
+    { k: t('goodsDetail.spec.cells.material'), v: (m.compatible_materials || []).join(' / ') || '—' },
+    { k: t('goodsDetail.spec.cells.supports'), v: m.needs_supports === false ? t('goodsDetail.spec.cells.supportsNone') : m.needs_supports ? t('goodsDetail.spec.cells.supportsRequired') : '—', vEm: m.needs_supports === false },
+    { k: t('goodsDetail.spec.cells.nozzle'), v: m.nozzle_mm != null ? String(m.nozzle_mm.toFixed(2)) : '—', vSmall: 'mm' },
+    { k: t('goodsDetail.spec.cells.printTime'), v: m.print_time_str || '—' },
   ]
 })
 
@@ -175,8 +177,32 @@ const geometryStamp = computed(() => {
 })
 const filesStamp = computed(() => {
   const f = enriched.value.files || []
-  return `${f.length} ENTRIES · BUNDLE ${enriched.value.fileSizeStr}`
+  return t('goodsDetail.section.filesStamp', { count: f.length, size: enriched.value.fileSizeStr })
 })
+
+/* ─── i18n: localized footer columns (借用 home.json 的 footer keys) ─── */
+const FOOTER_COL_KEYS = ['explore', 'create', 'company', 'legal']
+const FOOTER_LINK_KEYS = {
+  explore: ['catalog', 'marketplace', 'collections', 'operators', 'printFarm'],
+  create: ['logSample', 'studio', 'makerProgram', 'designGuide'],
+  company: ['about', 'labLog', 'pressKit', 'careers', 'contact'],
+  legal: ['terms', 'privacy', 'licenses', 'dmca'],
+}
+const localizedFooterColumns = computed(() =>
+  footerColumns.map((col, idx) => {
+    const key = FOOTER_COL_KEYS[idx]
+    const linkKeys = FOOTER_LINK_KEYS[key] || []
+    return {
+      ...col,
+      heading: t(`home.footer.columns.${key}.heading`),
+      links: col.links.map((link, i) => ({
+        ...link,
+        label: linkKeys[i] ? t(`home.footer.columns.${key}.links.${linkKeys[i]}`) : link.label,
+      })),
+    }
+  })
+)
+const localizedFooterBottom = computed(() => ({ ...footerBottom, networkStatus: t('home.footer.networkStatusNominal') }))
 
 const authorFollowersText = computed(() => {
   const n = enriched.value.user?.followers_count
@@ -188,17 +214,17 @@ function onLogo() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function onHelp() {
-  ElMessage.info('Help center (mock)')
+  ElMessage.info(t('goodsDetail.toast.helpCenterMock'))
 }
 function onBell() {
-  ElMessage.info('Notifications (mock)')
+  ElMessage.info(t('goodsDetail.toast.notificationsMock'))
 }
 function onAvatar() {
-  router.push('/profile').catch(() => ElMessage.info('Profile route (mock)'))
+  router.push('/profile').catch(() => ElMessage.info(t('goodsDetail.toast.profileRouteMock')))
 }
 function onCtrlClick(groupTitle, item) {
   activeNavCtrl.value[groupTitle] = item.id
-  ElMessage.info(`Ctrl · ${groupTitle} → ${item.label} (${item.kbd})`)
+  ElMessage.info(t('goodsDetail.toast.ctrlMock', { group: groupTitle, label: item.label, kbd: item.kbd }))
 }
 function isCtrlActive(groupTitle, item) {
   const v = activeNavCtrl.value[groupTitle]
@@ -210,21 +236,21 @@ function onToggleAutoRotate() {
   // Phase 4 T4.1: 接 viewerSoul — 真实暂停 / 恢复模型自转
   if (autoRotate.value) soul?.resume()
   else soul?.pause()
-  ElMessage.success(`Auto-rotate ${autoRotate.value ? 'ON' : 'OFF'}`)
+  ElMessage.success(t('goodsDetail.toast.autoRotateToast', { state: autoRotate.value ? t('goodsDetail.viewer.stateOn') : t('goodsDetail.viewer.stateOff') }))
 }
 function onVariantClick(v) {
   activeVariant.value = v.id
-  ElMessage.info(`Variant · ${v.label}`)
+  ElMessage.info(t('goodsDetail.toast.variantToast', { label: v.label }))
 }
 function onTabChange(tabId) {
   activeTab.value = tabId
 }
 function onFollow() {
   isFollowing.value = !isFollowing.value
-  ElMessage.success(isFollowing.value ? '已关注' : '已取消关注')
+  ElMessage.success(isFollowing.value ? t('goodsDetail.toast.followed') : t('goodsDetail.toast.unfollowed'))
 }
 function onAuthorClick() {
-  ElMessage.info(`@${enriched.value.user?.handle || 'maker'} 主页 (mock)`)
+  ElMessage.info(t('goodsDetail.toast.authorMock', { handle: enriched.value.user?.handle || 'maker' }))
 }
 function onDownloadBundle() {
   const url = enriched.value.modelUrl
@@ -232,30 +258,30 @@ function onDownloadBundle() {
     window.open(url, '_blank', 'noopener')
     return
   }
-  ElMessage.info('Bundle 下载链接待后端就位')
+  ElMessage.info(t('goodsDetail.toast.bundleAwaitingBackend'))
 }
 function onSendToPrint() {
-  ElMessage.info('Print queue 待接入')
+  ElMessage.info(t('goodsDetail.toast.printQueueAwaiting'))
 }
 function onFileDownload(file) {
   if (file.url) {
     window.open(file.url, '_blank', 'noopener')
     return
   }
-  ElMessage.info(`Download · ${file.filename} (mock)`)
+  ElMessage.info(t('goodsDetail.toast.fileDownloadMock', { filename: file.filename }))
 }
 function onTip(opt) {
   activeTipAmount.value = opt.amount
-  ElMessage.success(`Tip $${opt.amount} 已选 (mock 支付待接入)`)
+  ElMessage.success(t('goodsDetail.toast.tipSelected', { amount: opt.amount }))
 }
 function onBreadcrumb(crumb) {
-  if (crumb.href) router.push(crumb.href).catch(() => ElMessage.info(`Breadcrumb · ${crumb.label}`))
+  if (crumb.href) router.push(crumb.href).catch(() => ElMessage.info(t('goodsDetail.toast.breadcrumbMock', { label: crumb.label })))
 }
 function onRelatedClick(item) {
-  router.push(`/goods/${item.id}`).catch(() => ElMessage.info(`Open · ${item.title}`))
+  router.push(`/goods/${item.id}`).catch(() => ElMessage.info(t('goodsDetail.toast.openMock', { title: item.title })))
 }
 function onRelatedViewAll() {
-  router.push('/market').catch(() => ElMessage.info('All related (mock)'))
+  router.push('/market').catch(() => ElMessage.info(t('goodsDetail.toast.allRelatedMock')))
 }
 </script>
 
@@ -283,20 +309,20 @@ function onRelatedViewAll() {
           <span class="goods-detail__ctx-saved">{{ savedState }}</span>
         </div>
         <div class="goods-detail__nav-right">
-          <button class="goods-detail__icon-sq" type="button" aria-label="Help" @click="onHelp">
+          <button class="goods-detail__icon-sq" type="button" :aria-label="t('goodsDetail.nav.helpAria')" @click="onHelp">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="9" />
               <path d="M9.5 9a2.5 2.5 0 1 1 4.5 1.5c-1 .8-2 1.3-2 2.5" />
               <circle cx="12" cy="17" r="0.8" fill="currentColor" />
             </svg>
           </button>
-          <UiIconButton variant="outline" :size="32" :badge="true" aria-label="Notifications" @click="onBell">
+          <UiIconButton variant="outline" :size="32" :badge="true" :aria-label="t('goodsDetail.nav.notificationsAria')" @click="onBell">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 8a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6" />
               <path d="M10 19a2 2 0 0 0 4 0" />
             </svg>
           </UiIconButton>
-          <button class="goods-detail__nav-avatar" type="button" aria-label="My profile" @click="onAvatar">
+          <button class="goods-detail__nav-avatar" type="button" :aria-label="t('goodsDetail.nav.myProfileAria')" @click="onAvatar">
             <UiAvatar :initials="studioBrandConstants.currentUserInitials" :size="32" palette="hilite" shape="square" />
           </button>
         </div>
@@ -306,7 +332,7 @@ function onRelatedViewAll() {
     <!-- ===== Telemetry strip ===== -->
     <div class="goods-detail__telemetry">
       <span class="goods-detail__telemetry-led" aria-hidden="true" />
-      <span>STUDIO LIVE</span>
+      <span>{{ t('goodsDetail.telemetry.studioLive') }}</span>
       <template v-for="(item, idx) in telemetryItems" :key="item.label">
         <span class="goods-detail__telemetry-sep">/</span>
         <span>{{ item.label }} <b>{{ item.value }}</b></span>
@@ -352,7 +378,7 @@ function onRelatedViewAll() {
         <template #controls>
           <div class="goods-detail__controls" aria-label="Viewer controls">
             <div class="goods-detail__controls-head">
-              <span>CONTROLS</span>
+              <span>{{ t('goodsDetail.viewer.controlsHeading') }}</span>
               <span class="goods-detail__controls-id">{{ viewerOverlayDefaults.controls.panelId }}</span>
             </div>
             <div v-for="group in ctrlGroups" :key="group.title" class="goods-detail__ctrl-group">
@@ -391,16 +417,16 @@ function onRelatedViewAll() {
                 <path d="M3 6V3h3" />
               </svg>
             </span>
-            <span>Auto-rotate</span>
+            <span>{{ t('goodsDetail.viewer.autoRotateLabel') }}</span>
             <span class="goods-detail__rotate-sw" />
-            <span class="goods-detail__rotate-state">{{ autoRotate ? 'ON' : 'OFF' }}</span>
+            <span class="goods-detail__rotate-state">{{ autoRotate ? t('goodsDetail.viewer.stateOn') : t('goodsDetail.viewer.stateOff') }}</span>
           </button>
         </template>
 
         <template #variants>
           <div class="goods-detail__variants">
             <div class="goods-detail__variants-head">
-              <span>Variants</span>
+              <span>{{ t('goodsDetail.viewer.variantsHeading') }}</span>
               <span>
                 <b>{{ String(enriched.variants.length).padStart(2, '0') }}</b> / {{ String(enriched.variants.length).padStart(2, '0') }}
               </span>
@@ -439,8 +465,8 @@ function onRelatedViewAll() {
 
         <!-- 默认 render slot: viewer 未就位时显示占位 (Phase 4 T4.1) -->
         <div v-if="!viewerReady" class="goods-detail__render-placeholder" aria-hidden="true">
-          <span>3D RENDER</span>
-          <span class="sub">SLOT · awaiting viewer attach</span>
+          <span>{{ t('goodsDetail.viewer.renderPlaceholder') }}</span>
+          <span class="sub">{{ t('goodsDetail.viewer.renderPlaceholderSub') }}</span>
         </div>
       </PcViewerStage>
 
@@ -469,10 +495,10 @@ function onRelatedViewAll() {
         <div class="goods-detail__right-pad">
           <UiReveal :delay="0">
             <PcCtaStack
-              primary-label="Download Bundle"
+              :primary-label="t('goodsDetail.cta.downloadBundle')"
               :primary-meta="enriched.fileSizeStr"
-              secondary-label="Send to Print Queue"
-              secondary-aria-label="Send to Print Queue"
+              :secondary-label="t('goodsDetail.cta.sendToPrint')"
+              :secondary-aria-label="t('goodsDetail.cta.sendToPrint')"
               @primary-click="onDownloadBundle"
               @secondary-click="onSendToPrint"
             />
@@ -481,7 +507,7 @@ function onRelatedViewAll() {
           <UiReveal :delay="60">
             <UiSpecCard
               num="§ 01"
-              title="Geometry"
+              :title="t('goodsDetail.spec.geometryTitle')"
               :stamp="geometryStamp"
               :cells="geometryCells"
               :cols="3"
@@ -491,8 +517,8 @@ function onRelatedViewAll() {
           <UiReveal :delay="120">
             <UiSpecCard
               num="§ 02"
-              title="Print Config"
-              stamp="RECOMMENDED · FDM"
+              :title="t('goodsDetail.spec.printConfigTitle')"
+              :stamp="t('goodsDetail.spec.printConfigStamp')"
               :cells="printConfigCells"
               :cols="3"
             />
@@ -503,7 +529,7 @@ function onRelatedViewAll() {
             <div class="goods-detail__eyebrow">
               <span class="goods-detail__brow-text">
                 <span class="goods-detail__brow-num">§ 03</span>
-                <span class="goods-detail__brow-title">· Files</span>
+                <span class="goods-detail__brow-title">· {{ t('goodsDetail.section.filesTitle') }}</span>
               </span>
               <span class="goods-detail__brow-stamp">{{ filesStamp }}</span>
             </div>
@@ -547,8 +573,8 @@ function onRelatedViewAll() {
           <!-- § 04 Related -->
           <UiReveal as="section" class="goods-detail__related" :delay="300">
             <div class="goods-detail__related-head">
-              <span class="goods-detail__related-title">§ 04 · Related Specimens</span>
-              <a class="goods-detail__related-view-all" href="#" @click.prevent="onRelatedViewAll">View all →</a>
+              <span class="goods-detail__related-title">{{ t('goodsDetail.section.relatedTitle') }}</span>
+              <a class="goods-detail__related-view-all" href="#" @click.prevent="onRelatedViewAll">{{ t('goodsDetail.section.viewAll') }}</a>
             </div>
             <div class="goods-detail__related-grid">
               <PcRelatedCard
@@ -576,9 +602,9 @@ function onRelatedViewAll() {
 
     <PcFooter
       :brand="pcBrand"
-      :columns="footerColumns"
+      :columns="localizedFooterColumns"
       :social="socialLinks"
-      :bottom="footerBottom"
+      :bottom="localizedFooterBottom"
     />
   </div>
 </template>

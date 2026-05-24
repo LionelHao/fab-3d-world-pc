@@ -5,6 +5,7 @@
  */
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 
 import PcNavbar from '@/components/PcNavbar.vue'
@@ -29,15 +30,16 @@ import { getPostDetail } from '@/service/content'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const post = ref({})
 const loading = ref(false)
 const searchValue = ref('')
 
-const tabs = [
-  { id: 'overview', label: 'Overview', ix: '01' },
-  { id: 'photos', label: 'Photos', ix: '02' },
-  { id: 'discuss', label: 'Discuss', ix: '03' },
-]
+const tabs = computed(() => [
+  { id: 'overview', label: t('postDetail.tabs.overview'), ix: '01' },
+  { id: 'photos', label: t('postDetail.tabs.photos'), ix: '02' },
+  { id: 'discuss', label: t('postDetail.tabs.discuss'), ix: '03' },
+])
 const activeTab = ref('overview')
 
 const sampleCode = computed(() => formatSampleCode(post.value.id || route.params.id, 'POS'))
@@ -48,16 +50,44 @@ const telemetry = computed(() => ({
 }))
 
 const statsCells = computed(() => [
-  { k: 'Likes', v: formatThousands(post.value.likeCount || 0) },
-  { k: 'Saves', v: formatThousands(post.value.collectCount || 0) },
-  { k: 'Photos', v: formatThousands((post.value.imageUrlList || []).length) },
-  { k: 'Models', v: formatThousands((post.value.modelUrlList || []).length) },
-  { k: 'Posted', v: post.value.createTime ? new Date(post.value.createTime).toLocaleDateString() : '—' },
-  { k: 'ID', v: String(post.value.id || route.params.id || '—') },
+  { k: t('postDetail.stats.likes'), v: formatThousands(post.value.likeCount || 0) },
+  { k: t('postDetail.stats.saves'), v: formatThousands(post.value.collectCount || 0) },
+  { k: t('postDetail.stats.photos'), v: formatThousands((post.value.imageUrlList || []).length) },
+  { k: t('postDetail.stats.models'), v: formatThousands((post.value.modelUrlList || []).length) },
+  { k: t('postDetail.stats.posted'), v: post.value.createTime ? new Date(post.value.createTime).toLocaleDateString() : '—' },
+  { k: t('postDetail.stats.id'), v: String(post.value.id || route.params.id || '—') },
 ])
 
 const galleryImages = computed(() => post.value.imageUrlList || [])
 const modelEntries = computed(() => post.value.modelUrlList || [])
+
+/* ─── i18n: localized chrome (nav + footer 借 home.json) ─── */
+const NAV_KEYS = { catalog: 'home.nav.catalog', market: 'home.nav.market', studio: 'home.nav.studio', lab_log: 'home.nav.labLog' }
+const localizedNavLinks = computed(() =>
+  navLinks.map((l) => ({ ...l, label: NAV_KEYS[l.id] ? t(NAV_KEYS[l.id]) : l.label }))
+)
+const FOOTER_COL_KEYS = ['explore', 'create', 'company', 'legal']
+const FOOTER_LINK_KEYS = {
+  explore: ['catalog', 'marketplace', 'collections', 'operators', 'printFarm'],
+  create: ['logSample', 'studio', 'makerProgram', 'designGuide'],
+  company: ['about', 'labLog', 'pressKit', 'careers', 'contact'],
+  legal: ['terms', 'privacy', 'licenses', 'dmca'],
+}
+const localizedFooterColumns = computed(() =>
+  footerColumns.map((col, idx) => {
+    const key = FOOTER_COL_KEYS[idx]
+    const linkKeys = FOOTER_LINK_KEYS[key] || []
+    return {
+      ...col,
+      heading: t(`home.footer.columns.${key}.heading`),
+      links: col.links.map((link, i) => ({
+        ...link,
+        label: linkKeys[i] ? t(`home.footer.columns.${key}.links.${linkKeys[i]}`) : link.label,
+      })),
+    }
+  })
+)
+const localizedFooterBottom = computed(() => ({ ...footerBottom, networkStatus: t('home.footer.networkStatusNominal') }))
 
 onMounted(async () => {
   loading.value = true
@@ -70,30 +100,30 @@ onMounted(async () => {
 
 function onLogo() { window.scrollTo({ top: 0, behavior: 'smooth' }) }
 function onNavClick(link) { if (link.route) router.push(link.route).catch(() => {}) }
-function onBell() { ElMessage.info('Notifications (mock)') }
+function onBell() { ElMessage.info(t('postDetail.toast.notificationsMock')) }
 function onAvatar() { router.push('/profile').catch(() => {}) }
-function onLocale() { ElMessage.info('Locale (mock)') }
-function onUpload() { router.push('/publish').catch(() => ElMessage.info('Upload (mock)')) }
-function onSearch() { ElMessage.info(`Search · "${searchValue.value}"`) }
+function onLocale() { ElMessage.info(t('postDetail.toast.localeMock')) }
+function onUpload() { router.push('/publish').catch(() => ElMessage.info(t('postDetail.toast.uploadMock'))) }
+function onSearch() { ElMessage.info(t('postDetail.toast.searchMock', { query: searchValue.value })) }
 function onPrimary() {
-  ElMessage.info('Buy / Save action placeholder')
+  ElMessage.info(t('postDetail.toast.primaryMock'))
 }
 function onSecondary() {
-  ElMessage.info('Share link copied (mock)')
+  ElMessage.info(t('postDetail.toast.secondaryMock'))
 }
 function onModelClick(url) {
   if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
     window.open(url, '_blank', 'noopener')
     return
   }
-  ElMessage.info('Model URL pending backend')
+  ElMessage.info(t('postDetail.toast.modelUrlPending'))
 }
 </script>
 
 <template>
   <div class="pc-post-detail" v-loading="loading">
     <PcNavbar
-      :nav-links="navLinks"
+      :nav-links="localizedNavLinks"
       :brand="brandConstants"
       v-model:search-value="searchValue"
       :bell-badge="true"
@@ -112,19 +142,19 @@ function onModelClick(url) {
       <!-- LEFT: gallery -->
       <UiReveal as="section" class="pc-post-detail__gallery" :delay="0">
         <div class="pc-post-detail__gallery-head">
-          <span>§ 01 · Gallery</span>
-          <span class="pc-post-detail__gallery-stamp">{{ galleryImages.length }} ENTRIES</span>
+          <span>{{ t('postDetail.section.galleryTitle') }}</span>
+          <span class="pc-post-detail__gallery-stamp">{{ t('postDetail.section.galleryStamp', { count: galleryImages.length }) }}</span>
         </div>
         <div v-if="galleryImages.length" class="pc-post-detail__gallery-grid">
           <img
             v-for="(url, i) in galleryImages"
             :key="i"
             :src="url"
-            :alt="`Photo ${i + 1}`"
+            :alt="t('postDetail.photoAlt', { index: i + 1 })"
             class="pc-post-detail__photo"
           />
         </div>
-        <div v-else class="pc-post-detail__gallery-empty">EOF · NO PHOTOS</div>
+        <div v-else class="pc-post-detail__gallery-empty">{{ t('postDetail.section.galleryEmpty') }}</div>
       </UiReveal>
 
       <!-- RIGHT: detail -->
@@ -133,10 +163,10 @@ function onModelClick(url) {
           :sample-code="sampleCode"
           class-badge="CLASS B"
           :certified="false"
-          :model-name="post.title || 'UNTITLED'"
+          :model-name="post.title || t('postDetail.untitled')"
           :version-major="''"
           :version-minor="''"
-          :author-name="post.userName || 'Operator'"
+          :author-name="post.userName || t('postDetail.anonymousOperator')"
           :author-handle="post.userName || ''"
           :author-followers="''"
           :author-joined-year="''"
@@ -150,10 +180,10 @@ function onModelClick(url) {
         <div class="pc-post-detail__right-pad">
           <UiReveal :delay="0">
             <PcCtaStack
-              primary-label="Buy / Save"
+              :primary-label="t('postDetail.cta.primary')"
               primary-meta=""
-              secondary-label="Share Link"
-              secondary-aria-label="Share post link"
+              :secondary-label="t('postDetail.cta.secondary')"
+              :secondary-aria-label="t('postDetail.cta.secondaryAria')"
               @primary-click="onPrimary"
               @secondary-click="onSecondary"
             />
@@ -162,8 +192,8 @@ function onModelClick(url) {
           <UiReveal :delay="80">
             <UiSpecCard
               num="§ 02"
-              title="Stats"
-              stamp="LIVE"
+              :title="t('postDetail.section.statsTitle')"
+              :stamp="t('postDetail.section.statsStamp')"
               :cells="statsCells"
               :cols="3"
             />
@@ -171,18 +201,18 @@ function onModelClick(url) {
 
           <UiReveal as="section" class="pc-post-detail__notes" :delay="160">
             <div class="pc-post-detail__eyebrow">
-              <span>§ 03 · Notes</span>
-              <span class="pc-post-detail__eyebrow-stamp">CONTENT</span>
+              <span>{{ t('postDetail.section.notesTitle') }}</span>
+              <span class="pc-post-detail__eyebrow-stamp">{{ t('postDetail.section.notesStamp') }}</span>
             </div>
             <p class="pc-post-detail__content">
-              {{ post.content || 'NO CONTENT · STAND BY' }}
+              {{ post.content || t('postDetail.section.notesEmpty') }}
             </p>
           </UiReveal>
 
           <UiReveal v-if="modelEntries.length" as="section" class="pc-post-detail__models" :delay="240">
             <div class="pc-post-detail__eyebrow">
-              <span>§ 04 · Model Files</span>
-              <span class="pc-post-detail__eyebrow-stamp">{{ modelEntries.length }} ENTRIES</span>
+              <span>{{ t('postDetail.section.modelFilesTitle') }}</span>
+              <span class="pc-post-detail__eyebrow-stamp">{{ t('postDetail.section.galleryStamp', { count: modelEntries.length }) }}</span>
             </div>
             <div class="pc-post-detail__models-list">
               <button
@@ -192,8 +222,8 @@ function onModelClick(url) {
                 class="pc-post-detail__model-row"
                 @click="onModelClick(url)"
               >
-                <span class="pc-post-detail__model-ico">MDL</span>
-                <span class="pc-post-detail__model-label">Model · {{ i + 1 }}</span>
+                <span class="pc-post-detail__model-ico">{{ t('postDetail.modelAria') }}</span>
+                <span class="pc-post-detail__model-label">{{ t('postDetail.section.modelLabel', { index: i + 1 }) }}</span>
                 <span class="pc-post-detail__model-arrow">→</span>
               </button>
             </div>
@@ -204,9 +234,9 @@ function onModelClick(url) {
 
     <PcFooter
       :brand="brandConstants"
-      :columns="footerColumns"
+      :columns="localizedFooterColumns"
       :social="socialLinks"
-      :bottom="footerBottom"
+      :bottom="localizedFooterBottom"
     />
   </div>
 </template>

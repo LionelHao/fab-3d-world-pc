@@ -1,0 +1,45 @@
+{
+  "tabs": {
+    "overview": "概览",
+    "photos": "图片",
+    "discuss": "讨论"
+  },
+  "section": {
+    "galleryTitle": "§ 01 · 图库",
+    "galleryStamp": "{count} 项",
+    "galleryEmpty": "EOF · 无图片",
+    "statsTitle": "数据",
+    "statsStamp": "实时",
+    "notesTitle": "§ 03 · 笔记",
+    "notesStamp": "内容",
+    "notesEmpty": "无内容 · 待机",
+    "modelFilesTitle": "§ 04 · 模型文件",
+    "modelLabel": "模型 · {index}"
+  },
+  "stats": {
+    "likes": "点赞",
+    "saves": "收藏",
+    "photos": "图片",
+    "models": "模型",
+    "posted": "发布于",
+    "id": "ID"
+  },
+  "cta": {
+    "primary": "购买 / 收藏",
+    "secondary": "分享链接",
+    "secondaryAria": "分享帖子链接"
+  },
+  "photoAlt": "图片 {index}",
+  "modelAria": "MDL",
+  "untitled": "无标题",
+  "anonymousOperator": "操作员",
+  "toast": {
+    "notificationsMock": "通知（暂未接入）",
+    "localeMock": "语言（暂未接入）",
+    "uploadMock": "上传（暂未接入）",
+    "searchMock": "搜索 · \"{query}\"",
+    "primaryMock": "购买 / 收藏 占位",
+    "secondaryMock": "分享链接已复制（mock）",
+    "modelUrlPending": "模型 URL 待后端就位"
+  }
+}

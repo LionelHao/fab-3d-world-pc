@@ -5,6 +5,10 @@
  * Spec: docs/design/specs/p3.2-pc-home.md §1.7
  * Anchor: cd-3-desktop.html line 2058-2241 + CSS line 1047-1247
  */
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   job: { type: Object, required: true },
 })
@@ -15,7 +19,7 @@ defineProps({
     <header class="pc-farm-card__head">
       <span class="pc-farm-card__live">
         <span class="pc-farm-card__led" aria-hidden="true"></span>
-        LIVE · {{ job.cam }}
+        {{ t('common.telemetry.live') }} · {{ job.cam }}
       </span>
       <span class="pc-farm-card__job-id">{{ job.printerModel }} {{ job.jobId }}</span>
     </header>
@@ -31,7 +35,7 @@ defineProps({
           <rect x="40" y="120" width="240" height="14" fill="var(--ink)" fill-opacity="0.12" stroke="var(--ink)" stroke-width="1"/>
           <rect x="40" y="118" width="240" height="2" fill="var(--ink)"/>
           <text x="160" y="80" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="var(--accent-link)" text-anchor="middle" letter-spacing="0.1em">
-            LIVE STREAM
+            {{ t('home.farm.liveStreamLabel') }}
           </text>
           <text x="160" y="98" font-family="IBM Plex Mono" font-size="9" fill="var(--ink-3)" text-anchor="middle">
             {{ job.cam }}
@@ -42,10 +46,12 @@ defineProps({
 
     <div class="pc-farm-card__body">
       <div class="pc-farm-card__title">{{ job.title }}</div>
-      <span class="pc-farm-card__by">printing for <b>{{ job.printingFor }}</b></span>
+      <i18n-t keypath="home.farm.printingForLabel" tag="span" class="pc-farm-card__by">
+        <template #handle><b>{{ job.printingFor }}</b></template>
+      </i18n-t>
       <div class="pc-farm-card__progress-row">
         <span class="pc-farm-card__pct">{{ job.progressPct }}%</span>
-        <span class="pc-farm-card__eta">ETA · <b>{{ job.etaText }}</b></span>
+        <span class="pc-farm-card__eta">{{ t('home.farm.etaLabel') }} · <b>{{ job.etaText }}</b></span>
       </div>
       <div class="pc-farm-card__progress" role="progressbar" :aria-valuenow="job.progressPct" aria-valuemin="0" aria-valuemax="100">
         <div class="pc-farm-card__bar" :style="{ width: `${job.progressPct}%` }"></div>

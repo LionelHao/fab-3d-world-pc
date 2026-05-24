@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "catalog": "目录",
+    "market": "市集",
+    "studio": "工作台",
+    "labLog": "实验日志"
+  },
+  "search": {
+    "label": "查询",
+    "placeholder": "搜索 482,164 件样本、创作者与合集…"
+  },
+  "sections": {
+    "trending": {
+      "title": "本周热门",
+      "sub": "更新于 9:41 AM · 每 60 分钟刷新",
+      "cta": "浏览全部"
+    },
+    "operators": {
+      "title": "操作员 · 本月榜",
+      "sub": "按已生成打印数 · 排序",
+      "cta": "完整排行榜"
+    },
+    "printFarm": {
+      "title": "打印农场 · 实时遥测",
+      "sub": "142 个任务进行中 · 实时推送",
+      "cta": "全部打印机"
+    }
+  },
+  "hero": {
+    "sampleLabel": "样本",
+    "certifiedLabel": "已认证 ✓",
+    "scrollHint": "向下滚动浏览",
+    "ctaDownload": "下载 STL",
+    "ctaStudio": "在工作台打开",
+    "statsPrintsLabel": "次打印",
+    "body": [
+      "Mecha Dragon 系列第三次修订。每个关节如今都能稳定卡入位 —— 不卡死、不上胶、不需支撑。整体一次性贴床打印完成。",
+      "针对 PLA 缩水率设计，关节间隙 0.30mm。下颌处预留磁铁腔体 —— 打印前放入 5mm 磁铁，即可吸附于任何钢质表面。"
+    ]
+  },
+  "maker": {
+    "rankLabel": "排名",
+    "follLabel": "粉丝",
+    "modelsLabel": "模型",
+    "followBtn": "关注",
+    "followingBtn": "已关注"
+  },
+  "farm": {
+    "printingForLabel": "正在为 {handle} 打印",
+    "etaLabel": "预计剩余",
+    "liveStreamLabel": "直播流"
+  },
+  "footer": {
+    "columns": {
+      "explore": {
+        "heading": "探索",
+        "links": {
+          "catalog": "目录",
+          "marketplace": "市集",
+          "collections": "合集",
+          "operators": "操作员",
+          "printFarm": "打印农场"
+        }
+      },
+      "create": {
+        "heading": "创作",
+        "links": {
+          "logSample": "登记样本",
+          "studio": "工作台（在线切片）",
+          "makerProgram": "创作者计划",
+          "designGuide": "设计指南"
+        }
+      },
+      "company": {
+        "heading": "公司",
+        "links": {
+          "about": "关于",
+          "labLog": "实验日志（博客）",
+          "pressKit": "媒体资料",
+          "careers": "招聘",
+          "contact": "联系我们"
+        }
+      },
+      "legal": {
+        "heading": "法律",
+        "links": {
+          "terms": "服务条款",
+          "privacy": "隐私政策",
+          "licenses": "授权",
+          "dmca": "DMCA"
+        }
+      }
+    },
+    "networkStatusNominal": "网络正常"
+  },
+  "toast": {
+    "navigateMock": "导航 · {label}（暂未接入）",
+    "searchMock": "搜索 · \"{query}\"",
+    "searchEmpty": "（空）",
+    "localePickerMock": "语言选择器（暂未接入）",
+    "notificationsMock": "通知（暂未接入）",
+    "publishMock": "发布（暂未接入）",
+    "filterMock": "筛选 · {label}",
+    "downloadStarted": "STL 下载已开始（mock）",
+    "openInStudioMock": "在工作台打开（暂未接入）",
+    "browseAllMock": "浏览全部（暂未接入）",
+    "fullLeaderboardMock": "完整排行榜（暂未接入）",
+    "allPrintersMock": "全部打印机（暂未接入）",
+    "footerMock": "底栏 · {label}",
+    "socialMock": "社交 · {label}"
+  }
+}

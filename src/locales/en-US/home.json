@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "catalog": "Catalog",
+    "market": "Market",
+    "studio": "Studio",
+    "labLog": "Lab Log"
+  },
+  "search": {
+    "label": "QUERY",
+    "placeholder": "search 482,164 specimens, makers, collections…"
+  },
+  "sections": {
+    "trending": {
+      "title": "Trending This Week",
+      "sub": "Updated 9:41 AM · refresh 60min",
+      "cta": "Browse all"
+    },
+    "operators": {
+      "title": "Operators · Top of Month",
+      "sub": "By prints generated · ranked",
+      "cta": "Full Leaderboard"
+    },
+    "printFarm": {
+      "title": "Print Farm · Live Telemetry",
+      "sub": "142 jobs running · streamed",
+      "cta": "All printers"
+    }
+  },
+  "hero": {
+    "sampleLabel": "SAMPLE",
+    "certifiedLabel": "CERTIFIED ✓",
+    "scrollHint": "Scroll to explore",
+    "ctaDownload": "Download STL",
+    "ctaStudio": "Open in Studio",
+    "statsPrintsLabel": "prints",
+    "body": [
+      "The third revision of the Mecha Dragon series. Every articulation now clicks satisfyingly into position — no binding, no glue, no supports. Prints straight off the bed in a single piece.",
+      "Designed for stock PLA shrinkage with 0.30mm joint clearances. Includes a hidden magnet cavity in the lower jaw — drop in a 5mm magnet pre-print and it sticks to any steel surface."
+    ]
+  },
+  "maker": {
+    "rankLabel": "RANK",
+    "follLabel": "Foll",
+    "modelsLabel": "Models",
+    "followBtn": "Follow",
+    "followingBtn": "Following"
+  },
+  "farm": {
+    "printingForLabel": "printing for {handle}",
+    "etaLabel": "ETA",
+    "liveStreamLabel": "LIVE STREAM"
+  },
+  "footer": {
+    "columns": {
+      "explore": {
+        "heading": "Explore",
+        "links": {
+          "catalog": "Catalog",
+          "marketplace": "Marketplace",
+          "collections": "Collections",
+          "operators": "Operators",
+          "printFarm": "Print Farm"
+        }
+      },
+      "create": {
+        "heading": "Create",
+        "links": {
+          "logSample": "Log a sample",
+          "studio": "Studio (web slicer)",
+          "makerProgram": "Maker program",
+          "designGuide": "Design guide"
+        }
+      },
+      "company": {
+        "heading": "Company",
+        "links": {
+          "about": "About",
+          "labLog": "Lab Log (Blog)",
+          "pressKit": "Press kit",
+          "careers": "Careers",
+          "contact": "Contact"
+        }
+      },
+      "legal": {
+        "heading": "Legal",
+        "links": {
+          "terms": "Terms",
+          "privacy": "Privacy",
+          "licenses": "Licenses",
+          "dmca": "DMCA"
+        }
+      }
+    },
+    "networkStatusNominal": "NETWORK NOMINAL"
+  },
+  "toast": {
+    "navigateMock": "Navigate · {label} (mock)",
+    "searchMock": "Search · \"{query}\"",
+    "searchEmpty": "(empty)",
+    "localePickerMock": "Locale picker (mock)",
+    "notificationsMock": "Notifications (mock)",
+    "publishMock": "Publish (mock)",
+    "filterMock": "Filter · {label}",
+    "downloadStarted": "Download STL · started (mock)",
+    "openInStudioMock": "Open in Studio (mock)",
+    "browseAllMock": "Browse all (mock)",
+    "fullLeaderboardMock": "Full Leaderboard (mock)",
+    "allPrintersMock": "All printers (mock)",
+    "footerMock": "Footer · {label}",
+    "socialMock": "Social · {label}"
+  }
+}

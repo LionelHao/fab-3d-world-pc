@@ -1,0 +1,53 @@
+{
+  "chrome": {
+    "titleA": "LOGIN · ",
+    "titleB": "ACCESS",
+    "telemetrySecure": "SECURE",
+    "telemetryModeLabel": "MODE",
+    "telemetryModeLogin": "LOGIN",
+    "telemetrySessionLabel": "SESSION",
+    "helpRightLabel": "Help"
+  },
+  "page": {
+    "title": "Operator Access",
+    "subtitleA": "FBW IDENTITY · ",
+    "subtitleB": "V3.4"
+  },
+  "section": {
+    "credentialsName": "Credentials",
+    "stampRequired": "REQ"
+  },
+  "field": {
+    "usernameLabel": "Username",
+    "usernameHint": "account id",
+    "usernamePlaceholder": "operator id",
+    "usernameHelperRequired": "USERNAME REQUIRED",
+    "usernameHelperDefault": "ENTER YOUR FBW OPERATOR ID",
+    "passwordLabel": "Password",
+    "passwordHint": "min 8 chars",
+    "passwordPlaceholder": "enter password",
+    "passwordHelperRequired": "PASSWORD REQUIRED",
+    "passwordToggleAria": "Toggle password visibility",
+    "verifyLabel": "Verify Code",
+    "verifyHint": "6 digits",
+    "verifyPlaceholder": "------",
+    "verifyHelper": "CODE WILL BE SENT VIA SMS · TYPE 6 DIGITS",
+    "verifyResend": "RESEND"
+  },
+  "cta": {
+    "signIn": "Sign In",
+    "register": "Register · Phone",
+    "badgeAuth": "/AUTH"
+  },
+  "foot": {
+    "forgot": "Forgot",
+    "help": "Help",
+    "legal": "Legal"
+  },
+  "msg": {
+    "credentialsRequired": "Please enter username and password",
+    "loginSuccess": "Signed in",
+    "loginFailed": "Login failed, check your username or password",
+    "registerContactOps": "Register — please contact ops to create an account"
+  }
+}

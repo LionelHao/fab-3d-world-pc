@@ -11,9 +11,13 @@
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import UiSearchBar from '@/components/ui/UiSearchBar.vue'
 import UiIconButton from '@/components/ui/UiIconButton.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
+import PcLocaleSwitcher from '@/components/PcLocaleSwitcher.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   navLinks: { type: Array, required: true },
@@ -95,26 +99,23 @@ const onAvatar = () => emit('avatar-click')
       />
 
       <div class="pc-navbar__right">
-        <button class="pc-navbar__locale" type="button" @click="onLocale" :aria-label="`Locale: ${locale.display}`">
-          <span class="pc-navbar__flag" aria-hidden="true"></span>
-          <span>{{ locale.display }}</span>
-        </button>
+        <PcLocaleSwitcher />
 
-        <UiIconButton variant="outline" :size="32" :badge="bellBadge" aria-label="Notifications" @click="onBell">
+        <UiIconButton variant="outline" :size="32" :badge="bellBadge" :aria-label="t('common.navbar.notificationsAria')" @click="onBell">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 8a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/>
             <path d="M10 19a2 2 0 0 0 4 0"/>
           </svg>
         </UiIconButton>
 
-        <button class="pc-navbar__upload" type="button" @click="onUpload" aria-label="Log a sample">
+        <button class="pc-navbar__upload" type="button" @click="onUpload" :aria-label="t('common.navbar.uploadAria')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">
             <path d="M12 5v14M5 12h14"/>
           </svg>
-          Log Sample
+          {{ t('common.navbar.uploadLabel') }}
         </button>
 
-        <button class="pc-navbar__avatar" type="button" @click="onAvatar" aria-label="My profile">
+        <button class="pc-navbar__avatar" type="button" @click="onAvatar" :aria-label="t('common.navbar.avatarAria')">
           <UiAvatar :initials="userInitials" :size="32" palette="hilite" shape="square" />
         </button>
       </div>

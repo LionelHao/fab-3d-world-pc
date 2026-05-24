@@ -6,7 +6,10 @@
  * Anchor: cd-3-desktop.html line 1977-2036 + CSS line 926-1042
  */
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   maker: { type: Object, required: true },
@@ -15,7 +18,7 @@ const props = defineProps({
 const emit = defineEmits(['follow-toggle', 'click'])
 
 const rankLabel = computed(() => `№ ${String(props.maker.rank).padStart(2, '0')} · ${props.maker.opId}`)
-const followLabel = computed(() => (props.maker.following ? 'Following' : 'Follow'))
+const followLabel = computed(() => (props.maker.following ? t('home.maker.followingBtn') : t('home.maker.followBtn')))
 
 const onFollow = (e) => {
   e.stopPropagation()
@@ -26,7 +29,7 @@ const onFollow = (e) => {
 <template>
   <div class="pc-maker" :class="{ 'pc-maker--following': maker.following }" @click="$emit('click', maker)">
     <header class="pc-maker__head">
-      <span>RANK</span>
+      <span>{{ t('home.maker.rankLabel') }}</span>
       <span class="pc-maker__id">{{ rankLabel }}</span>
     </header>
     <div class="pc-maker__body">
@@ -42,11 +45,11 @@ const onFollow = (e) => {
       </span>
       <div class="pc-maker__stats">
         <div class="pc-maker__cell">
-          <span class="pc-maker__k">Foll</span>
+          <span class="pc-maker__k">{{ t('home.maker.follLabel') }}</span>
           <span class="pc-maker__v">{{ maker.stats.foll }}</span>
         </div>
         <div class="pc-maker__cell">
-          <span class="pc-maker__k">Models</span>
+          <span class="pc-maker__k">{{ t('home.maker.modelsLabel') }}</span>
           <span class="pc-maker__v">{{ maker.stats.models }}</span>
         </div>
       </div>

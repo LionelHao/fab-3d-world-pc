@@ -1,0 +1,17 @@
+{
+  "section": {
+    "title": "Marketplace",
+    "subtitle": "{count} ENTRIES · LIVE INDEX",
+    "cta": "See all"
+  },
+  "chip": {
+    "all": "All"
+  },
+  "empty": "EOF · NO GOODS · ADJUST FILTERS",
+  "toast": {
+    "searchFailed": "Search failed · stand by",
+    "notificationsMock": "Notifications (mock)",
+    "localeMock": "Locale (mock)",
+    "uploadMock": "Upload (mock)"
+  }
+}

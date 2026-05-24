@@ -8,6 +8,10 @@
  * ahd(BADGE + ix) + badge(80×80 SVG art) + body(title + meta)。
  * badge SVG 1:1 内联自 cd-8（装饰图样，4 型：gear / shield / bolt / star）。
  */
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   ix: { type: String, default: '' },
   /** gear | shield | bolt | star */
@@ -20,7 +24,7 @@ defineProps({
 <template>
   <article class="pc-ach">
     <div class="pc-ach__hd">
-      <span>BADGE</span><span class="pc-ach__ix">{{ ix }}</span>
+      <span>{{ t('profile.achievement.badgeHeading') }}</span><span class="pc-ach__ix">{{ ix }}</span>
     </div>
     <div class="pc-ach__badge">
       <!-- gear -->

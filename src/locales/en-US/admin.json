@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "helpAria": "Help",
+    "notificationsAria": "Notifications",
+    "accountAria": "Account"
+  },
+  "section": {
+    "streamTitle": "Stream · Live Tail",
+    "alertsTitle": "Alerts",
+    "ticketsTitle": "Tickets · Reports Queue",
+    "streamStamp": "AUTO-PAUSE · OFF",
+    "alertsStamp": "{count} OPEN",
+    "ticketsStamp": "{total} OPEN · {crit} CRIT",
+    "streamMeta": "SHOWING {showing} OF {total} EVENTS · {window} · TAIL FROM {tailFrom}",
+    "ticketsMeta": "SHOWING {showing} OF {total} OPEN TICKETS · SORT {sort}",
+    "loadOlder": "Load older",
+    "createManualAlert": "Create manual alert",
+    "viewAllTickets": "View all {total} →"
+  },
+  "toast": {
+    "tabLoaded": "{label} · {count} items",
+    "tabSwitch": "{label} · switched",
+    "sidebarMock": "{section} · {label}",
+    "opsConsole": "Ops Console",
+    "helpPalette": "Help · ⌘K command palette",
+    "alertsOpen": "{count} alerts open",
+    "alertAction": "{action} · {title}",
+    "createAlertMock": "Create manual alert",
+    "ticketAction": "{id} · {action}",
+    "loadOlderMock": "Load older events",
+    "viewAllTicketsMock": "View all {total} tickets"
+  }
+}

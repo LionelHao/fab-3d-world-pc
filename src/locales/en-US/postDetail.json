@@ -1,0 +1,45 @@
+{
+  "tabs": {
+    "overview": "Overview",
+    "photos": "Photos",
+    "discuss": "Discuss"
+  },
+  "section": {
+    "galleryTitle": "§ 01 · Gallery",
+    "galleryStamp": "{count} ENTRIES",
+    "galleryEmpty": "EOF · NO PHOTOS",
+    "statsTitle": "Stats",
+    "statsStamp": "LIVE",
+    "notesTitle": "§ 03 · Notes",
+    "notesStamp": "CONTENT",
+    "notesEmpty": "NO CONTENT · STAND BY",
+    "modelFilesTitle": "§ 04 · Model Files",
+    "modelLabel": "Model · {index}"
+  },
+  "stats": {
+    "likes": "Likes",
+    "saves": "Saves",
+    "photos": "Photos",
+    "models": "Models",
+    "posted": "Posted",
+    "id": "ID"
+  },
+  "cta": {
+    "primary": "Buy / Save",
+    "secondary": "Share Link",
+    "secondaryAria": "Share post link"
+  },
+  "photoAlt": "Photo {index}",
+  "modelAria": "MDL",
+  "untitled": "UNTITLED",
+  "anonymousOperator": "Operator",
+  "toast": {
+    "notificationsMock": "Notifications (mock)",
+    "localeMock": "Locale (mock)",
+    "uploadMock": "Upload (mock)",
+    "searchMock": "Search · \"{query}\"",
+    "primaryMock": "Buy / Save action placeholder",
+    "secondaryMock": "Share link copied (mock)",
+    "modelUrlPending": "Model URL pending backend"
+  }
+}

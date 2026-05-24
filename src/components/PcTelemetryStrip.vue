@@ -9,6 +9,10 @@
  *  - 默认: 6 段固定 LIVE / NETWORK / FARM / SAMPLES / REV / SYNC（传 data）
  *  - 自定义: 传 items=[[label,value], …]，完全替换段位（T3.10.5 扩展，cd-8 profile）
  */
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   data: { type: Object, default: () => null },
   /** 自定义段位 [[label, value], …]；非空则替换固定 6 段 */
@@ -28,7 +32,7 @@ defineProps({
     </template>
     <!-- 固定 6 段模式 (cd-3 home) -->
     <template v-else-if="data">
-      <span>LIVE</span>
+      <span>{{ t('common.telemetry.live') }}</span>
       <span class="pc-telemetry__sep">/</span>
       <span>NETWORK <b>{{ data.network.value }} {{ data.network.unit }}</b></span>
       <span class="pc-telemetry__sep">/</span>

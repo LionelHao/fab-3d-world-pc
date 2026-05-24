@@ -8,6 +8,9 @@
  * 槽位: 装饰 chrome (head/crosshairs/readouts/scale-ruler) + render slot 供 SVG/3D viewer
  */
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 defineProps({
   data: { type: Object, required: true }, // heroFixture.plate + sample/rev/class/certified
@@ -27,11 +30,11 @@ defineExpose({ canvasRef })
   <div class="pc-plate">
     <div class="pc-plate__head">
       <div class="pc-plate__head-left">
-        <span>SAMPLE</span>
+        <span>{{ t('home.hero.sampleLabel') }}</span>
         <b>{{ sampleCode }}</b>
         <span v-if="rev || sampleClass">· REV {{ rev }} · CLASS {{ sampleClass }}</span>
       </div>
-      <div v-if="certified" class="pc-plate__head-right">CERTIFIED ✓</div>
+      <div v-if="certified" class="pc-plate__head-right">{{ t('home.hero.certifiedLabel') }}</div>
     </div>
 
     <div class="pc-plate__canvas">

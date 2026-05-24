@@ -10,6 +10,7 @@
  */
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import * as OV from 'online-3d-viewer/build/engine/o3dv.module.js'
 import { attachViewerSoul } from '@/utils/viewerSoul.js'
 import { ElMessage } from 'element-plus'
@@ -48,6 +49,7 @@ import {
 } from '@/mocks/cd-3-fixture'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const searchValue = ref('')
 const activeChipId = ref('all')
@@ -156,27 +158,71 @@ onUnmounted(() => {
   heroViewer = null
 })
 
+/* ─── i18n: localized chrome/section/footer derived from fixtures ─── */
+const NAV_KEYS = { catalog: 'home.nav.catalog', market: 'home.nav.market', studio: 'home.nav.studio', lab_log: 'home.nav.labLog' }
+const localizedNavLinks = computed(() =>
+  navLinks.map((l) => ({ ...l, label: NAV_KEYS[l.id] ? t(NAV_KEYS[l.id]) : l.label }))
+)
+const localizedSearch = computed(() => ({
+  ...searchDefaults,
+  label: t('home.search.label'),
+  placeholder: t('home.search.placeholder'),
+}))
+const localizedSectionHeaders = computed(() => ({
+  trending:   { ...sectionHeaders.trending,   title: t('home.sections.trending.title'),   sub: t('home.sections.trending.sub'),   cta: t('home.sections.trending.cta') },
+  operators:  { ...sectionHeaders.operators,  title: t('home.sections.operators.title'),  sub: t('home.sections.operators.sub'),  cta: t('home.sections.operators.cta') },
+  print_farm: { ...sectionHeaders.print_farm, title: t('home.sections.printFarm.title'),  sub: t('home.sections.printFarm.sub'),  cta: t('home.sections.printFarm.cta') },
+}))
+const localizedHeroScrollHint = computed(() => t('home.hero.scrollHint'))
+const FOOTER_COL_KEYS = ['explore', 'create', 'company', 'legal']
+const FOOTER_LINK_KEYS = {
+  explore: { '/home': 'catalog', '/market': 'marketplace', '#collections': 'collections', '#operators': 'operators', '#farm': 'printFarm' },
+  create: { '/publish': 'logSample', '/studio': 'studio', '#maker': 'makerProgram', '#guide': 'designGuide' },
+  company: { '#about': 'about', '/log': 'labLog', '#press': 'pressKit', '#careers': 'careers', '#contact': 'contact' },
+  legal: { '#terms': 'terms', '#privacy': 'privacy', '#licenses': 'licenses', '#dmca': 'dmca' },
+}
+const localizedFooterColumns = computed(() =>
+  footerColumns.map((col, idx) => {
+    const key = FOOTER_COL_KEYS[idx]
+    const linkMap = FOOTER_LINK_KEYS[key] || {}
+    return {
+      ...col,
+      heading: t(`home.footer.columns.${key}.heading`),
+      links: col.links.map((link, i) => {
+        // 按列内位置取 link key（fixture 顺序与 zh/en JSON 顺序对齐）
+        const linkKeys = Object.values(linkMap)
+        const lk = linkKeys[i]
+        return { ...link, label: lk ? t(`home.footer.columns.${key}.links.${lk}`) : link.label }
+      }),
+    }
+  })
+)
+const localizedFooterBottom = computed(() => ({
+  ...footerBottom,
+  networkStatus: t('home.footer.networkStatusNominal'),
+}))
+
 const onLogoClick = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 const onNavClick = (link) => {
   if (link.id === 'studio' || link.id === 'lab_log') {
-    ElMessage.info(`Navigate · ${link.label} (mock)`)
+    ElMessage.info(t('home.toast.navigateMock', { label: link.label }))
   }
 }
-const onSearch = (v) => ElMessage.info(`Search · "${v || '(empty)'}"`)
-const onLocaleClick = () => ElMessage.info('Locale picker (mock)')
-const onBellClick = () => ElMessage.info('Notifications (mock)')
+const onSearch = (v) => ElMessage.info(t('home.toast.searchMock', { query: v || t('home.toast.searchEmpty') }))
+const onLocaleClick = () => ElMessage.info(t('home.toast.localePickerMock'))
+const onBellClick = () => ElMessage.info(t('home.toast.notificationsMock'))
 const onUploadClick = () => {
-  router.push('/publish').catch(() => ElMessage.info('Publish (mock)'))
+  router.push('/publish').catch(() => ElMessage.info(t('home.toast.publishMock')))
 }
 const onAvatarClick = () => router.push('/profile').catch(() => {})
 
 const onChipClick = (chip) => {
   activeChipId.value = chip.id
-  ElMessage.info(`Filter · ${chip.label}`)
+  ElMessage.info(t('home.toast.filterMock', { label: chip.label }))
 }
 
-const onHeroDownload = () => ElMessage.success('Download STL · started (mock)')
-const onHeroStudio = () => ElMessage.info('Open in Studio (mock)')
+const onHeroDownload = () => ElMessage.success(t('home.toast.downloadStarted'))
+const onHeroStudio = () => ElMessage.info(t('home.toast.openInStudioMock'))
 
 const onCardClick = (postId) => router.push(`/post/${postId}`).catch(() => {})
 const onBookmarkToggle = (postId, next) => {
@@ -193,12 +239,12 @@ const onFollowToggle = (opId, next) => {
   followingSet.value = set
 }
 
-const onSeeAllTrending = () => router.push('/market').catch(() => ElMessage.info('Browse all (mock)'))
-const onSeeAllOperators = () => ElMessage.info('Full Leaderboard (mock)')
-const onSeeAllFarm = () => ElMessage.info('All printers (mock)')
+const onSeeAllTrending = () => router.push('/market').catch(() => ElMessage.info(t('home.toast.browseAllMock')))
+const onSeeAllOperators = () => ElMessage.info(t('home.toast.fullLeaderboardMock'))
+const onSeeAllFarm = () => ElMessage.info(t('home.toast.allPrintersMock'))
 
-const onFooterLink = (link) => ElMessage.info(`Footer · ${link.label}`)
-const onFooterSocial = (s) => ElMessage.info(`Social · ${s.label}`)
+const onFooterLink = (link) => ElMessage.info(t('home.toast.footerMock', { label: link.label }))
+const onFooterSocial = (s) => ElMessage.info(t('home.toast.socialMock', { label: s.label }))
 const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 </script>
 
@@ -206,9 +252,9 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
   <div class="pc-home">
     <PcNavbar
       v-model:search-value="searchValue"
-      :nav-links="navLinks"
+      :nav-links="localizedNavLinks"
       :brand="brandConstants"
-      :search="searchDefaults"
+      :search="localizedSearch"
       :locale="localePack"
       :bell-badge="true"
       @logo-click="onLogoClick"
@@ -243,7 +289,7 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
         />
       </div>
       <div class="pc-home__scroll-hint">
-        {{ heroFixture.scrollHint }}
+        {{ localizedHeroScrollHint }}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14M6 13l6 6 6-6"/>
         </svg>
@@ -252,10 +298,10 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
     <UiReveal as="section" class="pc-home__block" :delay="0">
       <PcSectionHeader
-        :num="sectionHeaders.trending.num"
-        :title="sectionHeaders.trending.title"
-        :sub="sectionHeaders.trending.sub"
-        :cta="sectionHeaders.trending.cta"
+        :num="localizedSectionHeaders.trending.num"
+        :title="localizedSectionHeaders.trending.title"
+        :sub="localizedSectionHeaders.trending.sub"
+        :cta="localizedSectionHeaders.trending.cta"
         @cta-click="onSeeAllTrending"
       />
 
@@ -293,10 +339,10 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
     <UiReveal as="section" class="pc-home__block" :delay="80">
       <PcSectionHeader
-        :num="sectionHeaders.operators.num"
-        :title="sectionHeaders.operators.title"
-        :sub="sectionHeaders.operators.sub"
-        :cta="sectionHeaders.operators.cta"
+        :num="localizedSectionHeaders.operators.num"
+        :title="localizedSectionHeaders.operators.title"
+        :sub="localizedSectionHeaders.operators.sub"
+        :cta="localizedSectionHeaders.operators.cta"
         @cta-click="onSeeAllOperators"
       />
       <div class="pc-home__makers">
@@ -311,10 +357,10 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
     <UiReveal as="section" class="pc-home__block" :delay="160">
       <PcSectionHeader
-        :num="sectionHeaders.print_farm.num"
-        :title="sectionHeaders.print_farm.title"
-        :sub="sectionHeaders.print_farm.sub"
-        :cta="sectionHeaders.print_farm.cta"
+        :num="localizedSectionHeaders.print_farm.num"
+        :title="localizedSectionHeaders.print_farm.title"
+        :sub="localizedSectionHeaders.print_farm.sub"
+        :cta="localizedSectionHeaders.print_farm.cta"
         @cta-click="onSeeAllFarm"
       />
       <div class="pc-home__farm-wrap">
@@ -330,9 +376,9 @@ const onFooterLogo = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
     <PcFooter
       :brand="brandConstants"
-      :columns="footerColumns"
+      :columns="localizedFooterColumns"
       :social="socialLinks"
-      :bottom="footerBottom"
+      :bottom="localizedFooterBottom"
       @logo-click="onFooterLogo"
       @link-click="onFooterLink"
       @social-click="onFooterSocial"

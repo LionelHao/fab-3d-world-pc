@@ -1,0 +1,58 @@
+{
+  "header": {
+    "title": "操作员",
+    "actionExport": "导出数据",
+    "actionPublic": "公开主页",
+    "actionSignOut": "退出登录"
+  },
+  "section": {
+    "identityName": "公开展示",
+    "identityStamp": "编辑模式",
+    "statsName": "工作台数据",
+    "statsStamp": "8 项指标 · 近 30 天",
+    "activityName": "近 30 天活动",
+    "activityStamp": "6 项 · 尾部",
+    "achievementsName": "成就",
+    "achievementsStamp": "已展示 {shown} / {total}"
+  },
+  "field": {
+    "handle": "用户名",
+    "handleReadonly": "只读",
+    "handleChange": "更换 ›",
+    "displayName": "显示名称",
+    "bio": "简介",
+    "bioCount": "{count} / {max} 字",
+    "tags": "标签",
+    "tagAdd": "+ 添加"
+  },
+  "avatar": {
+    "heading": "头像",
+    "replace": "更换图片"
+  },
+  "achievement": {
+    "viewAll": "查看全部成就（{total}）→",
+    "badgeHeading": "徽章"
+  },
+  "sidebar": {
+    "openDashboard": "进入仪表盘"
+  },
+  "toast": {
+    "loadFailed": "个人资料加载失败，使用占位数据",
+    "navMock": "导航 · {label}（暂未接入）",
+    "searchMock": "搜索 · {query}（暂未接入）",
+    "localeMock": "语言（暂未接入）",
+    "notificationsMock": "通知（暂未接入）",
+    "logSampleMock": "记录样本（暂未接入）",
+    "accountMock": "账号（暂未接入）",
+    "sideTabMock": "{label}（暂未接入）",
+    "exportQueued": "导出已排队（mock）",
+    "publicProfileMock": "公开主页（暂未接入）",
+    "handleChangeMock": "更换用户名（暂未接入）",
+    "replaceImageMock": "更换头像图片（暂未接入）",
+    "addTagMock": "添加标签（暂未接入）",
+    "viewLogMock": "完整活动日志（暂未接入）",
+    "viewAchievementsMock": "全部成就（暂未接入）",
+    "footerLinkMock": "{label}（暂未接入）",
+    "signedOut": "已退出登录"
+  }
+}

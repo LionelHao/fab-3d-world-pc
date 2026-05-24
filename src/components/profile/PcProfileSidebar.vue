@@ -7,6 +7,10 @@
  *
  * side-card(120px 头像 + handle + dossier 4 行) + side-tabs(8 stab) + side-foot(build + kbd-row)。
  */
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   avatarText: { type: String, default: 'OP' },
   avatarSrc: { type: String, default: '' },
@@ -76,7 +80,7 @@ function onTab(idx, tab) {
       WORLD <b>{{ foot.world }}</b>
       <div class="pc-sidebar__kbd-row">
         <span class="pc-sidebar__kbd">⌘</span><span class="pc-sidebar__kbd">,</span>
-        <span>OPEN DASHBOARD</span>
+        <span>{{ t('profile.sidebar.openDashboard') }}</span>
       </div>
     </div>
   </aside>

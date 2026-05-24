@@ -8,6 +8,10 @@
  * nav-left(wm + app-mode 红底脉冲) + ctx(居中 mono 上下文) + nav-right(help / bell / avatar)。
  * icon-sq / avatar 内联以 1:1 复刻 cd-9 pip / ADM micro-badge（同 P3.4 studio NAV 内联先例）。
  */
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   /** brand: { wordmark: { left, divider, right, tag }, appMode } */
   brand: { type: Object, default: () => ({}) },
@@ -50,14 +54,14 @@ const emit = defineEmits(['logo-click', 'help-click', 'bell-click', 'avatar-clic
 
       <!-- right -->
       <div class="admin-nav__right">
-        <button class="admin-nav__isq" aria-label="Help" @click="emit('help-click')">
+        <button class="admin-nav__isq" :aria-label="t('admin.nav.helpAria')" @click="emit('help-click')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 1 1 4.5 1.5c-1 .8-2 1.3-2 2.5" /><circle cx="12" cy="17" r="0.8" fill="currentColor" /></svg>
         </button>
-        <button class="admin-nav__isq" aria-label="Notifications" @click="emit('bell-click')">
+        <button class="admin-nav__isq" :aria-label="t('admin.nav.notificationsAria')" @click="emit('bell-click')">
           <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6" /><path d="M10 19a2 2 0 0 0 4 0" /></svg>
           <span v-if="bellBadge" class="admin-nav__pip" aria-hidden="true"></span>
         </button>
-        <button class="admin-nav__avatar" aria-label="Account" @click="emit('avatar-click')">
+        <button class="admin-nav__avatar" :aria-label="t('admin.nav.accountAria')" @click="emit('avatar-click')">
           <span class="admin-nav__av-txt">{{ avatarText }}</span>
           <span class="admin-nav__av-badge">ADM</span>
         </button>

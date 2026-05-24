@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "helpAria": "帮助",
+    "notificationsAria": "通知",
+    "accountAria": "账号"
+  },
+  "section": {
+    "streamTitle": "Stream · 实时跟踪",
+    "alertsTitle": "告警",
+    "ticketsTitle": "工单 · 举报队列",
+    "streamStamp": "自动暂停 · 关闭",
+    "alertsStamp": "{count} 项未处理",
+    "ticketsStamp": "{total} 项未处理 · {crit} 项严重",
+    "streamMeta": "显示 {showing} / {total} 条事件 · {window} · 从 {tailFrom} 起",
+    "ticketsMeta": "显示 {showing} / {total} 项未处理工单 · 排序 {sort}",
+    "loadOlder": "加载更早",
+    "createManualAlert": "新建手动告警",
+    "viewAllTickets": "查看全部 {total} →"
+  },
+  "toast": {
+    "tabLoaded": "{label} · {count} 条",
+    "tabSwitch": "{label} · 切换",
+    "sidebarMock": "{section} · {label}",
+    "opsConsole": "运营控制台",
+    "helpPalette": "帮助 · ⌘K 命令面板",
+    "alertsOpen": "{count} 项告警未处理",
+    "alertAction": "{action} · {title}",
+    "createAlertMock": "新建手动告警",
+    "ticketAction": "{id} · {action}",
+    "loadOlderMock": "加载更早事件",
+    "viewAllTicketsMock": "查看全部 {total} 项工单"
+  }
+}

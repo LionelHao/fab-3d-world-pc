@@ -1,0 +1,44 @@
+{
+  "appTitle": "FBW · 智造工坊",
+  "language": "语言",
+  "languageZh": "中文",
+  "languageEn": "English",
+  "actions": {
+    "back": "返回",
+    "cancel": "取消",
+    "confirm": "确定",
+    "submit": "提交",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除",
+    "retry": "重试",
+    "continue": "继续",
+    "loading": "加载中…",
+    "more": "更多"
+  },
+  "toast": {
+    "notAvailable": "{label} — 暂未开放",
+    "networkError": "网络异常，请稍后再试",
+    "loadFailed": "加载失败",
+    "saveSuccess": "保存成功",
+    "saveFailed": "保存失败"
+  },
+  "empty": {
+    "noData": "暂无数据",
+    "eof": "已经到底啦"
+  },
+  "navbar": {
+    "notificationsAria": "通知",
+    "uploadAria": "记录新样本",
+    "uploadLabel": "记录样本",
+    "avatarAria": "我的资料"
+  },
+  "telemetry": {
+    "live": "在线"
+  },
+  "footer": {
+    "tagline": "可打印几何体的实验室。每个模型登记为样本。每次打印经过测量、分类与归档。自 2024 年起。",
+    "statusLabel": "状态",
+    "uptimeLabel": "在线率"
+  }
+}

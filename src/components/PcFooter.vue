@@ -5,6 +5,10 @@
  * Spec: docs/design/specs/p3.2-pc-home.md §1.8
  * Anchor: cd-3-desktop.html line 1248-1320, 2247-2320
  */
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   brand: { type: Object, required: true },
   columns: { type: Array, required: true },
@@ -47,10 +51,10 @@ const onLogo = (e) => {
           {{ brand.wordmark.right }}
           <span class="pc-footer__wm-tag">{{ brand.wordmark.tag }}</span>
         </a>
-        <p class="pc-footer__tagline">A laboratory of printable geometries. Every model logged as a specimen. Every print measured, classified, archived. Since 2024.</p>
+        <p class="pc-footer__tagline">{{ t('common.footer.tagline') }}</p>
         <div class="pc-footer__meta">
           {{ brand.build }} · {{ brand.buildLocations }}<br/>
-          STATUS <b>{{ brand.status }}</b> · UPTIME <b>{{ brand.uptime }}</b>
+          {{ t('common.footer.statusLabel') }} <b>{{ brand.status }}</b> · {{ t('common.footer.uptimeLabel') }} <b>{{ brand.uptime }}</b>
         </div>
         <div class="pc-footer__social">
           <a

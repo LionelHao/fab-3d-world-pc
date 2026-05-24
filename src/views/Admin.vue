@@ -14,6 +14,7 @@
  * §3 Mapping note 2），动作走 mock action（ElMessage + console.log）。
  */
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { getDashboard, listPosts, listUsers, listOrders } from '@/service/admin'
 import { enrichAdmin } from '@/mocks/cd-9-fixture'
@@ -26,6 +27,8 @@ import AdminStream from '@/components/admin/AdminStream.vue'
 import AdminAlert from '@/components/admin/AdminAlert.vue'
 import AdminTicketsTable from '@/components/admin/AdminTicketsTable.vue'
 import AdminFooter from '@/components/admin/AdminFooter.vue'
+
+const { t } = useI18n()
 
 // view-model: 先用 fixture 兜底, getDashboard 成功后真实计数注入 sidebar
 const vm = ref(enrichAdmin({}))
@@ -44,18 +47,18 @@ async function loadDashboard() {
 onMounted(loadDashboard)
 
 /* ---- 派生印章文字 ---- */
-const streamStamp = computed(() => 'AUTO-PAUSE · OFF')
-const alertsStamp = computed(() => `${vm.value.alerts.length} OPEN`)
-const ticketsStamp = computed(
-  () => `${vm.value.tickets.meta.total} OPEN · ${vm.value.tickets.meta.crit} CRIT`,
+const streamStamp = computed(() => t('admin.section.streamStamp'))
+const alertsStamp = computed(() => t('admin.section.alertsStamp', { count: vm.value.alerts.length }))
+const ticketsStamp = computed(() =>
+  t('admin.section.ticketsStamp', { total: vm.value.tickets.meta.total, crit: vm.value.tickets.meta.crit }),
 )
 const streamMetaText = computed(() => {
   const m = vm.value.stream.meta
-  return `SHOWING ${m.showing} OF ${m.total} EVENTS · ${m.window} · TAIL FROM ${m.tailFrom}`
+  return t('admin.section.streamMeta', { showing: m.showing, total: m.total, window: m.window, tailFrom: m.tailFrom })
 })
 const ticketsMetaText = computed(() => {
   const m = vm.value.tickets.meta
-  return `SHOWING ${m.showing} OF ${m.total} OPEN TICKETS · SORT ${m.sort}`
+  return t('admin.section.ticketsMeta', { showing: m.showing, total: m.total, sort: m.sort })
 })
 
 /* ---- sidebar 导航: §02.1/§03.1/§04.1 走真实 backend 读取 ---- */
@@ -67,28 +70,28 @@ async function onSidebarTab({ section, tab }) {
     try {
       const data = await loader()
       console.log(`[admin] ${tab.label} loaded:`, data)
-      ElMessage.success(`${tab.label} · ${Array.isArray(data) ? data.length : 0} 条`)
+      ElMessage.success(t('admin.toast.tabLoaded', { label: tab.label, count: Array.isArray(data) ? data.length : 0 }))
     } catch (error) {
-      ElMessage.info(`${tab.label} · 切换`)
+      ElMessage.info(t('admin.toast.tabSwitch', { label: tab.label }))
     }
     return
   }
   console.log('[admin] sidebar tab:', tab.ix, tab.label)
-  ElMessage.info(`${section.name} · ${tab.label}`)
+  ElMessage.info(t('admin.toast.sidebarMock', { section: section.name, label: tab.label }))
 }
 
 /* ---- mock action handlers (运营 mock 域) ---- */
 function onLogo() {
   console.log('[admin] logo')
-  ElMessage.info('Ops Console')
+  ElMessage.info(t('admin.toast.opsConsole'))
 }
 function onHelp() {
   console.log('[admin] help')
-  ElMessage.info('Help · ⌘K command palette')
+  ElMessage.info(t('admin.toast.helpPalette'))
 }
 function onBell() {
   console.log('[admin] notifications')
-  ElMessage.info(`${vm.value.alerts.length} alerts open`)
+  ElMessage.info(t('admin.toast.alertsOpen', { count: vm.value.alerts.length }))
 }
 function onAvatar() {
   console.log('[admin] account')
@@ -96,23 +99,23 @@ function onAvatar() {
 }
 function onAlertAction(alert, act) {
   console.log('[admin] alert action:', alert.title, act.label)
-  ElMessage.success(`${act.label} · ${alert.title}`)
+  ElMessage.success(t('admin.toast.alertAction', { action: act.label, title: alert.title }))
 }
 function onCreateAlert() {
   console.log('[admin] create manual alert')
-  ElMessage.info('Create manual alert')
+  ElMessage.info(t('admin.toast.createAlertMock'))
 }
 function onTicketAction({ ticket, action }) {
   console.log('[admin] ticket action:', ticket.id, action.label)
-  ElMessage.success(`${ticket.id} · ${action.label}`)
+  ElMessage.success(t('admin.toast.ticketAction', { id: ticket.id, action: action.label }))
 }
 function onLoadOlder() {
   console.log('[admin] load older events')
-  ElMessage.info('Load older events')
+  ElMessage.info(t('admin.toast.loadOlderMock'))
 }
 function onViewAllTickets() {
   console.log('[admin] view all tickets')
-  ElMessage.info(`View all ${vm.value.tickets.meta.total} tickets`)
+  ElMessage.info(t('admin.toast.viewAllTicketsMock', { total: vm.value.tickets.meta.total }))
 }
 </script>
 
@@ -146,18 +149,18 @@ function onViewAllTickets() {
 
           <!-- ops row: stream + alerts -->
           <section class="admin-ops-row">
-            <AdminCard num="§ S" title="Stream · Live Tail" led :stamp="streamStamp" stamp-tone="hilite">
+            <AdminCard num="§ S" :title="t('admin.section.streamTitle')" led :stamp="streamStamp" stamp-tone="hilite">
               <AdminStream :rows="vm.stream.rows" />
               <template #foot>
                 <span class="admin-meta">{{ streamMetaText }}</span>
                 <button type="button" class="admin-obtn" @click="onLoadOlder">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-                  Load older
+                  {{ t('admin.section.loadOlder') }}
                 </button>
               </template>
             </AdminCard>
 
-            <AdminCard num="§ A" title="Alerts" :stamp="alertsStamp" stamp-tone="crit">
+            <AdminCard num="§ A" :title="t('admin.section.alertsTitle')" :stamp="alertsStamp" stamp-tone="crit">
               <div class="admin-alert-list">
                 <AdminAlert
                   v-for="(alert, idx) in vm.alerts"
@@ -172,19 +175,19 @@ function onViewAllTickets() {
                 />
                 <button type="button" class="admin-add" @click="onCreateAlert">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-                  Create manual alert
+                  {{ t('admin.section.createManualAlert') }}
                 </button>
               </div>
             </AdminCard>
           </section>
 
           <!-- tickets table -->
-          <AdminCard num="§ T" title="Tickets · Reports Queue" :stamp="ticketsStamp" stamp-tone="crit">
+          <AdminCard num="§ T" :title="t('admin.section.ticketsTitle')" :stamp="ticketsStamp" stamp-tone="crit">
             <AdminTicketsTable :rows="vm.tickets.rows" @action="onTicketAction" />
             <template #foot>
               <span class="admin-meta">{{ ticketsMetaText }}</span>
               <button type="button" class="admin-obtn" @click="onViewAllTickets">
-                View all {{ vm.tickets.meta.total }} →
+                {{ t('admin.section.viewAllTickets', { total: vm.tickets.meta.total }) }}
               </button>
             </template>
           </AdminCard>

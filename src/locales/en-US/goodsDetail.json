@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "helpAria": "Help",
+    "notificationsAria": "Notifications",
+    "myProfileAria": "My profile"
+  },
+  "telemetry": {
+    "studioLive": "STUDIO LIVE"
+  },
+  "viewer": {
+    "controlsHeading": "CONTROLS",
+    "autoRotateLabel": "Auto-rotate",
+    "stateOn": "ON",
+    "stateOff": "OFF",
+    "variantsHeading": "Variants",
+    "renderPlaceholder": "3D RENDER",
+    "renderPlaceholderSub": "SLOT · awaiting viewer attach"
+  },
+  "cta": {
+    "downloadBundle": "Download Bundle",
+    "sendToPrint": "Send to Print Queue"
+  },
+  "spec": {
+    "geometryTitle": "Geometry",
+    "printConfigTitle": "Print Config",
+    "printConfigStamp": "RECOMMENDED · FDM",
+    "cells": {
+      "dimensions": "Dimensions",
+      "polygons": "Polygons",
+      "vertices": "Vertices",
+      "volume": "Volume",
+      "surface": "Surface",
+      "massEst": "Mass est.",
+      "layer": "Layer",
+      "infill": "Infill",
+      "material": "Material",
+      "supports": "Supports",
+      "nozzle": "Nozzle",
+      "printTime": "Print Time",
+      "supportsNone": "None",
+      "supportsRequired": "Required"
+    }
+  },
+  "section": {
+    "filesTitle": "Files",
+    "filesStamp": "{count} ENTRIES · BUNDLE {size}",
+    "relatedTitle": "§ 04 · Related Specimens",
+    "viewAll": "View all →"
+  },
+  "toast": {
+    "helpCenterMock": "Help center (mock)",
+    "notificationsMock": "Notifications (mock)",
+    "profileRouteMock": "Profile route (mock)",
+    "ctrlMock": "Ctrl · {group} → {label} ({kbd})",
+    "autoRotateToast": "Auto-rotate {state}",
+    "variantToast": "Variant · {label}",
+    "followed": "Following",
+    "unfollowed": "Unfollowed",
+    "authorMock": "{'@'}{handle} profile (mock)",
+    "bundleAwaitingBackend": "Bundle download link awaiting backend",
+    "printQueueAwaiting": "Print queue awaiting integration",
+    "fileDownloadMock": "Download · {filename} (mock)",
+    "tipSelected": "Tip ${amount} selected (mock payment awaiting)",
+    "breadcrumbMock": "Breadcrumb · {label}",
+    "openMock": "Open · {title}",
+    "allRelatedMock": "All related (mock)"
+  }
+}

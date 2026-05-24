@@ -5,6 +5,7 @@
  */
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 
 import PcNavbar from '@/components/PcNavbar.vue'
@@ -28,6 +29,7 @@ import { formatThousands } from '@/mocks/cd-4-fixture.js'
 import { getGoodsList, getCategories, searchGoods } from '@/service/goods'
 
 const router = useRouter()
+const { t } = useI18n()
 const goods = ref([])
 const categories = ref([])
 const categoryId = ref(null)
@@ -50,12 +52,40 @@ const telemetry = computed(() => ({
 }))
 
 const chipItems = computed(() => {
-  const all = [{ id: null, label: 'All', ix: '01' }]
+  const all = [{ id: null, label: t('market.chip.all'), ix: '01' }]
   categories.value.forEach((c, idx) => {
     all.push({ id: c.id, label: c.name, ix: String(idx + 2).padStart(2, '0') })
   })
   return all
 })
+
+/* ─── i18n: localized nav/footer derived from PC home fixture ─── */
+const NAV_KEYS = { catalog: 'home.nav.catalog', market: 'home.nav.market', studio: 'home.nav.studio', lab_log: 'home.nav.labLog' }
+const localizedNavLinks = computed(() =>
+  navLinks.map((l) => ({ ...l, label: NAV_KEYS[l.id] ? t(NAV_KEYS[l.id]) : l.label }))
+)
+const FOOTER_COL_KEYS = ['explore', 'create', 'company', 'legal']
+const FOOTER_LINK_KEYS = {
+  explore: ['catalog', 'marketplace', 'collections', 'operators', 'printFarm'],
+  create: ['logSample', 'studio', 'makerProgram', 'designGuide'],
+  company: ['about', 'labLog', 'pressKit', 'careers', 'contact'],
+  legal: ['terms', 'privacy', 'licenses', 'dmca'],
+}
+const localizedFooterColumns = computed(() =>
+  footerColumns.map((col, idx) => {
+    const key = FOOTER_COL_KEYS[idx]
+    const linkKeys = FOOTER_LINK_KEYS[key] || []
+    return {
+      ...col,
+      heading: t(`home.footer.columns.${key}.heading`),
+      links: col.links.map((link, i) => ({
+        ...link,
+        label: linkKeys[i] ? t(`home.footer.columns.${key}.links.${linkKeys[i]}`) : link.label,
+      })),
+    }
+  })
+)
+const localizedFooterBottom = computed(() => ({ ...footerBottom, networkStatus: t('home.footer.networkStatusNominal') }))
 
 function goDetail(id) {
   router.push(`/goods/${id}`)
@@ -85,7 +115,7 @@ async function onSearch() {
   try {
     goods.value = (await searchGoods(v)) || []
   } catch {
-    ElMessage.warning('搜索失败 · stand by')
+    ElMessage.warning(t('market.toast.searchFailed'))
   } finally {
     loading.value = false
   }
@@ -105,16 +135,16 @@ onMounted(async () => {
 
 function onNavClick(link) { if (link.route) router.push(link.route).catch(() => {}) }
 function onLogo() { window.scrollTo({ top: 0, behavior: 'smooth' }) }
-function onBell() { ElMessage.info('Notifications (mock)') }
+function onBell() { ElMessage.info(t('market.toast.notificationsMock')) }
 function onAvatar() { router.push('/profile').catch(() => {}) }
-function onLocale() { ElMessage.info('Locale (mock)') }
-function onUpload() { router.push('/publish').catch(() => ElMessage.info('Upload (mock)')) }
+function onLocale() { ElMessage.info(t('market.toast.localeMock')) }
+function onUpload() { router.push('/publish').catch(() => ElMessage.info(t('market.toast.uploadMock'))) }
 </script>
 
 <template>
   <div class="market">
     <PcNavbar
-      :nav-links="navLinks"
+      :nav-links="localizedNavLinks"
       :brand="brandConstants"
       v-model:search-value="searchValue"
       :bell-badge="true"
@@ -132,9 +162,9 @@ function onUpload() { router.push('/publish').catch(() => ElMessage.info('Upload
     <main class="market__main">
       <PcSectionHeader
         num="§ 01"
-        title="Marketplace"
-        :subtitle="`${goods.length} ENTRIES · LIVE INDEX`"
-        cta-label="See all"
+        :title="t('market.section.title')"
+        :sub="t('market.section.subtitle', { count: goods.length })"
+        :cta="t('market.section.cta')"
       />
 
       <div class="market__chips">
@@ -159,16 +189,16 @@ function onUpload() { router.push('/publish').catch(() => ElMessage.info('Upload
           @click="goDetail(g.id)"
         />
         <div v-if="!loading && goods.length === 0" class="market__empty">
-          EOF · NO GOODS · ADJUST FILTERS
+          {{ t('market.empty') }}
         </div>
       </div>
     </main>
 
     <PcFooter
       :brand="brandConstants"
-      :columns="footerColumns"
+      :columns="localizedFooterColumns"
       :social="socialLinks"
-      :bottom="footerBottom"
+      :bottom="localizedFooterBottom"
     />
   </div>
 </template>

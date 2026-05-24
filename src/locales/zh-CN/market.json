@@ -1,0 +1,17 @@
+{
+  "section": {
+    "title": "市集",
+    "subtitle": "{count} 件 · 实时索引",
+    "cta": "查看全部"
+  },
+  "chip": {
+    "all": "全部"
+  },
+  "empty": "EOF · 无商品 · 请调整筛选",
+  "toast": {
+    "searchFailed": "搜索失败 · 待机",
+    "notificationsMock": "通知（暂未接入）",
+    "localeMock": "语言（暂未接入）",
+    "uploadMock": "上传（暂未接入）"
+  }
+}

@@ -11,6 +11,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 
 import PcNavbar from '@/components/PcNavbar.vue'
@@ -35,7 +36,36 @@ import {
 import { enrichProfilePc } from '@/mocks/cd-8-fixture.js'
 
 const router = useRouter()
+const { t } = useI18n()
 const userStore = useUserStore()
+
+/* ── i18n: localized chrome (nav + footer 借 home.json) ── */
+const NAV_KEYS = { catalog: 'home.nav.catalog', market: 'home.nav.market', studio: 'home.nav.studio', lab_log: 'home.nav.labLog' }
+const localizedNavLinks = computed(() =>
+  navLinks.map((l) => ({ ...l, label: NAV_KEYS[l.id] ? t(NAV_KEYS[l.id]) : l.label }))
+)
+const FOOTER_COL_KEYS = ['explore', 'create', 'company', 'legal']
+const FOOTER_LINK_KEYS = {
+  explore: ['catalog', 'marketplace', 'collections', 'operators', 'printFarm'],
+  create: ['logSample', 'studio', 'makerProgram', 'designGuide'],
+  company: ['about', 'labLog', 'pressKit', 'careers', 'contact'],
+  legal: ['terms', 'privacy', 'licenses', 'dmca'],
+}
+const localizedFooterColumns = computed(() =>
+  footerColumns.map((col, idx) => {
+    const key = FOOTER_COL_KEYS[idx]
+    const linkKeys = FOOTER_LINK_KEYS[key] || []
+    return {
+      ...col,
+      heading: t(`home.footer.columns.${key}.heading`),
+      links: col.links.map((link, i) => ({
+        ...link,
+        label: linkKeys[i] ? t(`home.footer.columns.${key}.links.${linkKeys[i]}`) : link.label,
+      })),
+    }
+  })
+)
+const localizedFooterBottom = computed(() => ({ ...footerBottom, networkStatus: t('home.footer.networkStatusNominal') }))
 
 /* ── view-model ── */
 const vm = ref(enrichProfilePc({}))
@@ -57,31 +87,31 @@ async function load() {
       bio.value = vm.value.bio
     }
   } catch {
-    ElMessage.warning('个人资料加载失败，使用占位数据')
+    ElMessage.warning(t('profile.toast.loadFailed'))
   }
 }
 
 /* ── mock action handlers（settings/stats 无后端 → mock 反馈）── */
-function onNavClick(link) { ElMessage.info(`Nav · ${link.label} (mock)`) }
-function onSearch(v) { ElMessage.info(`Search · ${v || '—'} (mock)`) }
-function onLocaleClick() { ElMessage.info('Locale (mock)') }
-function onBellClick() { ElMessage.info('Notifications (mock)') }
-function onUploadClick() { ElMessage.info('Log Sample (mock)') }
-function onAvatarClick() { ElMessage.info('Account (mock)') }
+function onNavClick(link) { ElMessage.info(t('profile.toast.navMock', { label: link.label })) }
+function onSearch(v) { ElMessage.info(t('profile.toast.searchMock', { query: v || '—' })) }
+function onLocaleClick() { ElMessage.info(t('profile.toast.localeMock')) }
+function onBellClick() { ElMessage.info(t('profile.toast.notificationsMock')) }
+function onUploadClick() { ElMessage.info(t('profile.toast.logSampleMock')) }
+function onAvatarClick() { ElMessage.info(t('profile.toast.accountMock')) }
 function onLogoClick() { router.push('/home') }
 function onSideTab(tab) {
   console.log('[Profile] side tab', tab.label) // TODO: backend integration
-  ElMessage.info(`${tab.label} (mock)`)
+  ElMessage.info(t('profile.toast.sideTabMock', { label: tab.label }))
 }
-function onExportData() { ElMessage.success('Export queued (mock)') }
-function onPublicProfile() { ElMessage.info('Public profile (mock)') }
-function onHandleChange() { ElMessage.info('Change handle (mock)') }
-function onReplaceImage() { ElMessage.info('Replace image (mock)') }
-function onAddTag() { ElMessage.info('Add tag (mock)') }
-function onViewLog() { ElMessage.info('Full activity log (mock)') }
-function onViewAchievements() { ElMessage.info('All achievements (mock)') }
-function onFooterLink(link) { ElMessage.info(`${link.label ?? link} (mock)`) }
-function onFooterSocial(s) { ElMessage.info(`${s.id ?? s} (mock)`) }
+function onExportData() { ElMessage.success(t('profile.toast.exportQueued')) }
+function onPublicProfile() { ElMessage.info(t('profile.toast.publicProfileMock')) }
+function onHandleChange() { ElMessage.info(t('profile.toast.handleChangeMock')) }
+function onReplaceImage() { ElMessage.info(t('profile.toast.replaceImageMock')) }
+function onAddTag() { ElMessage.info(t('profile.toast.addTagMock')) }
+function onViewLog() { ElMessage.info(t('profile.toast.viewLogMock')) }
+function onViewAchievements() { ElMessage.info(t('profile.toast.viewAchievementsMock')) }
+function onFooterLink(link) { ElMessage.info(t('profile.toast.footerLinkMock', { label: link.label ?? link })) }
+function onFooterSocial(s) { ElMessage.info(t('profile.toast.footerLinkMock', { label: s.id ?? s })) }
 function onFooterLogo() { router.push('/home') }
 async function onSignOut() {
   try {
@@ -90,7 +120,7 @@ async function onSignOut() {
     // 后端登出失败不阻断本地清理
   }
   userStore.logout()
-  ElMessage.success('Signed out')
+  ElMessage.success(t('profile.toast.signedOut'))
   router.push('/login')
 }
 
@@ -101,7 +131,7 @@ onMounted(load)
   <div class="pc-profile">
     <PcNavbar
       v-model:search-value="searchValue"
-      :nav-links="navLinks"
+      :nav-links="localizedNavLinks"
       :brand="brandConstants"
       :search="searchDefaults"
       :locale="localePack"
@@ -120,21 +150,21 @@ onMounted(load)
     <!-- ===== page header ===== -->
     <div class="pc-profile__header">
       <h1 class="pc-profile__h1">
-        Operator <span class="pc-profile__h1-sep">·</span>
+        {{ t('profile.header.title') }} <span class="pc-profile__h1-sep">·</span>
         <span class="pc-profile__h1-handle">{{ vm.handle }}</span>
       </h1>
       <div class="pc-profile__actions">
         <button type="button" class="pc-profile__pbtn" @click="onExportData">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12m0 0-4-4m4 4 4-4M5 20h14" /></svg>
-          Export Data
+          {{ t('profile.header.actionExport') }}
         </button>
         <button type="button" class="pc-profile__pbtn" @click="onPublicProfile">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
-          Public Profile
+          {{ t('profile.header.actionPublic') }}
         </button>
         <button type="button" class="pc-profile__pbtn pc-profile__pbtn--warn" @click="onSignOut">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4" /><path d="M10 8l-4 4 4 4" /><path d="M6 12h12" /></svg>
-          Sign Out
+          {{ t('profile.header.actionSignOut') }}
         </button>
       </div>
     </div>
@@ -154,39 +184,39 @@ onMounted(load)
 
       <main class="pc-profile__content">
         <!-- ===== § 01.1 Identity ===== -->
-        <PcSubSection num="§ 01.1" name="Display · Public" stamp="EDIT MODE">
+        <PcSubSection num="§ 01.1" :name="t('profile.section.identityName')" :stamp="t('profile.section.identityStamp')">
           <div class="pc-profile__id-grid">
             <div class="pc-profile__id-fields">
               <div class="pc-profile__field">
                 <div class="pc-profile__field-lbl">
-                  <span>Handle</span>
-                  <a href="#" class="pc-profile__change" @click.prevent="onHandleChange">Change ›</a>
+                  <span>{{ t('profile.field.handle') }}</span>
+                  <a href="#" class="pc-profile__change" @click.prevent="onHandleChange">{{ t('profile.field.handleChange') }}</a>
                 </div>
                 <div class="pc-profile__input-wrap pc-profile__input-wrap--ro">
-                  <input type="text" :value="vm.handle" readonly aria-label="Handle" />
-                  <span class="pc-profile__badge">READONLY</span>
+                  <input type="text" :value="vm.handle" readonly :aria-label="t('profile.field.handle')" />
+                  <span class="pc-profile__badge">{{ t('profile.field.handleReadonly') }}</span>
                 </div>
               </div>
               <div class="pc-profile__field">
-                <div class="pc-profile__field-lbl"><span>Display Name</span></div>
+                <div class="pc-profile__field-lbl"><span>{{ t('profile.field.displayName') }}</span></div>
                 <div class="pc-profile__input-wrap">
-                  <input v-model="displayName" type="text" aria-label="Display Name" />
+                  <input v-model="displayName" type="text" :aria-label="t('profile.field.displayName')" />
                 </div>
               </div>
               <div class="pc-profile__field">
                 <div class="pc-profile__field-lbl">
-                  <span>Bio</span>
-                  <span class="pc-profile__count">{{ bioCount }} / {{ vm.identity.bioMax }} chars</span>
+                  <span>{{ t('profile.field.bio') }}</span>
+                  <span class="pc-profile__count">{{ t('profile.field.bioCount', { count: bioCount, max: vm.identity.bioMax }) }}</span>
                 </div>
                 <textarea
                   v-model="bio"
                   class="pc-profile__textarea"
                   :maxlength="vm.identity.bioMax"
-                  aria-label="Bio"
+                  :aria-label="t('profile.field.bio')"
                 />
               </div>
               <div class="pc-profile__field">
-                <div class="pc-profile__field-lbl"><span>Tags</span></div>
+                <div class="pc-profile__field-lbl"><span>{{ t('profile.field.tags') }}</span></div>
                 <div class="pc-profile__tags">
                   <span
                     v-for="(tag, idx) in vm.identity.tags"
@@ -194,7 +224,7 @@ onMounted(load)
                     class="pc-profile__tag"
                     :class="{ 'pc-profile__tag--active': idx === 0 }"
                   >{{ tag }}</span>
-                  <button type="button" class="pc-profile__tag pc-profile__tag--add" @click="onAddTag">+ ADD</button>
+                  <button type="button" class="pc-profile__tag pc-profile__tag--add" @click="onAddTag">{{ t('profile.field.tagAdd') }}</button>
                 </div>
               </div>
             </div>
@@ -202,7 +232,7 @@ onMounted(load)
             <!-- av-card -->
             <div class="pc-profile__av-card">
               <div class="pc-profile__av-head">
-                <span>AVATAR</span><span class="pc-profile__av-id">200×200</span>
+                <span>{{ t('profile.avatar.heading') }}</span><span class="pc-profile__av-id">200×200</span>
               </div>
               <div class="pc-profile__av-preview-wrap">
                 <span class="pc-profile__av-c pc-profile__av-c--tl" />
@@ -216,7 +246,7 @@ onMounted(load)
               </div>
               <button type="button" class="pc-profile__av-replace" @click="onReplaceImage">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12m0 0-4-4m4 4 4-4M5 20h14" /></svg>
-                Replace Image
+                {{ t('profile.avatar.replace') }}
               </button>
               <div class="pc-profile__av-meta">
                 <div v-for="m in vm.identity.avatarMeta" :key="m.k" class="pc-profile__av-meta-r">
@@ -228,7 +258,7 @@ onMounted(load)
         </PcSubSection>
 
         <!-- ===== § 01.2 Studio Stats ===== -->
-        <PcSubSection num="§ 01.2" name="Studio Stats" stamp="8 METRICS · LAST 30 D" stamp-tone="dim">
+        <PcSubSection num="§ 01.2" :name="t('profile.section.statsName')" :stamp="t('profile.section.statsStamp')" stamp-tone="dim">
           <div class="pc-profile__stats">
             <div v-for="(cell, idx) in vm.stats" :key="idx" class="pc-profile__stat-cell">
               <span class="pc-profile__stat-k">{{ cell.k }}</span>
@@ -246,7 +276,7 @@ onMounted(load)
         </PcSubSection>
 
         <!-- ===== § 01.3 Activity log ===== -->
-        <PcSubSection num="§ 01.3" name="Activity · Last 30 Days" stamp="6 ENTRIES · TAIL" stamp-tone="dim">
+        <PcSubSection num="§ 01.3" :name="t('profile.section.activityName')" :stamp="t('profile.section.activityStamp')" stamp-tone="dim">
           <PcActivityLog
             :rows="vm.activity.rows"
             :meta="vm.activity.meta"
@@ -255,7 +285,7 @@ onMounted(load)
         </PcSubSection>
 
         <!-- ===== § 01.4 Achievements ===== -->
-        <PcSubSection num="§ 01.4" name="Achievements" :stamp="`${vm.achievements.meta.shown} OF ${vm.achievements.meta.total} SHOWN`">
+        <PcSubSection num="§ 01.4" :name="t('profile.section.achievementsName')" :stamp="t('profile.section.achievementsStamp', { shown: vm.achievements.meta.shown, total: vm.achievements.meta.total })">
           <div class="pc-profile__ach-grid">
             <PcAchievementCard
               v-for="a in vm.achievements.items"
@@ -267,7 +297,7 @@ onMounted(load)
             />
           </div>
           <div class="pc-profile__ach-foot">
-            <a href="#" @click.prevent="onViewAchievements">View all achievements ({{ vm.achievements.meta.total }}) →</a>
+            <a href="#" @click.prevent="onViewAchievements">{{ t('profile.achievement.viewAll', { total: vm.achievements.meta.total }) }}</a>
           </div>
         </PcSubSection>
       </main>
@@ -275,9 +305,9 @@ onMounted(load)
 
     <PcFooter
       :brand="brandConstants"
-      :columns="footerColumns"
+      :columns="localizedFooterColumns"
       :social="socialLinks"
-      :bottom="footerBottom"
+      :bottom="localizedFooterBottom"
       @logo-click="onFooterLogo"
       @link-click="onFooterLink"
       @social-click="onFooterSocial"
