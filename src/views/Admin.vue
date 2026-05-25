@@ -2,22 +2,20 @@
 /**
  * Admin.vue — PC 运营控制台（Ops Console）
  *
- * Phase 3.11 · anchor 1:1 复刻 cd-9-desktop-admin.html
- * Spec: docs/design/specs/p3.11-admin.md
+ * Phase 3.11 视觉装配 anchor cd-9-desktop-admin.html。
+ * user-auth P4 改造：
+ *  - role-based 侧栏 tab 显隐（admin / moderator / super_admin）
+ *  - mock Stream / Tickets 表替换为真接口装配（AdminUserMgmt + AdminAuditTable）
+ *  - super_admin 才看得到 Roles / Settings tab
  *
- * 装配: AdminNav + AdminTelemetry + shell(AdminSidebar + main(KPI strip /
- * ops-row(Stream + Alerts) / Tickets table)) + AdminFooter。
- *
- * 业务零修改: `admin.js` service 全部保留。getDashboard() 真实计数经 enrichAdmin()
- * 注入 sidebar section count；listUsers/listPosts/listOrders 由 sidebar §02.1/§03.1/§04.1
- * stab 触发真实读取。reports queue / stream / alerts 为运营 mock 域（见 fixture audit
- * §3 Mapping note 2），动作走 mock action（ElMessage + console.log）。
+ * 路由守卫已在 router/index.js `meta.requiresRoles: ['admin', 'super_admin']` 双层校验。
  */
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
-import { getDashboard, listPosts, listUsers, listOrders } from '@/service/admin'
+import { getDashboard, listPosts, listOrders } from '@/service/admin'
 import { enrichAdmin } from '@/mocks/cd-9-fixture'
+import { useUserStore } from '@/stores/user'
 import AdminNav from '@/components/admin/AdminNav.vue'
 import AdminTelemetry from '@/components/admin/AdminTelemetry.vue'
 import AdminSidebar from '@/components/admin/AdminSidebar.vue'
@@ -27,19 +25,79 @@ import AdminStream from '@/components/admin/AdminStream.vue'
 import AdminAlert from '@/components/admin/AdminAlert.vue'
 import AdminTicketsTable from '@/components/admin/AdminTicketsTable.vue'
 import AdminFooter from '@/components/admin/AdminFooter.vue'
+import AdminUserMgmt from '@/components/admin/AdminUserMgmt.vue'
+import AdminAuditTable from '@/components/admin/AdminAuditTable.vue'
 
 const { t } = useI18n()
+const userStore = useUserStore()
 
 // view-model: 先用 fixture 兜底, getDashboard 成功后真实计数注入 sidebar
 const vm = ref(enrichAdmin({}))
 const activeTab = ref('01.1')
+
+/**
+ * role-gated sidebar 改造：
+ *   - System §05 (Audit / Config / API Keys / Webhooks) → admin/moderator/super_admin
+ *   - Settings 仅 super_admin（Config/API Keys/Webhooks 归 super_admin）
+ *   - Danger Zone §06 → super_admin only
+ *   - Roles 子 tab 仅 super_admin 可见（注入 §02 Users）
+ */
+const filteredSidebar = computed(() => {
+  const isSuperAdmin = userStore.hasRole('super_admin')
+  const isAdmin = userStore.hasRole('admin') || isSuperAdmin
+  const isModerator = userStore.hasRole('moderator')
+
+  return vm.value.sidebar.sections
+    .map((sec) => {
+      // §02 Users → super_admin 加 Roles 子 tab
+      if (sec.name === 'Users' && isSuperAdmin) {
+        const hasRolesTab = sec.tabs.some((tt) => tt.ix === '02.R')
+        if (!hasRolesTab) {
+          return {
+            ...sec,
+            tabs: [...sec.tabs, { ix: '02.R', label: 'Roles', pillTone: 'hilite' }],
+          }
+        }
+      }
+      return sec
+    })
+    .filter((sec) => {
+      // §05 System: admin/moderator 看 Audit Log；super_admin 看全部 / Config
+      if (sec.name === 'System' && !isAdmin && !isModerator) return false
+      // §06 Danger Zone: super_admin only
+      if (sec.name === 'Danger Zone' && !isSuperAdmin) return false
+      return true
+    })
+    .map((sec) => {
+      // §05 System: non-super_admin 只保留 Audit Log
+      if (sec.name === 'System' && !isSuperAdmin) {
+        return { ...sec, tabs: sec.tabs.filter((tt) => tt.ix === '05.1') }
+      }
+      return sec
+    })
+})
+
+/**
+ * activeTab 决定主区渲染：
+ *  - 02.1 / 02.4 → AdminUserMgmt
+ *  - 02.R       → AdminUserMgmt (super_admin 可见编辑角色按钮)
+ *  - 05.1       → AdminAuditTable
+ *  - 其余        → Dashboard 视觉壳（KPI + Stream + Alerts + Tickets fixture）
+ */
+const activePane = computed(() => {
+  if (activeTab.value === '02.1' || activeTab.value === '02.4' || activeTab.value === '02.R') {
+    return 'users'
+  }
+  if (activeTab.value === '05.1') return 'audit'
+  return 'dashboard'
+})
 
 async function loadDashboard() {
   try {
     const dashboard = await getDashboard()
     vm.value = enrichAdmin(dashboard || {})
   } catch (error) {
-    // backend 不可达 → 保留 fixture 兜底, 不降低视觉密度 (per CLAUDE.md Mock Fixture 原则)
+    // backend 不可达 → 保留 fixture 兜底, 不降低视觉密度
     vm.value = enrichAdmin({})
   }
 }
@@ -61,62 +119,44 @@ const ticketsMetaText = computed(() => {
   return t('admin.section.ticketsMeta', { showing: m.showing, total: m.total, sort: m.sort })
 })
 
-/* ---- sidebar 导航: §02.1/§03.1/§04.1 走真实 backend 读取 ---- */
-const REAL_LOADERS = { '02.1': listUsers, '03.1': listPosts, '04.1': listOrders }
+/* ---- sidebar 导航 ---- */
+const REAL_LOADERS = { '03.1': listPosts, '04.1': listOrders }
 
 async function onSidebarTab({ section, tab }) {
   const loader = REAL_LOADERS[tab.ix]
   if (loader) {
     try {
       const data = await loader()
-      console.log(`[admin] ${tab.label} loaded:`, data)
       ElMessage.success(t('admin.toast.tabLoaded', { label: tab.label, count: Array.isArray(data) ? data.length : 0 }))
     } catch (error) {
       ElMessage.info(t('admin.toast.tabSwitch', { label: tab.label }))
     }
     return
   }
-  console.log('[admin] sidebar tab:', tab.ix, tab.label)
+  // 02.1 / 05.1 / 02.R 由 computed activePane 切换，无需 toast
+  if (['02.1', '02.4', '02.R', '05.1'].includes(tab.ix)) return
   ElMessage.info(t('admin.toast.sidebarMock', { section: section.name, label: tab.label }))
 }
 
 /* ---- mock action handlers (运营 mock 域) ---- */
-function onLogo() {
-  console.log('[admin] logo')
-  ElMessage.info(t('admin.toast.opsConsole'))
-}
-function onHelp() {
-  console.log('[admin] help')
-  ElMessage.info(t('admin.toast.helpPalette'))
-}
-function onBell() {
-  console.log('[admin] notifications')
-  ElMessage.info(t('admin.toast.alertsOpen', { count: vm.value.alerts.length }))
-}
-function onAvatar() {
-  console.log('[admin] account')
-  ElMessage.info(vm.value.ctx.operator)
-}
+function onLogo() { ElMessage.info(t('admin.toast.opsConsole')) }
+function onHelp() { ElMessage.info(t('admin.toast.helpPalette')) }
+function onBell() { ElMessage.info(t('admin.toast.alertsOpen', { count: vm.value.alerts.length })) }
+function onAvatar() { ElMessage.info(vm.value.ctx.operator) }
 function onAlertAction(alert, act) {
-  console.log('[admin] alert action:', alert.title, act.label)
   ElMessage.success(t('admin.toast.alertAction', { action: act.label, title: alert.title }))
 }
-function onCreateAlert() {
-  console.log('[admin] create manual alert')
-  ElMessage.info(t('admin.toast.createAlertMock'))
-}
+function onCreateAlert() { ElMessage.info(t('admin.toast.createAlertMock')) }
 function onTicketAction({ ticket, action }) {
-  console.log('[admin] ticket action:', ticket.id, action.label)
   ElMessage.success(t('admin.toast.ticketAction', { id: ticket.id, action: action.label }))
 }
-function onLoadOlder() {
-  console.log('[admin] load older events')
-  ElMessage.info(t('admin.toast.loadOlderMock'))
-}
+function onLoadOlder() { ElMessage.info(t('admin.toast.loadOlderMock')) }
 function onViewAllTickets() {
-  console.log('[admin] view all tickets')
   ElMessage.info(t('admin.toast.viewAllTicketsMock', { total: vm.value.tickets.meta.total }))
 }
+
+// test-only：暴露 activeTab，spec 直接断言 pane 切换
+defineExpose({ activeTab })
 </script>
 
 <template>
@@ -136,61 +176,68 @@ function onViewAllTickets() {
       <div class="admin-shell">
         <AdminSidebar
           v-model:active="activeTab"
-          :sections="vm.sidebar.sections"
+          :sections="filteredSidebar"
           :foot="vm.sidebar.foot"
           @tab-click="onSidebarTab"
         />
 
-        <main class="admin-main">
-          <!-- KPI strip -->
+        <main class="admin-main" data-test="admin-main">
+          <!-- KPI strip 始终在顶部 -->
           <section class="admin-kpi-strip">
             <AdminKpiCard v-for="kpi in vm.kpi" :key="kpi.ix" v-bind="kpi" />
           </section>
 
-          <!-- ops row: stream + alerts -->
-          <section class="admin-ops-row">
-            <AdminCard num="§ S" :title="t('admin.section.streamTitle')" led :stamp="streamStamp" stamp-tone="hilite">
-              <AdminStream :rows="vm.stream.rows" />
+          <!-- ACTIVE PANE: users (auth 运营面) -->
+          <AdminUserMgmt v-if="activePane === 'users'" data-test="pane-users" />
+
+          <!-- ACTIVE PANE: audit (登录审计) -->
+          <AdminAuditTable v-else-if="activePane === 'audit'" data-test="pane-audit" />
+
+          <!-- ACTIVE PANE: dashboard (视觉壳，保留 fixture) -->
+          <template v-else>
+            <section class="admin-ops-row">
+              <AdminCard num="§ S" :title="t('admin.section.streamTitle')" led :stamp="streamStamp" stamp-tone="hilite">
+                <AdminStream :rows="vm.stream.rows" />
+                <template #foot>
+                  <span class="admin-meta">{{ streamMetaText }}</span>
+                  <button type="button" class="admin-obtn" @click="onLoadOlder">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                    {{ t('admin.section.loadOlder') }}
+                  </button>
+                </template>
+              </AdminCard>
+
+              <AdminCard num="§ A" :title="t('admin.section.alertsTitle')" :stamp="alertsStamp" stamp-tone="crit">
+                <div class="admin-alert-list">
+                  <AdminAlert
+                    v-for="(alert, idx) in vm.alerts"
+                    :key="idx"
+                    :sev="alert.sev"
+                    :tone="alert.tone"
+                    :age="alert.age"
+                    :title="alert.title"
+                    :since="alert.since"
+                    :actions="alert.actions"
+                    @action="onAlertAction(alert, $event)"
+                  />
+                  <button type="button" class="admin-add" @click="onCreateAlert">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                    {{ t('admin.section.createManualAlert') }}
+                  </button>
+                </div>
+              </AdminCard>
+            </section>
+
+            <AdminCard num="§ T" :title="t('admin.section.ticketsTitle')" :stamp="ticketsStamp" stamp-tone="crit">
+              <AdminTicketsTable :rows="vm.tickets.rows" @action="onTicketAction" />
               <template #foot>
-                <span class="admin-meta">{{ streamMetaText }}</span>
-                <button type="button" class="admin-obtn" @click="onLoadOlder">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-                  {{ t('admin.section.loadOlder') }}
+                <span class="admin-meta">{{ ticketsMetaText }}</span>
+                <button type="button" class="admin-obtn" @click="onViewAllTickets">
+                  {{ t('admin.section.viewAllTickets', { total: vm.tickets.meta.total }) }}
                 </button>
               </template>
             </AdminCard>
-
-            <AdminCard num="§ A" :title="t('admin.section.alertsTitle')" :stamp="alertsStamp" stamp-tone="crit">
-              <div class="admin-alert-list">
-                <AdminAlert
-                  v-for="(alert, idx) in vm.alerts"
-                  :key="idx"
-                  :sev="alert.sev"
-                  :tone="alert.tone"
-                  :age="alert.age"
-                  :title="alert.title"
-                  :since="alert.since"
-                  :actions="alert.actions"
-                  @action="onAlertAction(alert, $event)"
-                />
-                <button type="button" class="admin-add" @click="onCreateAlert">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-                  {{ t('admin.section.createManualAlert') }}
-                </button>
-              </div>
-            </AdminCard>
-          </section>
-
-          <!-- tickets table -->
-          <AdminCard num="§ T" :title="t('admin.section.ticketsTitle')" :stamp="ticketsStamp" stamp-tone="crit">
-            <AdminTicketsTable :rows="vm.tickets.rows" @action="onTicketAction" />
-            <template #foot>
-              <span class="admin-meta">{{ ticketsMetaText }}</span>
-              <button type="button" class="admin-obtn" @click="onViewAllTickets">
-                {{ t('admin.section.viewAllTickets', { total: vm.tickets.meta.total }) }}
-              </button>
-            </template>
-          </AdminCard>
+          </template>
         </main>
       </div>
 
@@ -218,7 +265,6 @@ function onViewAllTickets() {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* CAD 网格背景 (cd-9 .page) */
   background-image:
     linear-gradient(to right, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
     linear-gradient(to bottom, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
@@ -242,21 +288,18 @@ function onViewAllTickets() {
   overflow: hidden;
 }
 
-/* KPI strip */
 .admin-kpi-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 
-/* ops row */
 .admin-ops-row {
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 12px;
 }
 
-/* alerts list */
 .admin-alert-list {
   padding: 12px;
   display: flex;
@@ -290,7 +333,6 @@ function onViewAllTickets() {
 .admin-add:hover { background: var(--hilite); }
 .admin-add:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
 
-/* card-foot 内部元素 */
 .admin-meta {
   font-family: var(--f-mono);
   font-size: 9.5px;

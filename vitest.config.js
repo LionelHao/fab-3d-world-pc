@@ -18,6 +18,8 @@ export default mergeConfig(
           'src/router/**',
           'src/service/**',
           'src/components/admin/**',
+          'src/views/Admin.vue',
+          'src/views/SettingsSecurity.vue',
         ],
         exclude: [
           'src/main.js',
