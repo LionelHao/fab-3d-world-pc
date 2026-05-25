@@ -1,0 +1,59 @@
+# .wiki/ 索引 — fab-3d-world-pc
+# 协议见 ../../ARCHITECTURE.md §5 + ../../docs/wiki-migration-plan.md。
+
+last_ingested_sha: ""
+
+files:
+  modules.md:
+    role: "目录拆解 + views / Pc* primitives / admin/ chrome / stores / service / router"
+    src_paths:
+      - "src/views/**"
+      - "src/components/**"
+      - "src/stores/**"
+      - "src/service/**"
+      - "src/router/**"
+    update_triggers:
+      - "新增 views / components"
+      - "admin/ chrome 增减"
+      - "router 路由表变更"
+
+  entities.md:
+    role: "Pinia stores schema + api/types.ts paths/components 摘要 + admin 表格 row 类型"
+    src_paths:
+      - "src/stores/**"
+      - "src/api/types.ts"
+    update_triggers:
+      - "store state shape 变更"
+      - "api/types.ts 重生"
+      - "admin 表格列定义变更"
+
+  flows.md:
+    role: "关键页面交互流（登录 / Admin RBAC / 表格分页 / refresh）"
+    src_paths:
+      - "src/views/Login.vue"
+      - "src/views/Admin.vue"
+      - "src/utils/axios.js"
+      - "src/router/index.js"
+    update_triggers:
+      - "axios 拦截器变更"
+      - "Admin 路由 / RBAC 守卫变更"
+      - "登录 / refresh 流程改"
+
+  cross-repo.md:
+    role: "调 api 哪些 endpoint + 调用点 path:line 索引 + admin 独占 endpoint"
+    src_paths:
+      - "src/service/**"
+    update_triggers:
+      - "新增 service 函数"
+      - "admin 调用点变更"
+
+  conventions.md:
+    role: "Vue 3 / Element Plus 薄壳 / Admin RBAC / 命名 / 安全 / 性能 速查"
+    src_paths:
+      - "src/components/admin/**"
+      - "src/components/ui/**"
+      - "src/utils/axios.js"
+    update_triggers:
+      - "新增 admin primitive"
+      - "RBAC 规则变更"
+      - "ElTable 风格统一调整"
