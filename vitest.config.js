@@ -12,7 +12,13 @@ export default mergeConfig(
       coverage: {
         provider: 'v8',
         reporter: ['text', 'html', 'lcov'],
-        include: ['src/stores/**', 'src/utils/**', 'src/router/**', 'src/service/**'],
+        include: [
+          'src/stores/**',
+          'src/utils/**',
+          'src/router/**',
+          'src/service/**',
+          'src/components/admin/**',
+        ],
         exclude: [
           'src/main.js',
           'src/mocks/**',
