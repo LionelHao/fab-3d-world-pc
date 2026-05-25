@@ -62,7 +62,7 @@ test.describe('PC user-auth P3 — settings/security', () => {
     // 设备表头存在
     await expect(page.locator('thead th').first()).toBeVisible({ timeout: 5_000 })
     // 行数（2 行）
-    await expect(page.locator('tbody tr')).toHaveCount(2)
+    await expect(page.locator('.pc-session-list__table tbody tr')).toHaveCount(2)
     // 第二行（非当前）revoke 按钮可点
     const revokeBtn = page.locator('[data-testid="revoke-btn-web-tok"]')
     await expect(revokeBtn).toBeVisible()
@@ -71,7 +71,9 @@ test.describe('PC user-auth P3 — settings/security', () => {
     const curBtn = page.locator('[data-testid="revoke-btn-cur-tok"]')
     await expect(curBtn).toBeDisabled()
     // Current chip 渲染（locale-agnostic：chip 在当前行内存在 .pc-session-list__chip）
-    await expect(page.locator('tbody tr').first().locator('.pc-session-list__chip')).toBeVisible()
+    await expect(
+      page.locator('.pc-session-list__table tbody tr').first().locator('.pc-session-list__chip'),
+    ).toBeVisible()
   })
 
   test('点 Revoke (非当前) → 调 /auth/sessions/{tokenValue}/revoke + 刷新', async ({ page, context }) => {
@@ -93,7 +95,7 @@ test.describe('PC user-auth P3 — settings/security', () => {
 
     await expect.poll(() => revokeCalled).toBe(1)
     // 刷新后只剩 1 行
-    await expect(page.locator('tbody tr')).toHaveCount(1, { timeout: 5_000 })
+    await expect(page.locator('.pc-session-list__table tbody tr')).toHaveCount(1, { timeout: 5_000 })
   })
 
   test('点 "修改密码" 按钮 → ElDialog 弹出', async ({ page, context }) => {
