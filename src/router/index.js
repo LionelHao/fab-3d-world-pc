@@ -16,6 +16,11 @@ const routes = [
     component: () => import('@/views/ForgotPassword.vue')
   },
   {
+    path: '/oauth/callback/:provider',
+    name: 'OAuthCallback',
+    component: () => import('@/views/OAuthCallback.vue')
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: () => import('@/views/Profile.vue'),
