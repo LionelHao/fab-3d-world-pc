@@ -20,6 +20,8 @@ export default mergeConfig(
           'src/components/admin/**',
           'src/views/Admin.vue',
           'src/views/SettingsSecurity.vue',
+          'src/views/Login.vue',
+          'src/views/OAuthCallback.vue',
         ],
         exclude: [
           'src/main.js',
