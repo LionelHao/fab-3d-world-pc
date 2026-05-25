@@ -7,7 +7,21 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       globals: true,
-      include: ['src/**/*.{test,spec}.{js,mjs}']
-    }
+      include: ['src/**/*.{test,spec}.{js,mjs}'],
+      exclude: ['node_modules/**', 'dist/**', 'tests/e2e/**'],
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'html', 'lcov'],
+        include: ['src/stores/**', 'src/utils/**', 'src/router/**', 'src/service/**'],
+        exclude: [
+          'src/main.js',
+          'src/mocks/**',
+          'src/locales/**',
+          'src/**/*.d.ts',
+          'src/**/*.spec.js',
+          'src/**/*.test.js',
+        ],
+      },
+    },
   })
 )

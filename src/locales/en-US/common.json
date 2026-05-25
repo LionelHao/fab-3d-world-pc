@@ -19,9 +19,11 @@
   "toast": {
     "notAvailable": "{label} — coming soon",
     "networkError": "Network error, please try again",
+    "serverError": "Server error, please try again",
     "loadFailed": "Load failed",
     "saveSuccess": "Saved",
-    "saveFailed": "Save failed"
+    "saveFailed": "Save failed",
+    "forbidden": "Access denied"
   },
   "empty": {
     "noData": "No data",

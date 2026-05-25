@@ -5,7 +5,8 @@ vi.mock('@/utils/axios', () => ({
 }))
 
 import axios from '@/utils/axios'
-import { login, getUserInfo } from '@/service/user'
+import { getUserInfo } from '@/service/user'
+import { loginByPassword, login, logout } from '@/service/auth'
 import {
   getDashboard, listPosts, offlinePost,
   listUsers, banUser, unbanUser, listOrders
@@ -15,13 +16,27 @@ import { getModelLibrary } from '@/service/model'
 describe('service/user — 账号接口契约', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('login POST /auth/login', () => {
-    login({ username: 'u', password: 'p' })
-    expect(axios.post).toHaveBeenCalledWith('/auth/login', { username: 'u', password: 'p' })
-  })
   it('getUserInfo GET /user/info', () => {
     getUserInfo()
     expect(axios.get).toHaveBeenCalledWith('/user/info')
+  })
+})
+
+describe('service/auth — 认证接口契约 (兼容性 smoke)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('loginByPassword POST /auth/login/password', () => {
+    loginByPassword({ identifier: 'u', password: 'p' })
+    expect(axios.post).toHaveBeenCalledWith('/auth/login/password', { identifier: 'u', password: 'p' })
+  })
+
+  it('login 是 loginByPassword 别名', () => {
+    expect(login).toBe(loginByPassword)
+  })
+
+  it('logout POST /auth/logout', () => {
+    logout()
+    expect(axios.post).toHaveBeenCalledWith('/auth/logout')
   })
 })
 

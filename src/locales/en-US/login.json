@@ -18,11 +18,11 @@
     "stampRequired": "REQ"
   },
   "field": {
-    "usernameLabel": "Username",
-    "usernameHint": "account id",
-    "usernamePlaceholder": "operator id",
-    "usernameHelperRequired": "USERNAME REQUIRED",
-    "usernameHelperDefault": "ENTER YOUR FBW OPERATOR ID",
+    "identifierLabel": "Account",
+    "identifierHint": "mobile / email / username",
+    "identifierPlaceholder": "Mobile / Email / Username",
+    "identifierHelperRequired": "ACCOUNT REQUIRED",
+    "identifierHelperDefault": "ENTER MOBILE, EMAIL, OR USERNAME",
     "passwordLabel": "Password",
     "passwordHint": "min 8 chars",
     "passwordPlaceholder": "enter password",
@@ -45,9 +45,9 @@
     "legal": "Legal"
   },
   "msg": {
-    "credentialsRequired": "Please enter username and password",
+    "credentialsRequired": "Please enter account and password",
     "loginSuccess": "Signed in",
-    "loginFailed": "Login failed, check your username or password",
+    "loginFailed": "Login failed, check your account or password",
     "registerContactOps": "Register — please contact ops to create an account"
   }
 }

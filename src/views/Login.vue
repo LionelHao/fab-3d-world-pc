@@ -14,7 +14,8 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { login, getUserInfo } from '@/service/user'
+import { loginByPassword } from '@/service/auth'
+import { getUserInfo } from '@/service/user'
 import UiFormChrome from '@/components/ui/UiFormChrome.vue'
 import UiPageTitle from '@/components/ui/UiPageTitle.vue'
 import UiFormSection from '@/components/ui/UiFormSection.vue'
@@ -26,8 +27,8 @@ const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
-const form = reactive({ username: '', password: '', verifyCode: '' })
-const errors = reactive({ username: false, password: false })
+const form = reactive({ identifier: '', password: '', verifyCode: '' })
+const errors = reactive({ identifier: false, password: false })
 const showPwd = ref(false)
 const loading = ref(false)
 
@@ -57,26 +58,36 @@ const pageSubtitle = computed(() => [t('login.page.subtitleA'), t('login.page.su
 
 const onLogin = async () => {
   if (loading.value) return
-  errors.username = !form.username
+  errors.identifier = !form.identifier
   errors.password = !form.password
-  if (errors.username || errors.password) {
+  if (errors.identifier || errors.password) {
     ElMessage.warning(t('login.msg.credentialsRequired'))
     return
   }
   loading.value = true
   try {
-    const token = await login({ username: form.username, password: form.password })
-    userStore.login(token, { username: form.username })
+    // axios 拦截器在 /auth/login/* 成功时会自动写 store.login(token, user, expireAt)
+    const data = await loginByPassword({
+      identifier: form.identifier,
+      password: form.password,
+      deviceType: 'pc',
+    })
+    // 兜底: 拦截器之外仍保留显式写入 (兼容契约变动)
+    if (data?.token && !userStore.token) {
+      userStore.login(data.token, data.user || null, data.expireAt)
+    }
     try {
       const info = await getUserInfo()
-      if (info) userStore.login(token, info)
+      if (info) userStore.updateUser(info)
     } catch (e) {
       // 资料获取失败不阻断登录
     }
     ElMessage.success(t('login.msg.loginSuccess'))
-    router.push('/home')
+    const redirect = router.currentRoute.value.query?.from || '/home'
+    router.push(typeof redirect === 'string' ? redirect : '/home')
   } catch (error) {
-    ElMessage.error(t('login.msg.loginFailed'))
+    // 拦截器已 toast；此处兜底再 toast 防御未走拦截器的网络层错误
+    if (!error?.code) ElMessage.error(t('login.msg.loginFailed'))
   } finally {
     loading.value = false
   }
@@ -111,14 +122,14 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
 
         <UiFormSection num="§ 01" :name="t('login.section.credentialsName')" :stamp="t('login.section.stampRequired')">
           <UiFormField
-            :label="t('login.field.usernameLabel')"
+            :label="t('login.field.identifierLabel')"
             required
-            :hint="t('login.field.usernameHint')"
-            :helper="errors.username ? t('login.field.usernameHelperRequired') : t('login.field.usernameHelperDefault')"
-            :helper-tone="errors.username ? 'warn' : 'default'"
+            :hint="t('login.field.identifierHint')"
+            :helper="errors.identifier ? t('login.field.identifierHelperRequired') : t('login.field.identifierHelperDefault')"
+            :helper-tone="errors.identifier ? 'warn' : 'default'"
             v-slot="{ fieldId }"
           >
-            <UiInput :id="fieldId" v-model="form.username" :placeholder="t('login.field.usernamePlaceholder')" :error="errors.username" />
+            <UiInput :id="fieldId" v-model="form.identifier" :placeholder="t('login.field.identifierPlaceholder')" :error="errors.identifier" />
           </UiFormField>
 
           <UiFormField
