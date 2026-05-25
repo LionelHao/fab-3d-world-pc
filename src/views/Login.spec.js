@@ -19,11 +19,17 @@ const oauthAuthorizeMock = vi.fn()
 const loginByPasswordMock = vi.fn()
 const loginMfaVerifyMock = vi.fn()
 const getUserInfoMock = vi.fn()
+const getCaptchaConfigMock = vi.fn()
 
 vi.mock('@/service/auth', () => ({
   oauthAuthorize: (...a) => oauthAuthorizeMock(...a),
   loginByPassword: (...a) => loginByPasswordMock(...a),
   loginMfaVerify: (...a) => loginMfaVerifyMock(...a),
+}))
+
+vi.mock('@/service/captcha', () => ({
+  getConfig: (...a) => getCaptchaConfigMock(...a),
+  verify: vi.fn(),
 }))
 
 vi.mock('@/service/user', () => ({
@@ -82,7 +88,9 @@ describe('Login (PC) — OAuth 区块 (P5)', () => {
     oauthAuthorizeMock.mockReset()
     loginByPasswordMock.mockReset()
     loginMfaVerifyMock.mockReset()
+    getCaptchaConfigMock.mockReset()
     routerPushMock.mockReset()
+    getCaptchaConfigMock.mockResolvedValue({ provider: 'mock', siteKey: '', required: false })
     // 替换 window.location 以拦截赋值
     delete window.location
     window.location = { href: '', assign: vi.fn(), replace: vi.fn() }
@@ -164,6 +172,52 @@ describe('Login (PC) — OAuth 区块 (P5)', () => {
     await flushPromises()
     // 切到 MFA step
     expect(wrapper.find('[data-test="login-mfa-code"]').exists()).toBe(true)
+  })
+
+  it('mount 时调 captcha.getConfig(scene=login)', async () => {
+    await mountLogin('en-US')
+    await flushPromises()
+    expect(getCaptchaConfigMock).toHaveBeenCalledWith('login')
+  })
+
+  it('captcha config required=true → 渲染 CaptchaWidget', async () => {
+    getCaptchaConfigMock.mockResolvedValue({ provider: 'mock', siteKey: '', required: true })
+    const wrapper = await mountLogin('en-US')
+    await flushPromises()
+    expect(wrapper.find('[data-test="captcha-widget"]').exists()).toBe(true)
+  })
+
+  it('captcha required + 未通过 → onLogin 不调 loginByPassword', async () => {
+    getCaptchaConfigMock.mockResolvedValue({ provider: 'mock', siteKey: '', required: true })
+    const wrapper = await mountLogin('en-US')
+    await flushPromises()
+    const inputs = wrapper.findAll('input')
+    inputs[0].setValue('lionel')
+    inputs[1].setValue('p@ss1234')
+    await flushPromises()
+    const signIn = wrapper.findAll('button').find((b) => /Sign In|登录/i.test(b.text()))
+    await signIn.trigger('click')
+    await flushPromises()
+    expect(loginByPasswordMock).not.toHaveBeenCalled()
+  })
+
+  it('captcha required + 通过 → onLogin 携带 captchaToken 调 loginByPassword', async () => {
+    getCaptchaConfigMock.mockResolvedValue({ provider: 'mock', siteKey: '', required: true })
+    loginByPasswordMock.mockResolvedValueOnce({ token: 't', user: { userId: 1, roles: ['user'] }, expireAt: Date.now() + 3600_000 })
+    const wrapper = await mountLogin('en-US')
+    await flushPromises()
+    const inputs = wrapper.findAll('input')
+    inputs[0].setValue('lionel')
+    inputs[1].setValue('p@ss1234')
+    // 勾选 mock checkbox
+    await wrapper.find('[data-test="captcha-mock-checkbox"]').setValue(true)
+    await flushPromises()
+    const signIn = wrapper.findAll('button').find((b) => /Sign In|登录/i.test(b.text()))
+    await signIn.trigger('click')
+    await flushPromises()
+    expect(loginByPasswordMock).toHaveBeenCalledWith(
+      expect.objectContaining({ captchaToken: 'mock-pass' }),
+    )
   })
 
   it('MFA step submit → 调 loginMfaVerify(mfaToken, code)', async () => {

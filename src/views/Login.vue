@@ -15,7 +15,9 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { loginByPassword, loginMfaVerify, oauthAuthorize } from '@/service/auth'
+import { getConfig as getCaptchaConfig } from '@/service/captcha'
 import { getUserInfo } from '@/service/user'
+import CaptchaWidget from '@/components/captcha/CaptchaWidget.vue'
 import UiFormChrome from '@/components/ui/UiFormChrome.vue'
 import UiPageTitle from '@/components/ui/UiPageTitle.vue'
 import UiFormSection from '@/components/ui/UiFormSection.vue'
@@ -31,6 +33,30 @@ const form = reactive({ identifier: '', password: '', verifyCode: '' })
 const errors = reactive({ identifier: false, password: false })
 const showPwd = ref(false)
 const loading = ref(false)
+
+/* ───── CAPTCHA（P6） ───── */
+const captchaCfg = ref({ provider: 'mock', siteKey: '', required: false })
+const captchaToken = ref('')
+
+async function refreshCaptchaConfig() {
+  try {
+    const data = await getCaptchaConfig('login')
+    captchaCfg.value = {
+      provider: data?.provider || 'mock',
+      siteKey: data?.siteKey || '',
+      required: !!data?.required,
+    }
+  } catch {
+    // 失败时退回到 mock（不强制）
+    captchaCfg.value = { provider: 'mock', siteKey: '', required: false }
+  }
+}
+
+function onCaptchaVerified(payload) {
+  captchaToken.value = payload?.token || ''
+}
+
+onMounted(refreshCaptchaConfig)
 
 /* ───── MFA 二段（P6） ───── */
 const mfaStep = ref(false)
@@ -113,14 +139,20 @@ const onLogin = async () => {
     ElMessage.warning(t('login.msg.credentialsRequired'))
     return
   }
+  if (captchaCfg.value.required && !captchaToken.value) {
+    ElMessage.warning(t('auth.captcha.required'))
+    return
+  }
   loading.value = true
   try {
     // axios 拦截器在 /auth/login/* 成功时会自动写 store.login(token, user, expireAt)
-    const data = await loginByPassword({
+    const payload = {
       identifier: form.identifier,
       password: form.password,
       deviceType: 'pc',
-    })
+    }
+    if (captchaToken.value) payload.captchaToken = captchaToken.value
+    const data = await loginByPassword(payload)
     // P6: 后端要求 MFA → 不调 applyLoginResult，切到 MFA step（拦截器对 requireMfa 不写 store）
     if (data?.requireMfa && data?.mfaToken) {
       mfaToken.value = data.mfaToken
@@ -131,6 +163,22 @@ const onLogin = async () => {
     }
     await applyLoginResult(data)
   } catch (error) {
+    // 失败响应携带 requireCaptcha → 拉新配置 + 显示 widget（即便服务端原本未要求）
+    if (error?.data?.requireCaptcha) {
+      captchaCfg.value = {
+        provider: error.data.provider || captchaCfg.value.provider,
+        siteKey: error.data.siteKey || '',
+        required: true,
+      }
+      captchaToken.value = ''
+    } else if (error?.requireCaptcha) {
+      captchaCfg.value = {
+        provider: error.provider || captchaCfg.value.provider,
+        siteKey: error.siteKey || '',
+        required: true,
+      }
+      captchaToken.value = ''
+    }
     // 拦截器已 toast；此处兜底再 toast 防御未走拦截器的网络层错误
     if (!error?.code) ElMessage.error(t('login.msg.loginFailed'))
   } finally {
@@ -273,6 +321,14 @@ const startOAuth = async (provider) => {
           </UiFormField>
         </UiFormSection>
 
+        <div v-if="!mfaStep && captchaCfg.required" class="pc-login__captcha">
+          <CaptchaWidget
+            :provider="captchaCfg.provider"
+            :site-key="captchaCfg.siteKey"
+            @verified="onCaptchaVerified"
+          />
+        </div>
+
         <div v-if="!mfaStep" class="pc-login__cta">
           <UiButton variant="primary" :badge="t('login.cta.badgeAuth')" :disabled="loading" @click="onLogin">
             <template #icon>
@@ -354,6 +410,10 @@ const startOAuth = async (provider) => {
   gap: var(--space-10);
   margin-top: var(--space-14);
   margin-bottom: var(--space-8);
+}
+
+.pc-login__captcha {
+  margin-top: var(--space-14);
 }
 
 .pc-login__oauth {
