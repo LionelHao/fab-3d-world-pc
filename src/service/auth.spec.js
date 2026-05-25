@@ -148,4 +148,24 @@ describe('service/auth — PC 认证域接口 (P1)', () => {
     })
     await auth.oauthCallback('apple', { code: 'xyz', state: 's' })
   })
+
+  it('oauthBind 调 POST /auth/oauth/{provider}/bind 带 code/state', async () => {
+    mock.onPost('/auth/oauth/github/bind').reply((config) => {
+      expect(JSON.parse(config.data)).toEqual({ code: 'gh-code', state: 'st-1' })
+      return [200, { code: 200, data: null }]
+    })
+    await auth.oauthBind('github', { code: 'gh-code', state: 'st-1' })
+  })
+
+  it('oauthUnbind 调 DELETE /auth/oauth/{provider}', async () => {
+    mock.onDelete('/auth/oauth/google').reply(200, { code: 200, data: null })
+    await auth.oauthUnbind('google')
+  })
+
+  it('oauthBind 失败 422 → reject 业务错误（拦截器已 toast）', async () => {
+    mock.onPost('/auth/oauth/github/bind').reply(200, { code: 10301, message: 'already bound' })
+    await expect(auth.oauthBind('github', { code: 'x', state: 's' })).rejects.toMatchObject({
+      code: 10301,
+    })
+  })
 })

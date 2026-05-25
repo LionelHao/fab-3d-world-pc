@@ -21,6 +21,8 @@
  *   revokeOtherSessions                   POST /auth/sessions/revoke-others
  *   oauthAuthorize(provider, params)      GET  /auth/oauth/{provider}/authorize
  *   oauthCallback(provider, payload)      POST /auth/oauth/{provider}/callback
+ *   oauthBind(provider, payload)          POST /auth/oauth/{provider}/bind  (登录态)
+ *   oauthUnbind(provider)                 DELETE /auth/oauth/{provider}    (登录态)
  */
 import axios from '../utils/axios'
 
@@ -58,3 +60,7 @@ export const oauthAuthorize = (provider, params) =>
   axios.get(`/auth/oauth/${provider}/authorize`, { params })
 export const oauthCallback = (provider, params) =>
   axios.post(`/auth/oauth/${provider}/callback`, params)
+export const oauthBind = (provider, params) =>
+  axios.post(`/auth/oauth/${provider}/bind`, params)
+export const oauthUnbind = (provider) =>
+  axios.delete(`/auth/oauth/${provider}`)
