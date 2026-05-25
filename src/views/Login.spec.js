@@ -17,11 +17,13 @@ import { setActivePinia, createPinia } from 'pinia'
 
 const oauthAuthorizeMock = vi.fn()
 const loginByPasswordMock = vi.fn()
+const loginMfaVerifyMock = vi.fn()
 const getUserInfoMock = vi.fn()
 
 vi.mock('@/service/auth', () => ({
   oauthAuthorize: (...a) => oauthAuthorizeMock(...a),
   loginByPassword: (...a) => loginByPasswordMock(...a),
+  loginMfaVerify: (...a) => loginMfaVerifyMock(...a),
 }))
 
 vi.mock('@/service/user', () => ({
@@ -78,6 +80,8 @@ describe('Login (PC) — OAuth 区块 (P5)', () => {
     localStorage.clear()
     setActivePinia(createPinia())
     oauthAuthorizeMock.mockReset()
+    loginByPasswordMock.mockReset()
+    loginMfaVerifyMock.mockReset()
     routerPushMock.mockReset()
     // 替换 window.location 以拦截赋值
     delete window.location
@@ -140,4 +144,45 @@ describe('Login (PC) — OAuth 区块 (P5)', () => {
     await flushPromises()
     expect(wrapper.html()).toContain('Or sign in with')
   })
+
+  /* ───── P6 MFA 二段登录 ───── */
+
+  it('密码登录返回 requireMfa → 切到 MFA code 输入态', async () => {
+    loginByPasswordMock.mockResolvedValueOnce({ requireMfa: true, mfaToken: 'mfa-1' })
+    const wrapper = await mountLogin('en-US')
+    await flushPromises()
+    // 填密码 + 触发登录
+    const idInput = wrapper.find('input[id]')
+    const inputs = wrapper.findAll('input')
+    inputs[0].setValue('lionel')
+    inputs[1].setValue('p@ss1234')
+    await flushPromises()
+    // 点 Sign In
+    const ctaBtns = wrapper.findAll('button')
+    const signIn = ctaBtns.find((b) => /Sign In|登录/i.test(b.text()))
+    await signIn.trigger('click')
+    await flushPromises()
+    // 切到 MFA step
+    expect(wrapper.find('[data-test="login-mfa-code"]').exists()).toBe(true)
+  })
+
+  it('MFA step submit → 调 loginMfaVerify(mfaToken, code)', async () => {
+    loginByPasswordMock.mockResolvedValueOnce({ requireMfa: true, mfaToken: 'mfa-x' })
+    loginMfaVerifyMock.mockResolvedValueOnce({ token: 'final-tk', user: { userId: 1, roles: ['user'] }, expireAt: Date.now() + 3600_000 })
+    const wrapper = await mountLogin('en-US')
+    await flushPromises()
+    const inputs = wrapper.findAll('input')
+    inputs[0].setValue('lionel')
+    inputs[1].setValue('p@ss1234')
+    await flushPromises()
+    const signIn = wrapper.findAll('button').find((b) => /Sign In|登录/i.test(b.text()))
+    await signIn.trigger('click')
+    await flushPromises()
+    const codeEl = wrapper.find('[data-test="login-mfa-code"]')
+    await codeEl.setValue('123456')
+    await wrapper.find('[data-test="login-mfa-submit"]').trigger('click')
+    await flushPromises()
+    expect(loginMfaVerifyMock).toHaveBeenCalledWith('mfa-x', '123456')
+  })
+
 })

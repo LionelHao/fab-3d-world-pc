@@ -14,7 +14,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { loginByPassword, oauthAuthorize } from '@/service/auth'
+import { loginByPassword, loginMfaVerify, oauthAuthorize } from '@/service/auth'
 import { getUserInfo } from '@/service/user'
 import UiFormChrome from '@/components/ui/UiFormChrome.vue'
 import UiPageTitle from '@/components/ui/UiPageTitle.vue'
@@ -31,6 +31,55 @@ const form = reactive({ identifier: '', password: '', verifyCode: '' })
 const errors = reactive({ identifier: false, password: false })
 const showPwd = ref(false)
 const loading = ref(false)
+
+/* ───── MFA 二段（P6） ───── */
+const mfaStep = ref(false)
+const mfaToken = ref('')
+const mfaCode = ref('')
+const mfaSubmitting = ref(false)
+
+function resetMfa() {
+  mfaStep.value = false
+  mfaToken.value = ''
+  mfaCode.value = ''
+}
+
+async function applyLoginResult(data) {
+  if (data?.token && !userStore.token) {
+    userStore.login(data.token, data.user || null, data.expireAt)
+  }
+  try {
+    const info = await getUserInfo()
+    if (info) userStore.updateUser(info)
+  } catch (e) {
+    // 资料获取失败不阻断登录
+  }
+  ElMessage.success(t('login.msg.loginSuccess'))
+  const redirect = router.currentRoute.value.query?.from || '/home'
+  router.push(typeof redirect === 'string' ? redirect : '/home')
+}
+
+async function onMfaSubmit() {
+  if (mfaSubmitting.value) return
+  if (mfaCode.value.length < 6) {
+    ElMessage.warning(t('auth.mfa.errors.invalidCode'))
+    return
+  }
+  mfaSubmitting.value = true
+  try {
+    const data = await loginMfaVerify(mfaToken.value, mfaCode.value)
+    resetMfa()
+    await applyLoginResult(data)
+  } catch (error) {
+    if (!error?.code) ElMessage.error(t('auth.mfa.errors.invalidCode'))
+  } finally {
+    mfaSubmitting.value = false
+  }
+}
+
+function onMfaBack() {
+  resetMfa()
+}
 
 // mock 倒计时（无 SMS 后端，纯装饰可观察元素）
 const resend = ref(58)
@@ -72,19 +121,15 @@ const onLogin = async () => {
       password: form.password,
       deviceType: 'pc',
     })
-    // 兜底: 拦截器之外仍保留显式写入 (兼容契约变动)
-    if (data?.token && !userStore.token) {
-      userStore.login(data.token, data.user || null, data.expireAt)
+    // P6: 后端要求 MFA → 不调 applyLoginResult，切到 MFA step（拦截器对 requireMfa 不写 store）
+    if (data?.requireMfa && data?.mfaToken) {
+      mfaToken.value = data.mfaToken
+      mfaStep.value = true
+      mfaCode.value = ''
+      ElMessage.info(t('auth.login.mfaPrompt'))
+      return
     }
-    try {
-      const info = await getUserInfo()
-      if (info) userStore.updateUser(info)
-    } catch (e) {
-      // 资料获取失败不阻断登录
-    }
-    ElMessage.success(t('login.msg.loginSuccess'))
-    const redirect = router.currentRoute.value.query?.from || '/home'
-    router.push(typeof redirect === 'string' ? redirect : '/home')
+    await applyLoginResult(data)
   } catch (error) {
     // 拦截器已 toast；此处兜底再 toast 防御未走拦截器的网络层错误
     if (!error?.code) ElMessage.error(t('login.msg.loginFailed'))
@@ -148,7 +193,44 @@ const startOAuth = async (provider) => {
       <div class="pc-login__card">
         <UiPageTitle :title="pageTitle" :sub="pageSubtitle" />
 
-        <UiFormSection num="§ 01" :name="t('login.section.credentialsName')" :stamp="t('login.section.stampRequired')">
+        <!-- P6: MFA 二段 -->
+        <div v-if="mfaStep" class="pc-login__mfa" data-test="login-mfa-step">
+          <p class="pc-login__mfa-prompt">{{ t('auth.login.mfaPrompt') }}</p>
+          <label class="pc-login__mfa-field">
+            <span class="pc-login__mfa-label">{{ t('auth.login.mfaCodeLabel') }}</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              class="pc-login__mfa-input"
+              data-test="login-mfa-code"
+              v-model="mfaCode"
+              :placeholder="t('auth.login.mfaCodePlaceholder')"
+            />
+          </label>
+          <div class="pc-login__mfa-actions">
+            <button
+              type="button"
+              class="pc-login__mfa-btn pc-login__mfa-btn--ghost"
+              data-test="login-mfa-back"
+              :disabled="mfaSubmitting"
+              @click="onMfaBack"
+            >
+              {{ t('auth.login.mfaBack') }}
+            </button>
+            <button
+              type="button"
+              class="pc-login__mfa-btn pc-login__mfa-btn--primary"
+              data-test="login-mfa-submit"
+              :disabled="mfaSubmitting || mfaCode.length < 6"
+              @click="onMfaSubmit"
+            >
+              {{ t('auth.login.mfaSubmit') }}
+            </button>
+          </div>
+        </div>
+
+        <UiFormSection v-else num="§ 01" :name="t('login.section.credentialsName')" :stamp="t('login.section.stampRequired')">
           <UiFormField
             :label="t('login.field.identifierLabel')"
             required
@@ -191,7 +273,7 @@ const startOAuth = async (provider) => {
           </UiFormField>
         </UiFormSection>
 
-        <div class="pc-login__cta">
+        <div v-if="!mfaStep" class="pc-login__cta">
           <UiButton variant="primary" :badge="t('login.cta.badgeAuth')" :disabled="loading" @click="onLogin">
             <template #icon>
               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -206,7 +288,7 @@ const startOAuth = async (provider) => {
           </UiButton>
         </div>
 
-        <div class="pc-login__oauth" data-test="oauth-block">
+        <div v-if="!mfaStep" class="pc-login__oauth" data-test="oauth-block">
           <div class="pc-login__oauth-divider">
             <span class="pc-login__oauth-divider-line" />
             <span class="pc-login__oauth-divider-label">{{ t('auth.oauth.divider') }}</span>
@@ -344,4 +426,68 @@ const startOAuth = async (provider) => {
   color: var(--accent-link);
   font-weight: 600;
 }
+
+/* ───── MFA 二段 (P6) ───── */
+.pc-login__mfa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-14);
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  margin-bottom: var(--space-14);
+}
+.pc-login__mfa-prompt {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--text-11);
+  color: var(--ink-2);
+  letter-spacing: 0.04em;
+}
+.pc-login__mfa-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.pc-login__mfa-label {
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pc-login__mfa-input {
+  font-family: var(--f-mono);
+  font-size: var(--text-18);
+  letter-spacing: 0.4em;
+  text-align: center;
+  padding: var(--space-8) var(--space-10);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-none);
+  color: var(--ink);
+}
+.pc-login__mfa-input:focus { outline: none; box-shadow: var(--glow-accent-ring); }
+.pc-login__mfa-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-10);
+}
+.pc-login__mfa-btn {
+  font-family: var(--f-cond);
+  font-weight: 700;
+  font-size: var(--text-13);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--space-8) var(--space-16);
+  cursor: pointer;
+  border-radius: var(--radius-none);
+  border: 1.5px solid var(--ink);
+}
+.pc-login__mfa-btn--primary { background: var(--hilite); color: var(--ink); }
+.pc-login__mfa-btn--primary:hover:not(:disabled) { box-shadow: var(--glow-accent-md); }
+.pc-login__mfa-btn--ghost { background: var(--paper); color: var(--ink); }
+.pc-login__mfa-btn--ghost:hover { background: var(--paper-3); }
+.pc-login__mfa-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pc-login__mfa-btn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
 </style>
