@@ -33,7 +33,8 @@
     "notificationsAria": "Notifications",
     "uploadAria": "Log a sample",
     "uploadLabel": "Log Sample",
-    "avatarAria": "My profile"
+    "avatarAria": "My profile",
+    "menuProfile": "My Profile"
   },
   "telemetry": {
     "live": "LIVE"

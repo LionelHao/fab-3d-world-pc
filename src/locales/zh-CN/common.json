@@ -33,7 +33,8 @@
     "notificationsAria": "通知",
     "uploadAria": "记录新样本",
     "uploadLabel": "记录样本",
-    "avatarAria": "我的资料"
+    "avatarAria": "我的资料",
+    "menuProfile": "我的资料"
   },
   "telemetry": {
     "live": "在线"

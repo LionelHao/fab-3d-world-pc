@@ -12,6 +12,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import UiSearchBar from '@/components/ui/UiSearchBar.vue'
 import UiIconButton from '@/components/ui/UiIconButton.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
@@ -61,6 +62,11 @@ const onLocale = () => emit('locale-click')
 const onBell = () => emit('bell-click')
 const onUpload = () => emit('upload-click')
 const onAvatar = () => emit('avatar-click')
+
+const onUserMenu = (cmd) => {
+  if (cmd === 'profile') router.push('/profile').catch(() => {})
+  else if (cmd === 'security') router.push('/settings/security').catch(() => {})
+}
 </script>
 
 <template>
@@ -115,9 +121,31 @@ const onAvatar = () => emit('avatar-click')
           {{ t('common.navbar.uploadLabel') }}
         </button>
 
-        <button class="pc-navbar__avatar" type="button" @click="onAvatar" :aria-label="t('common.navbar.avatarAria')">
-          <UiAvatar :initials="userInitials" :size="32" palette="hilite" shape="square" />
-        </button>
+        <el-dropdown trigger="click" placement="bottom-end" @command="onUserMenu">
+          <button
+            class="pc-navbar__avatar"
+            type="button"
+            :aria-label="t('common.navbar.avatarAria')"
+            data-testid="pc-navbar-avatar"
+            @click="onAvatar"
+          >
+            <UiAvatar :initials="userInitials" :size="32" palette="hilite" shape="square" />
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="profile">
+                {{ t('common.navbar.menuProfile') }}
+              </el-dropdown-item>
+              <el-dropdown-item
+                command="security"
+                divided
+                data-testid="pc-navbar-menu-security"
+              >
+                {{ t('settings.security.menu.label') }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </div>
   </nav>

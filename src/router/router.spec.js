@@ -96,4 +96,17 @@ describe('router/index — 守卫 (P1)', () => {
     await router.push('/forgot-password')
     expect(router.currentRoute.value.path).toBe('/forgot-password')
   })
+
+  it('/settings/security 未登录 → 跳 /login 带 query.from (P3)', async () => {
+    await router.push('/settings/security')
+    expect(router.currentRoute.value.path).toBe('/login')
+    expect(router.currentRoute.value.query.from).toBe('/settings/security')
+  })
+
+  it('/settings/security 已登录 (普通 user) 可放行 (P3)', async () => {
+    useUserStore().login('tk', { userId: 1, roles: ['user'] }, Date.now() + 3600_000)
+    await router.push('/settings/security')
+    expect(router.currentRoute.value.path).toBe('/settings/security')
+    expect(router.currentRoute.value.name).toBe('SettingsSecurity')
+  })
 })
