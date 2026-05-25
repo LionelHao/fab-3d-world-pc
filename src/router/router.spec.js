@@ -84,4 +84,16 @@ describe('router/index — 守卫 (P1)', () => {
     await router.push('/login')
     expect(router.currentRoute.value.path).toBe('/home')
   })
+
+  it('公开页 /forgot-password 未登录可直接访问 (P2)', async () => {
+    await router.push('/forgot-password')
+    expect(router.currentRoute.value.path).toBe('/forgot-password')
+    expect(router.currentRoute.value.name).toBe('ForgotPassword')
+  })
+
+  it('已登录访问 /forgot-password 仍可访问 (P2, 不强制重定向)', async () => {
+    useUserStore().login('tk', { userId: 1, roles: ['user'] }, Date.now() + 3600_000)
+    await router.push('/forgot-password')
+    expect(router.currentRoute.value.path).toBe('/forgot-password')
+  })
 })

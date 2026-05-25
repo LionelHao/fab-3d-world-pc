@@ -96,6 +96,7 @@ const onLogin = async () => {
 const onRegister = () => ElMessage.info(t('login.msg.registerContactOps'))
 const onBack = () => router.push('/home')
 const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { label }))
+const onForgot = () => router.push('/forgot-password')
 </script>
 
 <template>
@@ -180,7 +181,7 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
 
         <div class="pc-login__foot">
           <span>
-            <a href="#" @click.prevent="onFootLink(t('login.foot.forgot'))">{{ t('login.foot.forgot') }}</a>
+            <a href="#" data-testid="forgot-link" @click.prevent="onForgot">{{ t('login.foot.forgot') }}</a>
             <span class="pc-login__sep"> · </span>
             <a href="#" @click.prevent="onFootLink(t('login.foot.help'))">{{ t('login.foot.help') }}</a>
             <span class="pc-login__sep"> · </span>
