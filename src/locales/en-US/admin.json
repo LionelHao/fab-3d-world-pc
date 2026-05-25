@@ -28,6 +28,105 @@
     "createAlertMock": "Create manual alert",
     "ticketAction": "{id} · {action}",
     "loadOlderMock": "Load older events",
-    "viewAllTicketsMock": "View all {total} tickets"
+    "viewAllTicketsMock": "View all {total} tickets",
+    "loadFailed": "Failed to load, please retry",
+    "banSuccess": "User banned",
+    "unbanSuccess": "User unbanned",
+    "rolesUpdated": "Roles updated",
+    "sessionsRevoked": "{count} sessions revoked",
+    "reasonRequired": "Reason is required",
+    "cannotDemoteSelf": "Cannot demote yourself",
+    "rolesRequired": "At least one role must remain"
+  },
+  "users": {
+    "title": "User Management",
+    "search": "Search by username / phone / email",
+    "filterStatus": "Status",
+    "filterRole": "Role",
+    "filterAll": "All",
+    "statusNormal": "Normal",
+    "statusBanned": "Banned",
+    "statusSuspended": "Suspended",
+    "col": {
+      "username": "Username",
+      "phone": "Phone",
+      "email": "Email",
+      "status": "Status",
+      "roles": "Roles",
+      "lastLogin": "Last Login",
+      "actions": "Actions"
+    },
+    "detail": "Detail",
+    "editRoles": "Edit Roles",
+    "ban": "Ban",
+    "unban": "Unban",
+    "revokeAll": "Revoke Sessions",
+    "confirmUnban": "Unban user \"{name}\"?",
+    "confirmRevokeAll": "Revoke all sessions of user \"{name}\"?",
+    "empty": "No users",
+    "banDialog": {
+      "title": "Ban User · {name}",
+      "reason": "Reason (required)",
+      "reasonPlaceholder": "Please enter reason",
+      "until": "Until",
+      "untilHelp": "Leave empty for permanent ban",
+      "submit": "Submit Ban"
+    },
+    "rolesDialog": {
+      "title": "Edit Roles · {name}",
+      "help": "Tick the roles to grant (super_admin only visible to platform owner)",
+      "submit": "Save Roles"
+    },
+    "detailDialog": {
+      "title": "User Detail · {name}",
+      "basic": "Basic Info",
+      "userId": "User ID",
+      "createTime": "Registered At",
+      "lastLogin": "Last Login",
+      "activeSessions": "Active Sessions",
+      "events": "Recent Login Events",
+      "noEvents": "No events"
+    }
+  },
+  "audit": {
+    "title": "Login Audit",
+    "search": "Search",
+    "reset": "Reset",
+    "filter": {
+      "userId": "User ID",
+      "type": "Event Type",
+      "from": "From",
+      "to": "To",
+      "device": "Device",
+      "failReason": "Fail Reason"
+    },
+    "col": {
+      "time": "Time",
+      "userId": "User ID",
+      "identifier": "Identifier",
+      "event": "Event",
+      "device": "Device",
+      "ip": "IP",
+      "ua": "UA",
+      "failReason": "Fail Reason"
+    },
+    "eventType": {
+      "LOGIN_SUCCESS": "Login Success",
+      "LOGIN_FAIL": "Login Fail",
+      "PASSWORD_RESET": "Password Reset",
+      "ACCOUNT_LOCKED": "Account Locked",
+      "BAN": "Ban",
+      "REFRESH": "Refresh Token",
+      "LOGOUT": "Logout"
+    },
+    "empty": "No audit events"
+  },
+  "roles": {
+    "user": "User",
+    "verified_user": "Verified",
+    "creator": "Creator",
+    "moderator": "Moderator",
+    "admin": "Admin",
+    "super_admin": "Super Admin"
   }
 }

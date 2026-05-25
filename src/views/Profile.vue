@@ -22,7 +22,8 @@ import PcSubSection from '@/components/profile/PcSubSection.vue'
 import PcActivityLog from '@/components/profile/PcActivityLog.vue'
 import PcAchievementCard from '@/components/profile/PcAchievementCard.vue'
 
-import { getUserInfo, logout } from '@/service/user'
+import { getUserInfo } from '@/service/user'
+import { logout } from '@/service/auth'
 import { useUserStore } from '@/stores/user'
 import {
   brandConstants,

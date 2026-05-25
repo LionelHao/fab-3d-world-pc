@@ -19,9 +19,11 @@
   "toast": {
     "notAvailable": "{label} — coming soon",
     "networkError": "Network error, please try again",
+    "serverError": "Server error, please try again",
     "loadFailed": "Load failed",
     "saveSuccess": "Saved",
-    "saveFailed": "Save failed"
+    "saveFailed": "Save failed",
+    "forbidden": "Access denied"
   },
   "empty": {
     "noData": "No data",
@@ -31,7 +33,8 @@
     "notificationsAria": "Notifications",
     "uploadAria": "Log a sample",
     "uploadLabel": "Log Sample",
-    "avatarAria": "My profile"
+    "avatarAria": "My profile",
+    "menuProfile": "My Profile"
   },
   "telemetry": {
     "live": "LIVE"

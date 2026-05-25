@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
+import { t } from '@/i18n'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -9,16 +11,32 @@ const routes = [
   { path: '/goods/:id', name: 'GoodsDetail', component: () => import('@/views/GoodsDetail.vue') },
   { path: '/login', name: 'Login', component: () => import('@/views/Login.vue') },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/ForgotPassword.vue')
+  },
+  {
+    path: '/oauth/callback/:provider',
+    name: 'OAuthCallback',
+    component: () => import('@/views/OAuthCallback.vue')
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: () => import('@/views/Profile.vue'),
     meta: { requiresAuth: true }
   },
   {
+    path: '/settings/security',
+    name: 'SettingsSecurity',
+    component: () => import('@/views/SettingsSecurity.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/admin',
     name: 'Admin',
     component: () => import('@/views/Admin.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresRoles: ['admin', 'super_admin'] }
   }
 ]
 
@@ -27,24 +45,35 @@ const router = createRouter({
   routes
 })
 
-// ⚠️ TEMP — i18n EN 视觉验收期间临时跳过登录/运营校验（验收完搜 BYPASS_AUTH 改回 false）
-const BYPASS_AUTH = false
-
-// 路由守卫:登录与运营角色校验
+/**
+ * 路由守卫 — user-auth P1
+ *
+ * - requiresAuth + 未登录 → /login?from=<original>
+ * - requiresRoles + 角色不匹配 → /home (warning toast)
+ * - 已登录用户访问 /login → /home (跳过登录页)
+ */
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
-  if (BYPASS_AUTH) {
-    next()
-    return
-  }
-  if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    next('/login')
-    return
-  }
-  if (to.meta.requiresAdmin && !userStore.isAdmin) {
+
+  if (to.path === '/login' && userStore.isLoggedIn) {
     next('/home')
     return
   }
+
+  if (to.meta.requiresAuth && !userStore.isLoggedIn) {
+    next({ path: '/login', query: { from: to.fullPath } })
+    return
+  }
+
+  if (to.meta.requiresRoles) {
+    const allowed = to.meta.requiresRoles.some((r) => userStore.hasRole(r))
+    if (!allowed) {
+      ElMessage.warning(t('common.toast.forbidden'))
+      next('/home')
+      return
+    }
+  }
+
   next()
 })
 

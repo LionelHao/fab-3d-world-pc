@@ -11,6 +11,9 @@ dist-ssr/
 # 测试与覆盖率
 coverage/
 *.lcov
+test-results/
+playwright-report/
+playwright/.cache/
 
 # 日志
 logs

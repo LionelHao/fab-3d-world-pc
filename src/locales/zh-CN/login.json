@@ -18,11 +18,11 @@
     "stampRequired": "必填"
   },
   "field": {
-    "usernameLabel": "用户名",
-    "usernameHint": "账号 ID",
-    "usernamePlaceholder": "operator id",
-    "usernameHelperRequired": "请输入用户名",
-    "usernameHelperDefault": "请输入您的 FBW 操作员 ID",
+    "identifierLabel": "账号",
+    "identifierHint": "手机 / 邮箱 / 用户名",
+    "identifierPlaceholder": "手机号 / 邮箱 / 用户名",
+    "identifierHelperRequired": "请输入账号",
+    "identifierHelperDefault": "支持手机号、邮箱或用户名登录",
     "passwordLabel": "密码",
     "passwordHint": "至少 8 位",
     "passwordPlaceholder": "输入密码",
@@ -45,9 +45,9 @@
     "legal": "条款"
   },
   "msg": {
-    "credentialsRequired": "请输入用户名和密码",
+    "credentialsRequired": "请输入账号和密码",
     "loginSuccess": "登录成功",
-    "loginFailed": "登录失败，请检查用户名或密码",
+    "loginFailed": "登录失败，请检查账号或密码",
     "registerContactOps": "注册 — 请联系运营开通账号"
   }
 }

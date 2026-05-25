@@ -14,7 +14,10 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { login, getUserInfo } from '@/service/user'
+import { loginByPassword, loginMfaVerify, oauthAuthorize } from '@/service/auth'
+import { getConfig as getCaptchaConfig } from '@/service/captcha'
+import { getUserInfo } from '@/service/user'
+import CaptchaWidget from '@/components/captcha/CaptchaWidget.vue'
 import UiFormChrome from '@/components/ui/UiFormChrome.vue'
 import UiPageTitle from '@/components/ui/UiPageTitle.vue'
 import UiFormSection from '@/components/ui/UiFormSection.vue'
@@ -26,10 +29,83 @@ const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
-const form = reactive({ username: '', password: '', verifyCode: '' })
-const errors = reactive({ username: false, password: false })
+const form = reactive({ identifier: '', password: '', verifyCode: '' })
+const errors = reactive({ identifier: false, password: false })
 const showPwd = ref(false)
 const loading = ref(false)
+
+/* ───── CAPTCHA（P6） ───── */
+const captchaCfg = ref({ provider: 'mock', siteKey: '', required: false })
+const captchaToken = ref('')
+
+async function refreshCaptchaConfig() {
+  try {
+    const data = await getCaptchaConfig('login')
+    captchaCfg.value = {
+      provider: data?.provider || 'mock',
+      siteKey: data?.siteKey || '',
+      required: !!data?.required,
+    }
+  } catch {
+    // 失败时退回到 mock（不强制）
+    captchaCfg.value = { provider: 'mock', siteKey: '', required: false }
+  }
+}
+
+function onCaptchaVerified(payload) {
+  captchaToken.value = payload?.token || ''
+}
+
+onMounted(refreshCaptchaConfig)
+
+/* ───── MFA 二段（P6） ───── */
+const mfaStep = ref(false)
+const mfaToken = ref('')
+const mfaCode = ref('')
+const mfaSubmitting = ref(false)
+
+function resetMfa() {
+  mfaStep.value = false
+  mfaToken.value = ''
+  mfaCode.value = ''
+}
+
+async function applyLoginResult(data) {
+  if (data?.token && !userStore.token) {
+    userStore.login(data.token, data.user || null, data.expireAt)
+  }
+  try {
+    const info = await getUserInfo()
+    if (info) userStore.updateUser(info)
+  } catch (e) {
+    // 资料获取失败不阻断登录
+  }
+  ElMessage.success(t('login.msg.loginSuccess'))
+  const redirect = router.currentRoute.value.query?.from || '/home'
+  router.push(typeof redirect === 'string' ? redirect : '/home')
+}
+
+async function onMfaSubmit() {
+  if (mfaSubmitting.value) return
+  if (mfaCode.value.length < 6) {
+    ElMessage.warning(t('auth.mfa.errors.invalidCode'))
+    return
+  }
+  mfaSubmitting.value = true
+  try {
+    const data = await loginMfaVerify(mfaToken.value, mfaCode.value)
+    resetMfa()
+    await applyLoginResult(data)
+  } catch (error) {
+    if (!error?.code) ElMessage.error(t('auth.mfa.errors.invalidCode'))
+  } finally {
+    mfaSubmitting.value = false
+  }
+}
+
+function onMfaBack() {
+  resetMfa()
+}
 
 // mock 倒计时（无 SMS 后端，纯装饰可观察元素）
 const resend = ref(58)
@@ -57,26 +133,54 @@ const pageSubtitle = computed(() => [t('login.page.subtitleA'), t('login.page.su
 
 const onLogin = async () => {
   if (loading.value) return
-  errors.username = !form.username
+  errors.identifier = !form.identifier
   errors.password = !form.password
-  if (errors.username || errors.password) {
+  if (errors.identifier || errors.password) {
     ElMessage.warning(t('login.msg.credentialsRequired'))
+    return
+  }
+  if (captchaCfg.value.required && !captchaToken.value) {
+    ElMessage.warning(t('auth.captcha.required'))
     return
   }
   loading.value = true
   try {
-    const token = await login({ username: form.username, password: form.password })
-    userStore.login(token, { username: form.username })
-    try {
-      const info = await getUserInfo()
-      if (info) userStore.login(token, info)
-    } catch (e) {
-      // 资料获取失败不阻断登录
+    // axios 拦截器在 /auth/login/* 成功时会自动写 store.login(token, user, expireAt)
+    const payload = {
+      identifier: form.identifier,
+      password: form.password,
+      deviceType: 'pc',
     }
-    ElMessage.success(t('login.msg.loginSuccess'))
-    router.push('/home')
+    if (captchaToken.value) payload.captchaToken = captchaToken.value
+    const data = await loginByPassword(payload)
+    // P6: 后端要求 MFA → 不调 applyLoginResult，切到 MFA step（拦截器对 requireMfa 不写 store）
+    if (data?.requireMfa && data?.mfaToken) {
+      mfaToken.value = data.mfaToken
+      mfaStep.value = true
+      mfaCode.value = ''
+      ElMessage.info(t('auth.login.mfaPrompt'))
+      return
+    }
+    await applyLoginResult(data)
   } catch (error) {
-    ElMessage.error(t('login.msg.loginFailed'))
+    // 失败响应携带 requireCaptcha → 拉新配置 + 显示 widget（即便服务端原本未要求）
+    if (error?.data?.requireCaptcha) {
+      captchaCfg.value = {
+        provider: error.data.provider || captchaCfg.value.provider,
+        siteKey: error.data.siteKey || '',
+        required: true,
+      }
+      captchaToken.value = ''
+    } else if (error?.requireCaptcha) {
+      captchaCfg.value = {
+        provider: error.provider || captchaCfg.value.provider,
+        siteKey: error.siteKey || '',
+        required: true,
+      }
+      captchaToken.value = ''
+    }
+    // 拦截器已 toast；此处兜底再 toast 防御未走拦截器的网络层错误
+    if (!error?.code) ElMessage.error(t('login.msg.loginFailed'))
   } finally {
     loading.value = false
   }
@@ -85,6 +189,34 @@ const onLogin = async () => {
 const onRegister = () => ElMessage.info(t('login.msg.registerContactOps'))
 const onBack = () => router.push('/home')
 const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { label }))
+const onForgot = () => router.push('/forgot-password')
+
+/* ───── OAuth (P5) — 桌面 provider 集合（PC 不出 wechat-mp，per impl §0.3）───── */
+const OAUTH_PROVIDERS = ['google', 'github', 'apple']
+const oauthBusy = ref(null)
+
+const providerLabel = (id) => {
+  const key = id === 'wechat-mp' ? 'wechatMp' : id
+  return t(`auth.oauth.providers.${key}`)
+}
+
+const startOAuth = async (provider) => {
+  if (oauthBusy.value) return
+  oauthBusy.value = provider
+  try {
+    const redirectUri = `${window.location.origin}/oauth/callback/${provider}`
+    const data = await oauthAuthorize(provider, { redirectUri })
+    if (data?.authorizeUrl) {
+      window.location.href = data.authorizeUrl
+      return
+    }
+    ElMessage.error(t('auth.oauth.bindStartFailed'))
+  } catch (err) {
+    if (!err?.code) ElMessage.error(t('auth.oauth.bindStartFailed'))
+  } finally {
+    oauthBusy.value = null
+  }
+}
 </script>
 
 <template>
@@ -109,16 +241,53 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
       <div class="pc-login__card">
         <UiPageTitle :title="pageTitle" :sub="pageSubtitle" />
 
-        <UiFormSection num="§ 01" :name="t('login.section.credentialsName')" :stamp="t('login.section.stampRequired')">
+        <!-- P6: MFA 二段 -->
+        <div v-if="mfaStep" class="pc-login__mfa" data-test="login-mfa-step">
+          <p class="pc-login__mfa-prompt">{{ t('auth.login.mfaPrompt') }}</p>
+          <label class="pc-login__mfa-field">
+            <span class="pc-login__mfa-label">{{ t('auth.login.mfaCodeLabel') }}</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              class="pc-login__mfa-input"
+              data-test="login-mfa-code"
+              v-model="mfaCode"
+              :placeholder="t('auth.login.mfaCodePlaceholder')"
+            />
+          </label>
+          <div class="pc-login__mfa-actions">
+            <button
+              type="button"
+              class="pc-login__mfa-btn pc-login__mfa-btn--ghost"
+              data-test="login-mfa-back"
+              :disabled="mfaSubmitting"
+              @click="onMfaBack"
+            >
+              {{ t('auth.login.mfaBack') }}
+            </button>
+            <button
+              type="button"
+              class="pc-login__mfa-btn pc-login__mfa-btn--primary"
+              data-test="login-mfa-submit"
+              :disabled="mfaSubmitting || mfaCode.length < 6"
+              @click="onMfaSubmit"
+            >
+              {{ t('auth.login.mfaSubmit') }}
+            </button>
+          </div>
+        </div>
+
+        <UiFormSection v-else num="§ 01" :name="t('login.section.credentialsName')" :stamp="t('login.section.stampRequired')">
           <UiFormField
-            :label="t('login.field.usernameLabel')"
+            :label="t('login.field.identifierLabel')"
             required
-            :hint="t('login.field.usernameHint')"
-            :helper="errors.username ? t('login.field.usernameHelperRequired') : t('login.field.usernameHelperDefault')"
-            :helper-tone="errors.username ? 'warn' : 'default'"
+            :hint="t('login.field.identifierHint')"
+            :helper="errors.identifier ? t('login.field.identifierHelperRequired') : t('login.field.identifierHelperDefault')"
+            :helper-tone="errors.identifier ? 'warn' : 'default'"
             v-slot="{ fieldId }"
           >
-            <UiInput :id="fieldId" v-model="form.username" :placeholder="t('login.field.usernamePlaceholder')" :error="errors.username" />
+            <UiInput :id="fieldId" v-model="form.identifier" :placeholder="t('login.field.identifierPlaceholder')" :error="errors.identifier" />
           </UiFormField>
 
           <UiFormField
@@ -152,7 +321,15 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
           </UiFormField>
         </UiFormSection>
 
-        <div class="pc-login__cta">
+        <div v-if="!mfaStep && captchaCfg.required" class="pc-login__captcha">
+          <CaptchaWidget
+            :provider="captchaCfg.provider"
+            :site-key="captchaCfg.siteKey"
+            @verified="onCaptchaVerified"
+          />
+        </div>
+
+        <div v-if="!mfaStep" class="pc-login__cta">
           <UiButton variant="primary" :badge="t('login.cta.badgeAuth')" :disabled="loading" @click="onLogin">
             <template #icon>
               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -167,9 +344,30 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
           </UiButton>
         </div>
 
+        <div v-if="!mfaStep" class="pc-login__oauth" data-test="oauth-block">
+          <div class="pc-login__oauth-divider">
+            <span class="pc-login__oauth-divider-line" />
+            <span class="pc-login__oauth-divider-label">{{ t('auth.oauth.divider') }}</span>
+            <span class="pc-login__oauth-divider-line" />
+          </div>
+          <div class="pc-login__oauth-list">
+            <button
+              v-for="p in OAUTH_PROVIDERS"
+              :key="p"
+              type="button"
+              class="pc-login__oauth-btn"
+              :disabled="oauthBusy === p"
+              :data-test="`oauth-btn-${p}`"
+              @click="startOAuth(p)"
+            >
+              {{ providerLabel(p) }}
+            </button>
+          </div>
+        </div>
+
         <div class="pc-login__foot">
           <span>
-            <a href="#" @click.prevent="onFootLink(t('login.foot.forgot'))">{{ t('login.foot.forgot') }}</a>
+            <a href="#" data-testid="forgot-link" @click.prevent="onForgot">{{ t('login.foot.forgot') }}</a>
             <span class="pc-login__sep"> · </span>
             <a href="#" @click.prevent="onFootLink(t('login.foot.help'))">{{ t('login.foot.help') }}</a>
             <span class="pc-login__sep"> · </span>
@@ -214,6 +412,53 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
   margin-bottom: var(--space-8);
 }
 
+.pc-login__captcha {
+  margin-top: var(--space-14);
+}
+
+.pc-login__oauth {
+  margin-top: var(--space-14);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+.pc-login__oauth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pc-login__oauth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-3);
+}
+.pc-login__oauth-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+}
+.pc-login__oauth-btn {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--f-cond);
+  font-weight: 700;
+  font-size: var(--text-12);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--space-8) var(--space-10);
+  cursor: pointer;
+  border-radius: var(--radius-none);
+}
+.pc-login__oauth-btn:hover:not(:disabled) { background: var(--paper-3); }
+.pc-login__oauth-btn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
+.pc-login__oauth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .pc-login__foot {
   margin-top: var(--space-14);
   padding-top: var(--space-12);
@@ -241,4 +486,68 @@ const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { la
   color: var(--accent-link);
   font-weight: 600;
 }
+
+/* ───── MFA 二段 (P6) ───── */
+.pc-login__mfa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-14);
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  margin-bottom: var(--space-14);
+}
+.pc-login__mfa-prompt {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--text-11);
+  color: var(--ink-2);
+  letter-spacing: 0.04em;
+}
+.pc-login__mfa-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.pc-login__mfa-label {
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pc-login__mfa-input {
+  font-family: var(--f-mono);
+  font-size: var(--text-18);
+  letter-spacing: 0.4em;
+  text-align: center;
+  padding: var(--space-8) var(--space-10);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-none);
+  color: var(--ink);
+}
+.pc-login__mfa-input:focus { outline: none; box-shadow: var(--glow-accent-ring); }
+.pc-login__mfa-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-10);
+}
+.pc-login__mfa-btn {
+  font-family: var(--f-cond);
+  font-weight: 700;
+  font-size: var(--text-13);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--space-8) var(--space-16);
+  cursor: pointer;
+  border-radius: var(--radius-none);
+  border: 1.5px solid var(--ink);
+}
+.pc-login__mfa-btn--primary { background: var(--hilite); color: var(--ink); }
+.pc-login__mfa-btn--primary:hover:not(:disabled) { box-shadow: var(--glow-accent-md); }
+.pc-login__mfa-btn--ghost { background: var(--paper); color: var(--ink); }
+.pc-login__mfa-btn--ghost:hover { background: var(--paper-3); }
+.pc-login__mfa-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pc-login__mfa-btn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
 </style>

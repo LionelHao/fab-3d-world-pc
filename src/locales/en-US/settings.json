@@ -1,0 +1,75 @@
+{
+  "security": {
+    "chrome": {
+      "titleA": "ACCOUNT · ",
+      "titleB": "SECURITY",
+      "rightLabel": "Back"
+    },
+    "page": {
+      "title": "Account Security",
+      "subtitleA": "OPERATOR · SECURITY CENTER",
+      "subtitleB": "Devices · password · session audit"
+    },
+    "menu": {
+      "label": "Account Security"
+    },
+    "sessions": {
+      "num": "§ 02",
+      "name": "Active Devices",
+      "stamp": "SESSIONS",
+      "title": "Active Devices",
+      "current": "Current",
+      "revoke": "Revoke",
+      "revokeOthers": "Sign out other devices",
+      "confirmRevoke": "Revoke this device?",
+      "confirmRevokeOthers": "Sign out all other devices?",
+      "empty": "No other active devices",
+      "loading": "Loading · standby",
+      "revokeAria": "Revoke device {device}",
+      "revokeSuccess": "Device revoked",
+      "revokeOthersSuccess": "Other devices signed out",
+      "revokeFailed": "Revoke failed, please retry",
+      "loadFailed": "Failed to load devices",
+      "deviceWeb": "Web",
+      "deviceMobile": "Mobile",
+      "deviceDesktop": "Desktop",
+      "deviceUnknown": "Unknown",
+      "col": {
+        "device": "Device",
+        "ip": "IP",
+        "loginAt": "Login Time",
+        "lastActive": "Last Active",
+        "actions": "Actions"
+      }
+    },
+    "password": {
+      "num": "§ 01",
+      "name": "Change Password",
+      "stamp": "PASSWORD",
+      "title": "Change Password",
+      "change": "Change Password",
+      "open": "Change Password",
+      "oldLabel": "Current Password",
+      "oldPlaceholder": "Enter current password",
+      "oldHelperRequired": "Current password is required",
+      "newLabel": "New Password",
+      "newPlaceholder": "Min 8 chars, letters + digits",
+      "newHelperRequired": "New password is required",
+      "newHelperWeak": "Password is too weak",
+      "confirmLabel": "Confirm New Password",
+      "confirmPlaceholder": "Repeat new password",
+      "confirmHelperNoMatch": "Passwords do not match",
+      "submitCta": "Confirm Change",
+      "cancelCta": "Cancel",
+      "strengthLabel": "Strength",
+      "strengthWeak": "Weak",
+      "strengthFair": "Fair",
+      "strengthGood": "Good",
+      "strengthStrong": "Strong",
+      "success": "Password changed. All devices have been signed out — please sign in again.",
+      "mismatch": "Passwords do not match",
+      "submitFailed": "Change failed, please retry",
+      "sameAsOld": "New password must differ from current"
+    }
+  }
+}
