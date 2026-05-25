@@ -1,104 +1,118 @@
-import { defineStore } from 'pinia'
-
 /**
- * 用户鉴权 store —— PC Web 端登录态唯一来源
+ * stores/user — 用户登录态（PC 端）
  *
- * 命名空间：fab.pc.* (与 Web 端 fab.web.* 对齐)
- * 持久化：localStorage (token / user / expireAt)
+ * 命名空间：`fab.pc.*` localStorage key（与 Web 端 `fab.web.*` 同构）
+ *   - fab.pc.token     —— Sa-Token 值
+ *   - fab.pc.user      —— UserDto JSON（含 roles）
+ *   - fab.pc.expireAt  —— 绝对过期时间戳（ms）
  *
- * Spec：docs/user-auth-impl.md §1.1 + 总体方案 §5.4
- * 同源副本对齐：fab-3d-world-web/src/stores/user.js (NS 不同 / 字段一致)
+ * 旧 key 迁移：首次启动时把 `pc_token` / `pc_userInfo` 搬到新 key 后清除。
+ *
+ * **web + pc 各一份同源副本，命名空间常量 NS + 旧 key 名 不同**。
+ * 双端 getters / actions 字段对齐。
  */
+import { defineStore } from 'pinia'
 
 const NS = 'fab.pc'
 const KEY_TOKEN = `${NS}.token`
 const KEY_USER = `${NS}.user`
 const KEY_EXPIRE = `${NS}.expireAt`
 
-/**
- * 旧 key 兼容迁移（首次启动时执行一次）
- * 旧 pc_token / pc_userInfo (Phase 0 命名) → 新 fab.pc.* (P1 user-auth)
- */
+/** 首次启动迁移旧 key（无 expireAt → 置 0，下次请求会触发 refresh 验证） */
 function migrateLegacy() {
+  if (typeof localStorage === 'undefined') return
   const oldToken = localStorage.getItem('pc_token')
   const oldUser = localStorage.getItem('pc_userInfo')
   if (oldToken && !localStorage.getItem(KEY_TOKEN)) {
     localStorage.setItem(KEY_TOKEN, oldToken)
     if (oldUser) localStorage.setItem(KEY_USER, oldUser)
-    // 老数据无 expireAt，置 0 → 下一次请求由 refresh 拦截器接管验证
     localStorage.setItem(KEY_EXPIRE, '0')
   }
-  // 旧 key 清掉，避免堆积
+  // 不论搬没搬，旧 key 都清除（避免下次启动重复 migrate）
   localStorage.removeItem('pc_token')
   localStorage.removeItem('pc_userInfo')
 }
 migrateLegacy()
 
-function parseUser(raw) {
-  if (!raw) return null
+function parseUser() {
   try {
-    return JSON.parse(raw)
+    return JSON.parse(localStorage.getItem(KEY_USER) || 'null')
   } catch {
     return null
   }
 }
 
-function normalizeExpireAt(value) {
-  if (typeof value === 'number') return value
-  if (!value) return 0
-  const ts = new Date(value).getTime()
-  return Number.isFinite(ts) ? ts : 0
+function toMs(expireAt) {
+  if (typeof expireAt === 'number') return expireAt
+  if (!expireAt) return 0
+  const parsed = new Date(expireAt).getTime()
+  return Number.isNaN(parsed) ? 0 : parsed
+}
+
+/**
+ * 抽取用户的 role 列表 — 兼容 `user.roles[]` 新字段与 `user.role` 旧字符串字段。
+ * 旧字段（迁移期）：登录返回过 `{ role: 'creator' }` 这种 shape。
+ * 返回值：array of role code strings（可能为空数组）。
+ */
+function extractRoles(user) {
+  if (!user) return []
+  if (Array.isArray(user.roles)) return user.roles
+  if (typeof user.role === 'string' && user.role) return [user.role]
+  return []
 }
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     token: localStorage.getItem(KEY_TOKEN) || '',
     expireAt: Number(localStorage.getItem(KEY_EXPIRE)) || 0,
-    user: parseUser(localStorage.getItem(KEY_USER)),
+    user: parseUser(),
   }),
 
   getters: {
-    /**
-     * 已登录：有 token 且 (无 expireAt 或 expireAt 未过期)
-     * expireAt = 0 视作未知（迁移过来的老 token），允许通过 → 由 refresh 拦截器兜底
-     */
+    /** expireAt=0 视为未知（legacy），仍认为登录态有效，让 axios 拦截器去验证 */
     isLoggedIn: (s) => !!s.token && (!s.expireAt || s.expireAt > Date.now()),
-
-    /**
-     * 是否管理员：roles 包含 admin 或 super_admin
-     */
-    isAdmin: (s) =>
-      Array.isArray(s.user?.roles) &&
-      (s.user.roles.includes('admin') || s.user.roles.includes('super_admin')),
-
-    /**
-     * hasRole(roleCode) — 通用角色判断
-     */
-    hasRole: (s) => (role) => Array.isArray(s.user?.roles) && s.user.roles.includes(role),
-
+    /** 抽出 roles 数组（兼容 legacy `user.role` 单字符串字段） */
+    roles: (s) => extractRoles(s.user),
+    hasRole(s) {
+      return (role) => extractRoles(s.user).includes(role)
+    },
+    hasAnyRole(s) {
+      return (rolesArg) => {
+        if (!Array.isArray(rolesArg) || rolesArg.length === 0) return false
+        const owned = extractRoles(s.user)
+        return rolesArg.some((r) => owned.includes(r))
+      }
+    },
+    isAdmin: (s) => {
+      const owned = extractRoles(s.user)
+      return owned.includes('admin') || owned.includes('super_admin')
+    },
+    isSuperAdmin: (s) => extractRoles(s.user).includes('super_admin'),
+    isModerator: (s) => extractRoles(s.user).includes('moderator'),
+    isCreator: (s) => extractRoles(s.user).includes('creator'),
+    isVerifiedUser: (s) => extractRoles(s.user).includes('verified_user'),
     userId: (s) => s.user?.userId ?? s.user?.id ?? '',
-
     nickname: (s) => s.user?.nickname || s.user?.username || '',
   },
 
   actions: {
     login(token, user, expireAt) {
       this.token = token
-      this.user = user || null
-      this.expireAt = normalizeExpireAt(expireAt)
+      this.user = user
+      this.expireAt = toMs(expireAt)
       localStorage.setItem(KEY_TOKEN, token)
-      localStorage.setItem(KEY_USER, JSON.stringify(user || null))
+      localStorage.setItem(KEY_USER, JSON.stringify(user))
       localStorage.setItem(KEY_EXPIRE, String(this.expireAt))
     },
     updateToken(token, expireAt) {
       this.token = token
-      this.expireAt = normalizeExpireAt(expireAt)
+      this.expireAt = toMs(expireAt)
       localStorage.setItem(KEY_TOKEN, token)
       localStorage.setItem(KEY_EXPIRE, String(this.expireAt))
     },
     updateUser(user) {
-      this.user = user || null
-      localStorage.setItem(KEY_USER, JSON.stringify(user || null))
+      this.user = user
+      localStorage.setItem(KEY_USER, JSON.stringify(user))
     },
     logout() {
       this.token = ''

@@ -154,6 +154,37 @@ describe('stores/user — PC 端用户鉴权 (P1)', () => {
     expect(store.token).toBe('old-tok')
   })
 
+  it('hasAnyRole 判断任一角色匹配', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    store.login('tk', { userId: 1, roles: ['user', 'creator'] }, Date.now() + 3600_000)
+    expect(store.hasAnyRole(['admin', 'creator'])).toBe(true)
+    expect(store.hasAnyRole(['admin', 'super_admin'])).toBe(false)
+    expect(store.hasAnyRole([])).toBe(false)
+  })
+
+  it('isSuperAdmin / isModerator / isCreator / isVerifiedUser getters', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    store.login('tk', { userId: 1, roles: ['super_admin', 'moderator', 'creator', 'verified_user'] }, Date.now() + 3600_000)
+    expect(store.isSuperAdmin).toBe(true)
+    expect(store.isModerator).toBe(true)
+    expect(store.isCreator).toBe(true)
+    expect(store.isVerifiedUser).toBe(true)
+    store.logout()
+    store.login('tk', { userId: 1, roles: ['user'] }, Date.now() + 3600_000)
+    expect(store.isSuperAdmin).toBe(false)
+    expect(store.isModerator).toBe(false)
+  })
+
+  it('roles getter 兼容 legacy user.role 单字符串', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    store.login('tk', { userId: 1, role: 'creator' }, Date.now() + 3600_000)
+    expect(store.roles).toEqual(['creator'])
+    expect(store.isCreator).toBe(true)
+  })
+
   it('migrateLegacy 不覆盖已存在的 fab.pc.token', async () => {
     localStorage.setItem('pc_token', 'old-tok')
     localStorage.setItem('fab.pc.token', 'new-tok')
