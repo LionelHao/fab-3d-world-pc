@@ -93,6 +93,8 @@ export const useUserStore = defineStore('user', {
     isVerifiedUser: (s) => extractRoles(s.user).includes('verified_user'),
     userId: (s) => s.user?.userId ?? s.user?.id ?? '',
     nickname: (s) => s.user?.nickname || s.user?.username || '',
+    /** OAuth 绑定列表，登录响应 user.bindings 字段；无字段时空数组 */
+    bindings: (s) => (Array.isArray(s.user?.bindings) ? s.user.bindings : []),
   },
 
   actions: {
@@ -113,6 +115,13 @@ export const useUserStore = defineStore('user', {
     updateUser(user) {
       this.user = user
       localStorage.setItem(KEY_USER, JSON.stringify(user))
+    },
+    /** 仅刷新 user.bindings；user 为空时 noop（OAuth 绑定/解绑后调） */
+    setBindings(bindings) {
+      if (!this.user) return
+      const next = { ...this.user, bindings: Array.isArray(bindings) ? bindings : [] }
+      this.user = next
+      localStorage.setItem(KEY_USER, JSON.stringify(next))
     },
     logout() {
       this.token = ''

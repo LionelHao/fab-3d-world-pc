@@ -185,6 +185,44 @@ describe('stores/user — PC 端用户鉴权 (P1)', () => {
     expect(store.isCreator).toBe(true)
   })
 
+  it('bindings 默认空数组（无 user）', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    expect(store.bindings).toEqual([])
+  })
+
+  it('login 时 user.bindings 字段被透出到 bindings getter', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    const bindings = [{ provider: 'github', boundAt: '2026-05-01T00:00:00Z' }]
+    store.login('tk', { userId: 1, bindings }, Date.now() + 3600_000)
+    expect(store.bindings).toEqual(bindings)
+  })
+
+  it('login 时 user 无 bindings 字段则 bindings getter 返回 []', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    store.login('tk', { userId: 1, roles: ['user'] }, Date.now() + 3600_000)
+    expect(store.bindings).toEqual([])
+  })
+
+  it('setBindings 更新 user.bindings 并持久化', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    store.login('tk', { userId: 1, roles: ['user'] }, Date.now() + 3600_000)
+    const next = [{ provider: 'google', boundAt: '2026-05-25T10:00:00Z' }]
+    store.setBindings(next)
+    expect(store.bindings).toEqual(next)
+    expect(JSON.parse(localStorage.getItem('fab.pc.user')).bindings).toEqual(next)
+  })
+
+  it('setBindings 在 user 为 null 时安全 noop', async () => {
+    const useUserStore = await importStore()
+    const store = useUserStore()
+    store.setBindings([{ provider: 'x' }])
+    expect(store.bindings).toEqual([])
+  })
+
   it('migrateLegacy 不覆盖已存在的 fab.pc.token', async () => {
     localStorage.setItem('pc_token', 'old-tok')
     localStorage.setItem('fab.pc.token', 'new-tok')
