@@ -42,6 +42,8 @@ import {
   revokeOtherSessions,
   changePassword,
   logout,
+  oauthAuthorize,
+  oauthUnbind,
 } from '@/service/auth'
 import { useUserStore } from '@/stores/user'
 import { validatePassword, scorePassword, MIN_PASSWORD_LENGTH } from '@/utils/passwordPolicy'
@@ -200,6 +202,59 @@ async function submitPw() {
 }
 
 onMounted(refreshSessions)
+
+/* ───── OAuth 绑定区（P5） ─────
+ * 桌面 provider 集合（PC 不出 wechat-mp，per impl §0.3）。
+ * 绑定状态由 userStore.bindings 维护（user.bindings 字段，登录响应携带）。
+ */
+const OAUTH_PROVIDERS = ['google', 'github', 'apple']
+
+const oauthBusy = ref(null)
+
+const providerLabel = (id) => {
+  const key = id === 'wechat-mp' ? 'wechatMp' : id
+  return t(`auth.oauth.providers.${key}`)
+}
+
+const isProviderBound = (provider) => userStore.bindings.some((b) => b?.provider === provider)
+const providerBinding = (provider) => userStore.bindings.find((b) => b?.provider === provider) || null
+
+async function onBindStart(provider) {
+  if (oauthBusy.value) return
+  oauthBusy.value = provider
+  try {
+    const origin = (typeof window !== 'undefined' && window.location?.origin) || ''
+    // 把 action=bind 拼进 redirectUri，让回调路由识别为绑定流程
+    const redirectUri = `${origin}/oauth/callback/${provider}?action=bind`
+    const data = await oauthAuthorize(provider, { redirectUri })
+    if (data?.authorizeUrl) {
+      window.location.href = data.authorizeUrl
+      return
+    }
+    ElMessage.error(t('auth.oauth.bindStartFailed'))
+  } catch {
+    // 拦截器已 toast
+  } finally {
+    oauthBusy.value = null
+  }
+}
+
+async function onUnbind(provider) {
+  if (oauthBusy.value) return
+  oauthBusy.value = provider
+  try {
+    await oauthUnbind(provider)
+    const next = userStore.bindings.filter((b) => b?.provider !== provider)
+    userStore.setBindings(next)
+    ElMessage.success(
+      t('auth.oauth.unbindSuccess', { provider: providerLabel(provider) }),
+    )
+  } catch {
+    // 拦截器已 toast
+  } finally {
+    oauthBusy.value = null
+  }
+}
 </script>
 
 <template>
@@ -281,6 +336,62 @@ onMounted(refreshSessions)
               </template>
             </el-popconfirm>
           </div>
+        </div>
+      </section>
+
+      <!-- ───── § 03 OAuth 第三方账号绑定 (P5) ───── -->
+      <section class="ss-pc__card">
+        <header class="ss-pc__card-head">
+          <span class="ss-pc__card-num">§ 03</span>
+          <span class="ss-pc__card-name">{{ t('auth.oauth.title') }}</span>
+          <span class="ss-pc__card-stamp">OAUTH</span>
+        </header>
+        <div class="ss-pc__card-body">
+          <table class="ss-pc__oauth-table">
+            <tbody>
+              <tr
+                v-for="p in OAUTH_PROVIDERS"
+                :key="p"
+                :data-test="`oauth-row-${p}`"
+                class="ss-pc__oauth-row"
+              >
+                <td class="ss-pc__oauth-name">{{ providerLabel(p) }}</td>
+                <td class="ss-pc__oauth-state">
+                  <span v-if="isProviderBound(p)" class="ss-pc__oauth-pill ss-pc__oauth-pill--on">
+                    {{ t('auth.oauth.bound') }}
+                  </span>
+                  <span v-else class="ss-pc__oauth-pill">{{ t('auth.oauth.notBound') }}</span>
+                </td>
+                <td class="ss-pc__oauth-meta">
+                  <template v-if="providerBinding(p)?.boundAt">
+                    {{ t('auth.oauth.boundAt', { time: providerBinding(p).boundAt }) }}
+                  </template>
+                </td>
+                <td class="ss-pc__oauth-act">
+                  <button
+                    v-if="!isProviderBound(p)"
+                    type="button"
+                    class="ss-pc__oauth-btn"
+                    :disabled="oauthBusy === p"
+                    :data-test="`oauth-bind-${p}`"
+                    @click="onBindStart(p)"
+                  >
+                    {{ t('auth.oauth.bind') }}
+                  </button>
+                  <button
+                    v-else
+                    type="button"
+                    class="ss-pc__oauth-btn ss-pc__oauth-btn--danger"
+                    :disabled="oauthBusy === p"
+                    :data-test="`oauth-unbind-${p}`"
+                    @click="onUnbind(p)"
+                  >
+                    {{ t('auth.oauth.unbind') }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
@@ -462,6 +573,75 @@ onMounted(refreshSessions)
 }
 .ss-pc__danger-btn:hover { background: var(--paper-3); }
 .ss-pc__danger-btn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
+
+/* ───── OAuth 绑定区 (P5) ───── */
+.ss-pc__oauth-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ss-pc__oauth-row {
+  border-bottom: 1px dashed var(--ink-2);
+}
+.ss-pc__oauth-row:last-child { border-bottom: none; }
+.ss-pc__oauth-row > td {
+  padding: var(--space-10) var(--space-8);
+  vertical-align: middle;
+  font-family: var(--f-cond);
+  font-size: var(--text-13);
+  color: var(--ink);
+}
+.ss-pc__oauth-name {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  width: 30%;
+}
+.ss-pc__oauth-pill {
+  display: inline-block;
+  padding: 1px var(--space-6);
+  border: 1px solid var(--ink-2);
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-none);
+}
+.ss-pc__oauth-pill--on {
+  background: var(--hilite);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.ss-pc__oauth-meta {
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+.ss-pc__oauth-act {
+  text-align: right;
+  width: 120px;
+}
+.ss-pc__oauth-btn {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--f-cond);
+  font-weight: 700;
+  font-size: var(--text-12);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--space-6) var(--space-14);
+  cursor: pointer;
+  border-radius: var(--radius-none);
+}
+.ss-pc__oauth-btn:hover:not(:disabled) { background: var(--paper-3); }
+.ss-pc__oauth-btn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
+.ss-pc__oauth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ss-pc__oauth-btn--danger {
+  color: var(--semantic-warning);
+  border-color: var(--semantic-warning);
+}
 </style>
 
 <style>

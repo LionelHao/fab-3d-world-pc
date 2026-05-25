@@ -24,6 +24,8 @@ const revokeSessionMock = vi.fn()
 const revokeOtherSessionsMock = vi.fn()
 const changePasswordMock = vi.fn()
 const logoutMock = vi.fn()
+const oauthAuthorizeMock = vi.fn()
+const oauthUnbindMock = vi.fn()
 
 vi.mock('@/service/auth', () => ({
   listSessions: (...a) => listSessionsMock(...a),
@@ -31,6 +33,8 @@ vi.mock('@/service/auth', () => ({
   revokeOtherSessions: (...a) => revokeOtherSessionsMock(...a),
   changePassword: (...a) => changePasswordMock(...a),
   logout: (...a) => logoutMock(...a),
+  oauthAuthorize: (...a) => oauthAuthorizeMock(...a),
+  oauthUnbind: (...a) => oauthUnbindMock(...a),
 }))
 
 // Spy router.push via vue-router useRouter mock（vue-router 内部 push 不可枚举可写）
@@ -76,7 +80,8 @@ const i18n = createI18n({
 async function loadMessages() {
   const settings = (await import('@/locales/en-US/settings.json')).default
   const common = (await import('@/locales/en-US/common.json')).default
-  return { settings, common }
+  const auth = (await import('@/locales/en-US/auth.json')).default
+  return { settings, common, auth }
 }
 
 function makeRouter() {
@@ -128,6 +133,12 @@ describe('SettingsSecurity (PC, P3)', () => {
       { tokenValue: 'cur', deviceType: 'pc', ip: '1.1.1.1', userAgent: 'UA', loginAt: '2026-05-25T10:00:00Z', current: true },
       { tokenValue: 'other', deviceType: 'web', ip: '2.2.2.2', userAgent: 'UA2', loginAt: '2026-05-25T11:00:00Z', current: false },
     ])
+    revokeSessionMock.mockReset()
+    revokeOtherSessionsMock.mockReset()
+    changePasswordMock.mockReset()
+    logoutMock.mockReset()
+    oauthAuthorizeMock.mockReset()
+    oauthUnbindMock.mockReset()
     revokeSessionMock.mockResolvedValue({})
     revokeOtherSessionsMock.mockResolvedValue({})
     changePasswordMock.mockResolvedValue({})
@@ -137,7 +148,8 @@ describe('SettingsSecurity (PC, P3)', () => {
   it('mount 后调 listSessions 并渲染 2 行', async () => {
     const { w } = await mountView()
     expect(listSessionsMock).toHaveBeenCalledTimes(1)
-    expect(w.findAll('tbody tr').length).toBe(2)
+    // 仅看 PcSessionList 的 tbody（不含 OAuth 表）
+    expect(w.findAll('.pc-session-list__table tbody tr').length).toBe(2)
   })
 
   it('listSessions reject 时不崩，sessions=[]', async () => {
@@ -214,5 +226,77 @@ describe('SettingsSecurity (PC, P3)', () => {
     expect(elMessageSuccess).toHaveBeenCalled()
     expect(logoutMock).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/login')
+  })
+
+  /* ───────── OAuth 绑定区（P5） ───────── */
+
+  function presetUser(bindings = []) {
+    localStorage.setItem('fab.pc.token', 'tk')
+    localStorage.setItem('fab.pc.user', JSON.stringify({ userId: 1, roles: ['user'], bindings }))
+    localStorage.setItem('fab.pc.expireAt', String(Date.now() + 3600_000))
+  }
+
+  it('OAuth 区块渲染三 provider 行（google/github/apple）', async () => {
+    presetUser()
+    const { w } = await mountView()
+    expect(w.find('[data-test="oauth-row-google"]').exists()).toBe(true)
+    expect(w.find('[data-test="oauth-row-github"]').exists()).toBe(true)
+    expect(w.find('[data-test="oauth-row-apple"]').exists()).toBe(true)
+  })
+
+  it('未绑定 provider → 显示「Bind」按钮', async () => {
+    presetUser([])
+    const { w } = await mountView()
+    expect(w.find('[data-test="oauth-bind-google"]').exists()).toBe(true)
+    expect(w.find('[data-test="oauth-unbind-google"]').exists()).toBe(false)
+  })
+
+  it('已绑定 provider → 显示「Unbind」按钮', async () => {
+    presetUser([{ provider: 'github', boundAt: '2026-05-01T00:00:00Z' }])
+    const { w } = await mountView()
+    expect(w.find('[data-test="oauth-unbind-github"]').exists()).toBe(true)
+    expect(w.find('[data-test="oauth-bind-github"]').exists()).toBe(false)
+  })
+
+  it('点 Bind → 调 oauthAuthorize 并跳转到 authorizeUrl（action=bind 拼到 redirectUri）', async () => {
+    presetUser()
+    oauthAuthorizeMock.mockResolvedValueOnce({
+      authorizeUrl: 'https://accounts.google.com/...',
+      state: 'st',
+    })
+    const originalLocation = window.location
+    delete window.location
+    window.location = { origin: 'http://localhost', href: '' }
+    const { w } = await mountView()
+    await w.find('[data-test="oauth-bind-google"]').trigger('click')
+    await flushPromises()
+    expect(oauthAuthorizeMock).toHaveBeenCalledWith(
+      'google',
+      expect.objectContaining({
+        redirectUri: expect.stringContaining('action=bind'),
+      }),
+    )
+    expect(window.location.href).toBe('https://accounts.google.com/...')
+    window.location = originalLocation
+  })
+
+  it('点 Unbind happy → 调 oauthUnbind + 成功 toast + bindings 清掉该 provider', async () => {
+    presetUser([{ provider: 'github', boundAt: '2026-05-01T00:00:00Z' }])
+    oauthUnbindMock.mockResolvedValueOnce(null)
+    const { w } = await mountView()
+    // ElPopconfirm 包装的解绑按钮，data-test 在内层 button
+    await w.find('[data-test="oauth-unbind-github"]').trigger('click')
+    await flushPromises()
+    expect(oauthUnbindMock).toHaveBeenCalledWith('github')
+    expect(elMessageSuccess).toHaveBeenCalled()
+  })
+
+  it('解绑失败 → 不抛出（拦截器已 toast）', async () => {
+    presetUser([{ provider: 'github', boundAt: '2026-05-01T00:00:00Z' }])
+    oauthUnbindMock.mockRejectedValueOnce({ code: 422, message: 'fail' })
+    const { w } = await mountView()
+    await w.find('[data-test="oauth-unbind-github"]').trigger('click')
+    await flushPromises()
+    expect(oauthUnbindMock).toHaveBeenCalled()
   })
 })
