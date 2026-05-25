@@ -1,7 +1,8 @@
 # .wiki/ 索引 — fab-3d-world-pc
 # 协议见 ../../ARCHITECTURE.md §5 + ../../docs/wiki-migration-plan.md。
 
-last_ingested_sha: ""
+last_ingested_sha: "ae693f3553864757461b75f7809a06aec522ff31"
+# 首次全量 ingest 2026-05-25：user-auth P1-P6（PR #1, 29 commits merged）+ 前期 Phase 3-4 UI 重构。
 
 files:
   modules.md:
