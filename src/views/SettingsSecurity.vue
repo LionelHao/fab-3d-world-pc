@@ -35,6 +35,9 @@ import PcFooter from '@/components/PcFooter.vue'
 import UiPageTitle from '@/components/ui/UiPageTitle.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import PcSessionList from '@/components/settings/PcSessionList.vue'
+import MfaSetupDialog from '@/components/mfa/MfaSetupDialog.vue'
+import MfaDisableDialog from '@/components/mfa/MfaDisableDialog.vue'
+import MfaRecoveryRegenDialog from '@/components/mfa/MfaRecoveryRegenDialog.vue'
 
 import {
   listSessions,
@@ -45,6 +48,8 @@ import {
   oauthAuthorize,
   oauthUnbind,
 } from '@/service/auth'
+import { status as mfaStatus } from '@/service/mfa'
+import { listAlerts } from '@/service/security'
 import { useUserStore } from '@/stores/user'
 import { validatePassword, scorePassword, MIN_PASSWORD_LENGTH } from '@/utils/passwordPolicy'
 import {
@@ -255,6 +260,69 @@ async function onUnbind(provider) {
     oauthBusy.value = null
   }
 }
+
+/* ───── MFA 状态 + 对话框（P6） ───── */
+const mfaState = ref({ enabled: false, recoveryRemaining: 0 })
+const mfaSetupOpen = ref(false)
+const mfaDisableOpen = ref(false)
+const mfaRegenOpen = ref(false)
+
+async function refreshMfaStatus() {
+  try {
+    const data = await mfaStatus()
+    mfaState.value = {
+      enabled: !!data?.enabled,
+      recoveryRemaining: Number(data?.recoveryRemaining) || 0,
+    }
+  } catch {
+    // 拦截器已 toast；保留旧 state
+  }
+}
+
+function onMfaEnableClick() {
+  mfaSetupOpen.value = true
+}
+function onMfaDisableClick() {
+  mfaDisableOpen.value = true
+}
+function onMfaRegenClick() {
+  mfaRegenOpen.value = true
+}
+
+async function onMfaSetupFinish() {
+  mfaSetupOpen.value = false
+  await refreshMfaStatus()
+}
+async function onMfaDisabled() {
+  mfaDisableOpen.value = false
+  await refreshMfaStatus()
+}
+async function onMfaRegenerated() {
+  mfaRegenOpen.value = false
+  await refreshMfaStatus()
+}
+
+onMounted(refreshMfaStatus)
+
+/* ───── 安全预警（P6） ───── */
+const alerts = ref([])
+
+async function refreshAlerts() {
+  try {
+    const data = await listAlerts()
+    alerts.value = Array.isArray(data) ? data : []
+  } catch {
+    alerts.value = []
+  }
+}
+
+function ownershipLabel(o) {
+  return o === 'self'
+    ? t('auth.alerts.ownership.self')
+    : t('auth.alerts.ownership.unknown')
+}
+
+onMounted(refreshAlerts)
 </script>
 
 <template>
@@ -339,10 +407,103 @@ async function onUnbind(provider) {
         </div>
       </section>
 
-      <!-- ───── § 03 OAuth 第三方账号绑定 (P5) ───── -->
-      <section class="ss-pc__card">
+      <!-- ───── § 03 两步验证 (P6) ───── -->
+      <section class="ss-pc__card" data-test="mfa-card">
         <header class="ss-pc__card-head">
           <span class="ss-pc__card-num">§ 03</span>
+          <span class="ss-pc__card-name">{{ t('auth.mfa.title') }}</span>
+          <span class="ss-pc__card-stamp">MFA</span>
+        </header>
+        <div class="ss-pc__card-body">
+          <p class="ss-pc__hint">{{ t('auth.mfa.subtitle') }}</p>
+          <div class="ss-pc__mfa-status">
+            <span
+              class="ss-pc__mfa-pill"
+              :class="{ 'ss-pc__mfa-pill--on': mfaState.enabled }"
+              data-test="mfa-status-pill"
+            >
+              {{ mfaState.enabled ? t('auth.mfa.statusEnabled') : t('auth.mfa.statusDisabled') }}
+            </span>
+            <span v-if="mfaState.enabled" class="ss-pc__mfa-remaining">
+              {{ t('auth.mfa.recoveryRemaining', { n: mfaState.recoveryRemaining }) }}
+            </span>
+          </div>
+          <div class="ss-pc__cta">
+            <button
+              v-if="!mfaState.enabled"
+              type="button"
+              class="ss-pc__oauth-btn"
+              data-test="mfa-enable-btn"
+              @click="onMfaEnableClick"
+            >
+              {{ t('auth.mfa.setupStart') }}
+            </button>
+            <template v-else>
+              <button
+                type="button"
+                class="ss-pc__oauth-btn"
+                data-test="mfa-regen-btn"
+                @click="onMfaRegenClick"
+              >
+                {{ t('auth.mfa.regenerate') }}
+              </button>
+              <button
+                type="button"
+                class="ss-pc__oauth-btn ss-pc__oauth-btn--danger"
+                data-test="mfa-disable-btn"
+                @click="onMfaDisableClick"
+              >
+                {{ t('auth.mfa.disable') }}
+              </button>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───── § 04 登录与安全提醒 (P6) ───── -->
+      <section class="ss-pc__card" data-test="alerts-card">
+        <header class="ss-pc__card-head">
+          <span class="ss-pc__card-num">§ 04</span>
+          <span class="ss-pc__card-name">{{ t('auth.alerts.title') }}</span>
+          <span class="ss-pc__card-stamp">ALERTS</span>
+        </header>
+        <div class="ss-pc__card-body">
+          <p class="ss-pc__hint">{{ t('auth.alerts.subtitle') }}</p>
+          <div v-if="alerts.length === 0" data-test="alerts-empty" class="ss-pc__alerts-empty">
+            {{ t('auth.alerts.empty') }}
+          </div>
+          <table v-else class="ss-pc__alerts-table">
+            <thead>
+              <tr>
+                <th>{{ t('auth.alerts.columns.time') }}</th>
+                <th>{{ t('auth.alerts.columns.location') }}</th>
+                <th>{{ t('auth.alerts.columns.device') }}</th>
+                <th>{{ t('auth.alerts.columns.ip') }}</th>
+                <th>{{ t('auth.alerts.columns.ownership') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="a in alerts"
+                :key="a.id"
+                :data-test="`alert-row-${a.id}`"
+                class="ss-pc__alerts-row"
+              >
+                <td>{{ a.time }}</td>
+                <td>{{ a.location }}</td>
+                <td>{{ a.device }}</td>
+                <td>{{ a.ip }}</td>
+                <td>{{ ownershipLabel(a.ownership) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ───── § 05 OAuth 第三方账号绑定 (P5) ───── -->
+      <section class="ss-pc__card">
+        <header class="ss-pc__card-head">
+          <span class="ss-pc__card-num">§ 05</span>
           <span class="ss-pc__card-name">{{ t('auth.oauth.title') }}</span>
           <span class="ss-pc__card-stamp">OAUTH</span>
         </header>
@@ -397,6 +558,20 @@ async function onUnbind(provider) {
     </div>
 
     <PcFooter v-if="false" />
+
+    <!-- ───── MFA Dialogs (P6) ───── -->
+    <MfaSetupDialog
+      v-model="mfaSetupOpen"
+      @finish="onMfaSetupFinish"
+    />
+    <MfaDisableDialog
+      v-model="mfaDisableOpen"
+      @disabled="onMfaDisabled"
+    />
+    <MfaRecoveryRegenDialog
+      v-model="mfaRegenOpen"
+      @regenerated="onMfaRegenerated"
+    />
 
     <!-- ───── 修改密码 ElDialog ───── -->
     <el-dialog
@@ -641,6 +816,66 @@ async function onUnbind(provider) {
 .ss-pc__oauth-btn--danger {
   color: var(--semantic-warning);
   border-color: var(--semantic-warning);
+}
+
+/* ───── MFA 卡片 (P6) ───── */
+.ss-pc__mfa-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  margin-bottom: var(--space-10);
+}
+.ss-pc__mfa-pill {
+  display: inline-block;
+  padding: 1px var(--space-8);
+  border: 1px solid var(--ink-2);
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-none);
+}
+.ss-pc__mfa-pill--on {
+  background: var(--hilite);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.ss-pc__mfa-remaining {
+  font-family: var(--f-mono);
+  font-size: var(--text-11);
+  color: var(--ink-2);
+  letter-spacing: 0.04em;
+}
+
+/* ───── Alerts 表 (P6) ───── */
+.ss-pc__alerts-empty {
+  font-family: var(--f-mono);
+  font-size: var(--text-11);
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  padding: var(--space-12) 0;
+}
+.ss-pc__alerts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ss-pc__alerts-table th {
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--space-6) var(--space-8);
+  border-bottom: 1px solid var(--ink);
+}
+.ss-pc__alerts-row > td {
+  padding: var(--space-8);
+  font-family: var(--f-cond);
+  font-size: var(--text-12);
+  color: var(--ink);
+  border-bottom: 1px dashed var(--ink-2);
 }
 </style>
 

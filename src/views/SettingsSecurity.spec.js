@@ -26,6 +26,8 @@ const changePasswordMock = vi.fn()
 const logoutMock = vi.fn()
 const oauthAuthorizeMock = vi.fn()
 const oauthUnbindMock = vi.fn()
+const mfaStatusMock = vi.fn()
+const listAlertsMock = vi.fn()
 
 vi.mock('@/service/auth', () => ({
   listSessions: (...a) => listSessionsMock(...a),
@@ -35,6 +37,20 @@ vi.mock('@/service/auth', () => ({
   logout: (...a) => logoutMock(...a),
   oauthAuthorize: (...a) => oauthAuthorizeMock(...a),
   oauthUnbind: (...a) => oauthUnbindMock(...a),
+}))
+
+vi.mock('@/service/mfa', () => ({
+  setup: vi.fn(),
+  verifySetup: vi.fn(),
+  verify: vi.fn(),
+  disable: vi.fn(),
+  status: (...a) => mfaStatusMock(...a),
+  regenerateRecoveryCodes: vi.fn(),
+}))
+
+vi.mock('@/service/security', () => ({
+  listAlerts: (...a) => listAlertsMock(...a),
+  acknowledgeAlert: vi.fn(),
 }))
 
 // Spy router.push via vue-router useRouter mock（vue-router 内部 push 不可枚举可写）
@@ -139,10 +155,14 @@ describe('SettingsSecurity (PC, P3)', () => {
     logoutMock.mockReset()
     oauthAuthorizeMock.mockReset()
     oauthUnbindMock.mockReset()
+    mfaStatusMock.mockReset()
+    listAlertsMock.mockReset()
     revokeSessionMock.mockResolvedValue({})
     revokeOtherSessionsMock.mockResolvedValue({})
     changePasswordMock.mockResolvedValue({})
     logoutMock.mockResolvedValue({})
+    mfaStatusMock.mockResolvedValue({ enabled: false, recoveryRemaining: 0 })
+    listAlertsMock.mockResolvedValue([])
   })
 
   it('mount 后调 listSessions 并渲染 2 行', async () => {
@@ -298,5 +318,66 @@ describe('SettingsSecurity (PC, P3)', () => {
     await w.find('[data-test="oauth-unbind-github"]').trigger('click')
     await flushPromises()
     expect(oauthUnbindMock).toHaveBeenCalled()
+  })
+
+  /* ───────── MFA 卡片（P6） ───────── */
+
+  it('mount 后调 mfa.status() → enabled=false 渲染「开启」按钮', async () => {
+    mfaStatusMock.mockResolvedValueOnce({ enabled: false, recoveryRemaining: 0 })
+    const { w } = await mountView()
+    expect(mfaStatusMock).toHaveBeenCalledTimes(1)
+    expect(w.find('[data-test="mfa-enable-btn"]').exists()).toBe(true)
+    expect(w.find('[data-test="mfa-disable-btn"]').exists()).toBe(false)
+  })
+
+  it('mfa.status enabled=true → 渲染「禁用」+ 「重新生成恢复码」+ 剩余数', async () => {
+    mfaStatusMock.mockResolvedValueOnce({ enabled: true, recoveryRemaining: 7 })
+    const { w } = await mountView()
+    expect(w.find('[data-test="mfa-disable-btn"]').exists()).toBe(true)
+    expect(w.find('[data-test="mfa-regen-btn"]').exists()).toBe(true)
+    expect(w.text()).toContain('7')
+  })
+
+  it('点「开启」→ 打开 MfaSetupDialog', async () => {
+    mfaStatusMock.mockResolvedValueOnce({ enabled: false, recoveryRemaining: 0 })
+    const { w } = await mountView()
+    await w.find('[data-test="mfa-enable-btn"]').trigger('click')
+    await flushPromises()
+    expect(document.querySelector('[data-test="mfa-setup-dialog"]')).not.toBeNull()
+  })
+
+  it('点「禁用」→ 打开 MfaDisableDialog', async () => {
+    mfaStatusMock.mockResolvedValueOnce({ enabled: true, recoveryRemaining: 7 })
+    const { w } = await mountView()
+    await w.find('[data-test="mfa-disable-btn"]').trigger('click')
+    await flushPromises()
+    expect(document.querySelector('[data-test="mfa-disable-dialog"]')).not.toBeNull()
+  })
+
+  it('点「重新生成恢复码」→ 打开 MfaRecoveryRegenDialog', async () => {
+    mfaStatusMock.mockResolvedValueOnce({ enabled: true, recoveryRemaining: 7 })
+    const { w } = await mountView()
+    await w.find('[data-test="mfa-regen-btn"]').trigger('click')
+    await flushPromises()
+    expect(document.querySelector('[data-test="mfa-regen-dialog"]')).not.toBeNull()
+  })
+
+  /* ───────── 安全预警 cell（P6） ───────── */
+
+  it('mount 后调 listAlerts → 列表渲染或 empty', async () => {
+    listAlertsMock.mockResolvedValueOnce([])
+    const { w } = await mountView()
+    expect(listAlertsMock).toHaveBeenCalledTimes(1)
+    expect(w.find('[data-test="alerts-empty"]').exists()).toBe(true)
+  })
+
+  it('listAlerts 返回数据 → 表格渲染 N 行', async () => {
+    listAlertsMock.mockResolvedValueOnce([
+      { id: 'a1', time: '2026-05-25T10:00:00Z', location: '深圳', device: 'pc', ip: '1.1.1.1', ownership: 'self' },
+      { id: 'a2', time: '2026-05-25T11:00:00Z', location: '北京', device: 'web', ip: '2.2.2.2', ownership: 'unknown' },
+    ])
+    const { w } = await mountView()
+    const rows = w.findAll('[data-test^="alert-row-"]')
+    expect(rows.length).toBe(2)
   })
 })
