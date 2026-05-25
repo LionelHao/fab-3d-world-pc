@@ -64,3 +64,10 @@ export const oauthBind = (provider, params) =>
   axios.post(`/auth/oauth/${provider}/bind`, params)
 export const oauthUnbind = (provider) =>
   axios.delete(`/auth/oauth/${provider}`)
+
+/* ── 登录二段（P6 MFA） ──
+ * 一段密码登录返回 {requireMfa:true, mfaToken}，前端拿 mfaToken + 6 位 code
+ * 调下方端点完成登录；后端按签名校验 mfaToken 与 code，颁正式 token。
+ */
+export const loginMfaVerify = (mfaToken, code) =>
+  axios.post('/auth/login/mfa-verify', { mfaToken, code })

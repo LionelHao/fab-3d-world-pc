@@ -168,4 +168,19 @@ describe('service/auth — PC 认证域接口 (P1)', () => {
       code: 10301,
     })
   })
+
+  /* ── P6 MFA 登录二段 ── */
+  it('loginMfaVerify 调 POST /auth/login/mfa-verify 带 mfaToken + code', async () => {
+    mock.onPost('/auth/login/mfa-verify').reply((config) => {
+      expect(JSON.parse(config.data)).toEqual({ mfaToken: 'mfa-1', code: '123456' })
+      return [200, { code: 200, data: { token: 'final-tk', expireAt: Date.now() + 3600_000, user: { userId: 1 } } }]
+    })
+    const data = await auth.loginMfaVerify('mfa-1', '123456')
+    expect(data.token).toBe('final-tk')
+  })
+
+  it('loginMfaVerify 失败 10402 → reject', async () => {
+    mock.onPost('/auth/login/mfa-verify').reply(200, { code: 10402, message: 'invalid mfa code' })
+    await expect(auth.loginMfaVerify('mfa-1', '000000')).rejects.toMatchObject({ code: 10402 })
+  })
 })
