@@ -14,7 +14,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { loginByPassword } from '@/service/auth'
+import { loginByPassword, oauthAuthorize } from '@/service/auth'
 import { getUserInfo } from '@/service/user'
 import UiFormChrome from '@/components/ui/UiFormChrome.vue'
 import UiPageTitle from '@/components/ui/UiPageTitle.vue'
@@ -97,6 +97,33 @@ const onRegister = () => ElMessage.info(t('login.msg.registerContactOps'))
 const onBack = () => router.push('/home')
 const onFootLink = (label) => ElMessage.info(t('common.toast.notAvailable', { label }))
 const onForgot = () => router.push('/forgot-password')
+
+/* ───── OAuth (P5) — 桌面 provider 集合（PC 不出 wechat-mp，per impl §0.3）───── */
+const OAUTH_PROVIDERS = ['google', 'github', 'apple']
+const oauthBusy = ref(null)
+
+const providerLabel = (id) => {
+  const key = id === 'wechat-mp' ? 'wechatMp' : id
+  return t(`auth.oauth.providers.${key}`)
+}
+
+const startOAuth = async (provider) => {
+  if (oauthBusy.value) return
+  oauthBusy.value = provider
+  try {
+    const redirectUri = `${window.location.origin}/oauth/callback/${provider}`
+    const data = await oauthAuthorize(provider, { redirectUri })
+    if (data?.authorizeUrl) {
+      window.location.href = data.authorizeUrl
+      return
+    }
+    ElMessage.error(t('auth.oauth.bindStartFailed'))
+  } catch (err) {
+    if (!err?.code) ElMessage.error(t('auth.oauth.bindStartFailed'))
+  } finally {
+    oauthBusy.value = null
+  }
+}
 </script>
 
 <template>
@@ -179,6 +206,27 @@ const onForgot = () => router.push('/forgot-password')
           </UiButton>
         </div>
 
+        <div class="pc-login__oauth" data-test="oauth-block">
+          <div class="pc-login__oauth-divider">
+            <span class="pc-login__oauth-divider-line" />
+            <span class="pc-login__oauth-divider-label">{{ t('auth.oauth.divider') }}</span>
+            <span class="pc-login__oauth-divider-line" />
+          </div>
+          <div class="pc-login__oauth-list">
+            <button
+              v-for="p in OAUTH_PROVIDERS"
+              :key="p"
+              type="button"
+              class="pc-login__oauth-btn"
+              :disabled="oauthBusy === p"
+              :data-test="`oauth-btn-${p}`"
+              @click="startOAuth(p)"
+            >
+              {{ providerLabel(p) }}
+            </button>
+          </div>
+        </div>
+
         <div class="pc-login__foot">
           <span>
             <a href="#" data-testid="forgot-link" @click.prevent="onForgot">{{ t('login.foot.forgot') }}</a>
@@ -225,6 +273,49 @@ const onForgot = () => router.push('/forgot-password')
   margin-top: var(--space-14);
   margin-bottom: var(--space-8);
 }
+
+.pc-login__oauth {
+  margin-top: var(--space-14);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+.pc-login__oauth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: var(--f-mono);
+  font-size: var(--text-10);
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pc-login__oauth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-3);
+}
+.pc-login__oauth-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+}
+.pc-login__oauth-btn {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--f-cond);
+  font-weight: 700;
+  font-size: var(--text-12);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--space-8) var(--space-10);
+  cursor: pointer;
+  border-radius: var(--radius-none);
+}
+.pc-login__oauth-btn:hover:not(:disabled) { background: var(--paper-3); }
+.pc-login__oauth-btn:focus-visible { outline: none; box-shadow: var(--glow-accent-ring); }
+.pc-login__oauth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .pc-login__foot {
   margin-top: var(--space-14);
