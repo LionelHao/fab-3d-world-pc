@@ -28,6 +28,105 @@
     "createAlertMock": "新建手动告警",
     "ticketAction": "{id} · {action}",
     "loadOlderMock": "加载更早事件",
-    "viewAllTicketsMock": "查看全部 {total} 项工单"
+    "viewAllTicketsMock": "查看全部 {total} 项工单",
+    "loadFailed": "加载失败，请重试",
+    "banSuccess": "用户已封禁",
+    "unbanSuccess": "用户已解封",
+    "rolesUpdated": "角色已更新",
+    "sessionsRevoked": "已强制下线 {count} 个会话",
+    "reasonRequired": "原因不能为空",
+    "cannotDemoteSelf": "不能降级自己",
+    "rolesRequired": "至少保留一个角色"
+  },
+  "users": {
+    "title": "用户管理",
+    "search": "搜索用户名 / 手机 / 邮箱",
+    "filterStatus": "状态",
+    "filterRole": "角色",
+    "filterAll": "全部",
+    "statusNormal": "正常",
+    "statusBanned": "封禁",
+    "statusSuspended": "暂停",
+    "col": {
+      "username": "用户名",
+      "phone": "手机",
+      "email": "邮箱",
+      "status": "状态",
+      "roles": "角色",
+      "lastLogin": "最后登录",
+      "actions": "操作"
+    },
+    "detail": "详情",
+    "editRoles": "编辑角色",
+    "ban": "封禁",
+    "unban": "解封",
+    "revokeAll": "强制下线",
+    "confirmUnban": "确认解封用户「{name}」？",
+    "confirmRevokeAll": "确认强制下线用户「{name}」的全部会话？",
+    "empty": "暂无用户",
+    "banDialog": {
+      "title": "封禁用户 · {name}",
+      "reason": "原因（必填）",
+      "reasonPlaceholder": "请输入封禁原因",
+      "until": "截止时间",
+      "untilHelp": "留空表示永久封禁",
+      "submit": "提交封禁"
+    },
+    "rolesDialog": {
+      "title": "编辑角色 · {name}",
+      "help": "勾选授予的角色（super_admin 仅平台所有者可见）",
+      "submit": "保存角色"
+    },
+    "detailDialog": {
+      "title": "用户详情 · {name}",
+      "basic": "基本信息",
+      "userId": "用户 ID",
+      "createTime": "注册时间",
+      "lastLogin": "最后登录",
+      "activeSessions": "活跃会话",
+      "events": "最近登录事件",
+      "noEvents": "暂无事件"
+    }
+  },
+  "audit": {
+    "title": "登录审计",
+    "search": "查询",
+    "reset": "重置",
+    "filter": {
+      "userId": "用户 ID",
+      "type": "事件类型",
+      "from": "起始时间",
+      "to": "截止时间",
+      "device": "设备类型",
+      "failReason": "失败原因"
+    },
+    "col": {
+      "time": "时间",
+      "userId": "用户 ID",
+      "identifier": "标识",
+      "event": "事件",
+      "device": "设备",
+      "ip": "IP",
+      "ua": "UA",
+      "failReason": "失败原因"
+    },
+    "eventType": {
+      "LOGIN_SUCCESS": "登录成功",
+      "LOGIN_FAIL": "登录失败",
+      "PASSWORD_RESET": "密码重置",
+      "ACCOUNT_LOCKED": "账号锁定",
+      "BAN": "封禁",
+      "REFRESH": "刷新令牌",
+      "LOGOUT": "登出"
+    },
+    "empty": "暂无审计事件"
+  },
+  "roles": {
+    "user": "普通用户",
+    "verified_user": "已验证用户",
+    "creator": "创作者",
+    "moderator": "审核员",
+    "admin": "管理员",
+    "super_admin": "超级管理员"
   }
 }
