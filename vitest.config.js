@@ -18,6 +18,8 @@ export default mergeConfig(
           'src/router/**',
           'src/service/**',
           'src/components/admin/**',
+          'src/components/mfa/**',
+          'src/components/captcha/**',
           'src/views/Admin.vue',
           'src/views/SettingsSecurity.vue',
           'src/views/Login.vue',
