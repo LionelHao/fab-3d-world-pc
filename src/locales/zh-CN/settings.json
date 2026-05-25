@@ -1,0 +1,75 @@
+{
+  "security": {
+    "chrome": {
+      "titleA": "ACCOUNT · ",
+      "titleB": "SECURITY",
+      "rightLabel": "返回"
+    },
+    "page": {
+      "title": "账户安全",
+      "subtitleA": "OPERATOR · SECURITY CENTER",
+      "subtitleB": "设备 · 密码 · 会话审计"
+    },
+    "menu": {
+      "label": "账户安全"
+    },
+    "sessions": {
+      "num": "§ 02",
+      "name": "已登录设备",
+      "stamp": "SESSIONS",
+      "title": "已登录设备",
+      "current": "当前",
+      "revoke": "下线",
+      "revokeOthers": "下线其他设备",
+      "confirmRevoke": "确认下线该设备？",
+      "confirmRevokeOthers": "确认下线其他所有设备？",
+      "empty": "暂无其他活跃设备",
+      "loading": "加载中 · 待命",
+      "revokeAria": "下线设备 {device}",
+      "revokeSuccess": "设备已下线",
+      "revokeOthersSuccess": "已下线其他设备",
+      "revokeFailed": "下线失败，请稍后重试",
+      "loadFailed": "获取设备列表失败",
+      "deviceWeb": "网页",
+      "deviceMobile": "移动端",
+      "deviceDesktop": "桌面端",
+      "deviceUnknown": "未知设备",
+      "col": {
+        "device": "设备",
+        "ip": "IP",
+        "loginAt": "登录时间",
+        "lastActive": "最近活跃",
+        "actions": "操作"
+      }
+    },
+    "password": {
+      "num": "§ 01",
+      "name": "修改密码",
+      "stamp": "PASSWORD",
+      "title": "修改密码",
+      "change": "修改密码",
+      "open": "修改密码",
+      "oldLabel": "当前密码",
+      "oldPlaceholder": "请输入当前密码",
+      "oldHelperRequired": "请输入当前密码",
+      "newLabel": "新密码",
+      "newPlaceholder": "至少 8 位，含字母与数字",
+      "newHelperRequired": "请输入新密码",
+      "newHelperWeak": "密码强度不足",
+      "confirmLabel": "确认新密码",
+      "confirmPlaceholder": "再次输入新密码",
+      "confirmHelperNoMatch": "两次输入不一致",
+      "submitCta": "确认修改",
+      "cancelCta": "取消",
+      "strengthLabel": "强度",
+      "strengthWeak": "弱",
+      "strengthFair": "一般",
+      "strengthGood": "良好",
+      "strengthStrong": "强",
+      "success": "密码已修改，将退出全部设备，请重新登录",
+      "mismatch": "两次新密码不一致",
+      "submitFailed": "修改失败，请稍后重试",
+      "sameAsOld": "新密码不能与当前密码相同"
+    }
+  }
+}
