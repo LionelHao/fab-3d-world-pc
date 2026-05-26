@@ -1,0 +1,22 @@
+name: SDD Checks
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  anchor-shallow:
+    name: SDD anchor syntax (shallow)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate @spec / @capability anchor syntax
+        run: node scripts/sdd/check-anchors-shallow.mjs
+
+  # Full cross-validation requires the shared `docs/` in the parent local dir.
+  # Run locally before commit; PR template includes a checkbox.
