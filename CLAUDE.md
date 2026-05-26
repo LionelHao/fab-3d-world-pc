@@ -40,6 +40,48 @@
 
 ---
 
+## 0.5 SDD 协议（2026-05-26 起 mandatory）
+
+> 5 分钟版：`../docs/sdd/SDD-PROTOCOL.md`
+
+**改/加任何 views / service / store / components/admin 必须**：
+
+```vue
+<script setup>
+/**
+ * <短描述>
+ *
+ * @spec docs/design/<module>/01-architecture.md#<section>
+ * @capability <module>.<feature-slug>
+ * @ac AC-PX.Y
+ */
+import { ref } from 'vue'
+</script>
+```
+
+```js
+/**
+ * @spec docs/design/<module>/01-architecture.md#<section>
+ * @capability <module>.<feature-slug>
+ */
+import axios from '@/utils/axios'
+```
+
+**Admin / RBAC 改动额外**：
+- capability tier 必须 `critical`
+- 关联测试方法上方 `// @validates AC-P4.X`
+- 双层校验：前端 v-if 是 UX，服务端 role 校验是真边界
+
+**配套强制流**：
+- 新跨模块决策 → 开 ADR（`../docs/adr/_template.md`）
+- 新能力 → 建 capability yaml（`../docs/reference/capabilities/_template.md`）
+- PR 模板 §1 必填 Spec / Capability / AC 字段
+- CI 自动跑 `scripts/sdd/check-anchors-shallow.mjs`
+- 本地跑全检：`cd .. && node scripts/sdd/check-anchor-integrity.mjs --repo fab-3d-world-pc`
+- `npm run gen:api` 内置 breaking-change guard（Phase F）
+
+---
+
 ## 1. 编码核心要点
 
 > 完整 Vue 3 / Element Plus / 命名 / 安全 / 性能 → `.wiki/conventions.md`。
