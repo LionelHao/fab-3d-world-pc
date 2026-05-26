@@ -15,6 +15,10 @@
  *   - 接口拒绝 → toast 业务错误 + push /login?oauth_error=<code>
  *
  * UI：极简「Signing in…」占位，不做炫技 spinner（实际只显示 1~2s）。
+  * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#7
+ * @capability user-auth.oauth-binding
+ * @since P5
  */
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

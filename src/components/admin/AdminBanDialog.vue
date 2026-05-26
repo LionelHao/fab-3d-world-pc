@@ -6,6 +6,10 @@
  *
  * 行为：reason 必填 + untilAt 可选 ElDatePicker；submit emit('submit', { reason, untilAt }).
  * 父组件接 submit 调 banUser(id, body) 后再用 v-model:open=false 关闭。
+  * @spec docs/design/user-auth/01-architecture.md#5.3.3
+ * @spec docs/design/user-auth/01-architecture.md#8
+ * @capability user-auth.rbac-admin-ops
+ * @since P4
  */
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -7,6 +7,10 @@
  *
  * N 行 stream-row(grid ts / type / desc)。ts 末两位秒加粗；type 11 种配色；
  * desc 含 <b>/<em>/<n>/<crit> 经 parseRich segment 渲染（不用 v-html）。
+  * @spec docs/design/user-auth/01-architecture.md#5.3.3
+ * @spec docs/design/user-auth/01-architecture.md#8
+ * @capability user-auth.rbac-admin-ops
+ * @since P4
  */
 import { parseRich } from '@/utils/parseRich'
 

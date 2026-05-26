@@ -14,6 +14,11 @@
  *
  * 注：requestPasswordReset 仅触发后端发码（不返回 token），confirm 才真正重置。
  * 当前后端契约把 code 在 confirm 时校验，所以 STEP 2 在前端是「客户端格式校验」（6 位数字）。
+  * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#6.5
+ * @spec docs/design/user-auth/01-architecture.md#6.6
+ * @capability user-auth.password-reset-flow
+ * @since P2
  */
 import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'

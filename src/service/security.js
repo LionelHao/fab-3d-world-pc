@@ -9,6 +9,9 @@
  *   acknowledgeAlert(id)  POST /user/security/alerts/{id}/ack
  *
  * AlertEvent shape: { id, time, location, device, ip, ownership: 'self'|'unknown', userAgent? }
+  * @spec docs/design/user-auth/01-architecture.md#11
+ * @capability user-auth.mfa-totp
+ * @since P6
  */
 import axios from '../utils/axios'
 

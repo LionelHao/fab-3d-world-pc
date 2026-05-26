@@ -23,6 +23,36 @@
  *   oauthCallback(provider, payload)      POST /auth/oauth/{provider}/callback
  *   oauthBind(provider, payload)          POST /auth/oauth/{provider}/bind  (登录态)
  *   oauthUnbind(provider)                 DELETE /auth/oauth/{provider}    (登录态)
+  * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#6.1
+ * @spec docs/design/user-auth/01-architecture.md#6.2
+ * @spec docs/design/user-auth/01-architecture.md#6.3
+ * @spec docs/design/user-auth/01-architecture.md#6.4
+ * @spec docs/design/user-auth/01-architecture.md#6.5
+ * @spec docs/design/user-auth/01-architecture.md#6.6
+ * @spec docs/design/user-auth/01-architecture.md#6.8
+ * @capability user-auth.login-code
+ * @capability user-auth.login-password
+ * @capability user-auth.password-reset-flow
+ * @capability user-auth.session-management
+ * @capability user-auth.signup-phone-email
+ * @since P1, P2, P3
+  * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#6.1
+ * @spec docs/design/user-auth/01-architecture.md#6.2
+ * @spec docs/design/user-auth/01-architecture.md#6.3
+ * @spec docs/design/user-auth/01-architecture.md#6.4
+ * @spec docs/design/user-auth/01-architecture.md#6.5
+ * @spec docs/design/user-auth/01-architecture.md#6.6
+ * @spec docs/design/user-auth/01-architecture.md#6.8
+ * @spec docs/design/user-auth/01-architecture.md#7
+ * @capability user-auth.login-code
+ * @capability user-auth.login-password
+ * @capability user-auth.oauth-binding
+ * @capability user-auth.password-reset-flow
+ * @capability user-auth.session-management
+ * @capability user-auth.signup-phone-email
+ * @since P1, P2, P3, P5
  */
 import axios from '../utils/axios'
 

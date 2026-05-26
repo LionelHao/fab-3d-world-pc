@@ -9,6 +9,9 @@
  *   verify(payload)    POST /captcha/verify               ⇒ {ok}
  *
  * provider：'mock' | 'hcaptcha' | 'turnstile'（mock dev 友好；prod 走真 provider）
+  * @spec docs/design/user-auth/01-architecture.md#11
+ * @capability user-auth.mfa-totp
+ * @since P6
  */
 import axios from '../utils/axios'
 

@@ -4,6 +4,9 @@
  *
  * 通用「敏感操作前调」对话框：输入 6 位 TOTP code → POST /mfa/verify → emit verified
  * 父组件在 verified 钩里执行后续敏感动作（regenerate / view secret / ...）
+  * @spec docs/design/user-auth/01-architecture.md#11
+ * @capability user-auth.mfa-totp
+ * @since P6
  */
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

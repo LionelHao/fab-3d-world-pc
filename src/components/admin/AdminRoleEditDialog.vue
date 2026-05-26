@@ -8,6 +8,10 @@
  *   - 列出全部可选 role（与后端 RoleCode 枚举对齐），预选 user.roles
  *   - 校验：至少保留一个角色；不能给自己降 super_admin
  *   - submit → emit('submit', { add: [...], remove: [...] }) 计算 diff，父组件再调 setUserRoles(id, body)
+  * @spec docs/design/user-auth/01-architecture.md#5.3.3
+ * @spec docs/design/user-auth/01-architecture.md#8
+ * @capability user-auth.rbac-admin-ops
+ * @since P4
  */
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'

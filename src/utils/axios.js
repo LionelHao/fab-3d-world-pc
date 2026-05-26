@@ -12,6 +12,12 @@
  * - 响应：登录/注册/oauth callback 端点自动 store.login
  * - 响应：code 419 / 401 → logout + 跳 /login?from=...
  * - 错误：ElMessage.error 渲染 i18n auth.error.<code>
+  * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#6.2
+ * @spec docs/design/user-auth/01-architecture.md#6.8
+ * @capability user-auth.login-password
+ * @capability user-auth.session-management
+ * @since P1, P3
  */
 import axios from 'axios'
 import { ElMessage } from 'element-plus'

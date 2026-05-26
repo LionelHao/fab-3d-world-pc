@@ -17,6 +17,17 @@
  *
  * 不放进 Profile 视图（per spec §4.0 + 总体 §10.6）。
  * Paper-CAD token 严格使用；不出现硬编码色值 / 圆角 / 字号。
+  * @spec docs/design/user-auth/01-architecture.md#11
+ * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#6.5
+ * @spec docs/design/user-auth/01-architecture.md#6.6
+ * @spec docs/design/user-auth/01-architecture.md#6.8
+ * @spec docs/design/user-auth/01-architecture.md#7
+ * @capability user-auth.mfa-totp
+ * @capability user-auth.oauth-binding
+ * @capability user-auth.password-reset-flow
+ * @capability user-auth.session-management
+ * @since P2, P3, P5, P6
  */
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'

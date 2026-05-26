@@ -8,6 +8,15 @@
  *
  * 业务零修改: login() / getUserInfo() / userStore.login 保留（PC 为 username 登录）。
  * verify-code 走 mock 倒计时（无 SMS 后端），与移动端 Login 一致。
+  * @spec docs/design/user-auth/01-architecture.md#5.3.1
+ * @spec docs/design/user-auth/01-architecture.md#6.1
+ * @spec docs/design/user-auth/01-architecture.md#6.2
+ * @spec docs/design/user-auth/01-architecture.md#6.3
+ * @spec docs/design/user-auth/01-architecture.md#6.4
+ * @capability user-auth.login-code
+ * @capability user-auth.login-password
+ * @capability user-auth.signup-phone-email
+ * @since P1
  */
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'

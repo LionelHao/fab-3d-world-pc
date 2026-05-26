@@ -1,3 +1,11 @@
+/**
+ * SDD anchor.
+ *
+ * @spec docs/design/user-auth/01-architecture.md#5.3.3
+ * @spec docs/design/user-auth/01-architecture.md#8
+ * @capability user-auth.rbac-admin-ops
+ * @since P4
+ */
 import { createRouter, createWebHistory } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'

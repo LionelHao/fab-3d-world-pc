@@ -8,6 +8,9 @@
  *   - 'turnstile': 同 hcaptcha 占位
  *
  * Spec: docs/user-auth-impl.md §11 P6
+  * @spec docs/design/user-auth/01-architecture.md#11
+ * @capability user-auth.mfa-totp
+ * @since P6
  */
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -11,6 +11,9 @@
  *   disable(password, code)            POST /mfa/disable
  *   status()                           GET  /mfa/status           ⇒ {enabled, recoveryRemaining}
  *   regenerateRecoveryCodes(code)      POST /mfa/recovery-codes   ⇒ {recoveryCodes:[10]}
+  * @spec docs/design/user-auth/01-architecture.md#11
+ * @capability user-auth.mfa-totp
+ * @since P6
  */
 import axios from '../utils/axios'
 
