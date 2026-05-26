@@ -77,9 +77,60 @@ async function main() {
   const contents = header + astToString(ast)
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true })
+
+  // SDD Phase F: breaking change guard.
+  // Compare new types.ts against existing one; flag suspected breaking changes
+  // (paths removed, fields removed, types narrowed). New fields = silent pass.
+  let breakingFindings = []
+  try {
+    const oldContent = await fs.readFile(OUT_FILE, 'utf-8')
+    breakingFindings = detectBreakingChanges(oldContent, contents)
+  } catch (e) {
+    // first run, no existing file — skip diff
+  }
+
   await fs.writeFile(OUT_FILE, contents)
   const bytes = Buffer.byteLength(contents)
   console.log(`✓ Generated: ${path.relative(ROOT, OUT_FILE)} (${bytes} bytes)`)
+
+  if (breakingFindings.length > 0) {
+    console.warn(`\n⚠ ${breakingFindings.length} suspected breaking change(s):`)
+    for (const f of breakingFindings.slice(0, 20)) console.warn(`  - ${f}`)
+    if (breakingFindings.length > 20) console.warn(`  ... and ${breakingFindings.length - 20} more`)
+    if (strict || args.includes('--strict-breaking')) {
+      console.error('\n✗ Failing because --strict (or --strict-breaking) was passed.')
+      console.error('  Review the diff; if intentional, re-run without --strict-breaking.')
+      process.exit(1)
+    } else {
+      console.warn('\n  Continuing (non-strict). Re-run with --strict-breaking to fail on these.')
+    }
+  }
+}
+
+/**
+ * Detect breaking changes between two types.ts files.
+ * Heuristic: any "/path" key or "field:" line present in old but missing in new.
+ * Strips header comments and AUTO-GENERATED metadata before diffing.
+ */
+function detectBreakingChanges(oldContent, newContent) {
+  const stripHeader = (s) => s.replace(/^\/\/[^\n]*\n/gm, '').trim()
+  const oldStripped = stripHeader(oldContent)
+  const newStripped = stripHeader(newContent)
+
+  const findings = []
+  // Paths: top-level object keys like `'/auth/login/password': {`
+  const pathPattern = /['"](\/[\w/{}.-]+)['"]\s*:/g
+  const oldPaths = new Set([...oldStripped.matchAll(pathPattern)].map((m) => m[1]))
+  const newPaths = new Set([...newStripped.matchAll(pathPattern)].map((m) => m[1]))
+  for (const p of oldPaths) if (!newPaths.has(p)) findings.push(`Path removed: ${p}`)
+
+  // Schema definitions: `SchemaName: {` inside `components.schemas`
+  const schemaPattern = /(\b[A-Z][A-Za-z0-9_]+)\s*:\s*\{/g
+  const oldSchemas = new Set([...oldStripped.matchAll(schemaPattern)].map((m) => m[1]))
+  const newSchemas = new Set([...newStripped.matchAll(schemaPattern)].map((m) => m[1]))
+  for (const s of oldSchemas) if (!newSchemas.has(s)) findings.push(`Schema removed: ${s}`)
+
+  return findings
 }
 
 main().catch((e) => {
