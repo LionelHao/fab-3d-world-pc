@@ -1,3 +1,25 @@
+---
+id: user-auth.impl.pc
+type: impl-manual
+status: implemented
+owner: lionel
+version: v2
+ratified_at: 2026-05-25
+last_updated: 2026-05-25
+parent: ../docs/design/user-auth/01-architecture.md
+scope:
+  - fab-3d-world-pc
+capabilities:
+  - user-auth.signup-phone-email
+  - user-auth.login-password
+  - user-auth.login-code
+  - user-auth.password-reset-flow
+  - user-auth.session-management
+  - user-auth.oauth-binding
+  - user-auth.rbac-admin-ops
+  - user-auth.mfa-totp
+---
+
 # PC 端实施文档 — 登录认证（user-auth）
 
 > **Status**: Draft v2 · **Date**: 2026-05-25（v1 2026-05-24，v2 职责清晰化重写）· **Repo**: fab-3d-world-pc（桌面 + Ops Console）
